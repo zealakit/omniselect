@@ -9,6 +9,7 @@ export { default as Item } from "./item.svelte";
 export { default as ItemIndicator } from "./item-indicator.svelte";
 export { default as Label } from "./label.svelte";
 export { default as List } from "./list.svelte";
+export { default as LoadMore } from "./load-more.svelte";
 export { default as Popover } from "./popover.svelte";
 export { default as Root } from "./root.svelte";
 export { default as Trigger } from "./trigger.svelte";

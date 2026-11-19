@@ -262,6 +262,41 @@ select.getValue(); // ["apple"]
 
 使用 `Select.Input` 时，选择后默认会清空输入框并保持列表打开（`selectionBehavior="clear-input"`）。表单重置会恢复 `defaultValue`（受控时会以它调用 `onValueChange`）。通过隐藏字段触发的自动填充会把 key 映射回值，并忽略未知 key。
 
+### Async loading
+
+`Select.LoadMore` 是分页数据的哨兵元素。请把它放在 `Select.List` 的最后；当列表打开、`hasMore` 为 `true` 且 `isLoading` 为 `false` 时，它滚动进入视野（或键盘到达最后一项）就会调用 `onLoadMore`。库本身从不发起请求：请求、分页状态和防抖都由你负责。
+
+```ts
+const select = createSelect(root, {
+  onLoadMore: () => {
+    select.setLoadMore({ isLoading: true });
+    fetchPage().then((rows) => {
+      appendItems(rows);
+      select.setLoadMore({ isLoading: false, hasMore: rows.length > 0 });
+    });
+  },
+});
+
+select.setLoadMore({ hasMore: true });
+```
+
+### LoadMore props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `onLoadMore` | `() => void` | — | 获取下一页。需要在列表末尾放置 `[data-part="load-more"]` 哨兵元素。 |
+| `setLoadMore({ isLoading, hasMore })` | `(state) => void` | — | 报告页面状态；加载期间阻止重复请求。 |
+
+### Async hooks
+
+| Attribute | Where | Purpose |
+| --- | --- | --- |
+| `data-loading` | LoadMore | 正在加载一页。 |
+| `data-has-more` | LoadMore | 还有更多页。 |
+| `aria-busy` | List | 正在加载一页。 |
+
+`isLoading` 为 `true` 时会阻止重复请求。一页加载完成后若哨兵仍然可见（页面较短），无需再次滚动就会加载下一页。追加选项不会改变高亮、滚动位置或焦点。加载期间列表带有 `aria-busy`，`Empty` 会等到加载结束，live region 会播报进度（可用 `messages.loading` 和 `messages.loaded` 覆盖）。异步搜索时请组合 `filter={false}`、`onInputChange` 和 `LoadMore`；已选值通过 `itemToString` 保留标签。
+
 ### Notes
 
 - 选项在弹层挂载后才会注册。在打开之前，已选值没有标签：请传入 `itemToString`，或给 `Popover` 设置 `forceMount` 以保持选项处于注册状态（这也让 type-ahead 在关闭时可用）。
@@ -272,7 +307,7 @@ select.getValue(); // ["apple"]
 
 ## Status
 
-`NativeSelect`、`Select`（单选和多选，支持表单）以及 combobox 搜索已可用。异步加载将在后续版本提供，因此该包同样只导出下面的 Overlay 类型。
+`NativeSelect`、`Select`（单选、多选、表单）、combobox 搜索和异步加载（`Select.LoadMore`）已可用。该包同样导出下面的 Overlay 类型。
 
 | Export | From |
 | --- | --- |

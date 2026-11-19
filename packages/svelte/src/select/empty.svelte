@@ -8,7 +8,10 @@ let { children, ...rest }: Props = $props();
 const { machine, snapshot } = getSelectContext("Empty");
 const isEmpty = $derived.by(() => {
   void $snapshot;
-  return machine.collection.visible().length === 0;
+  // While a page is loading the list is not empty yet.
+  return (
+    machine.collection.visible().length === 0 && !machine.store.get().hasLoading
+  );
 });
 </script>
 

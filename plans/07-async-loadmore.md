@@ -1,6 +1,6 @@
 # Plan: `Select.LoadMore` — declarative async pagination
 
-Status: **proposal — not implemented**. Release target: **0.5.0** (additive).
+Status: **implemented**. Release target: **0.5.0** (additive).
 
 Order: **7 of 8**. Requires `06-multi-and-forms.md` (0.4.0 shipped).
 
@@ -109,3 +109,11 @@ adapter's `tests/setup.ts`:
 
 Virtualization/windowing, bidirectional (load-previous) pagination, built-in debouncing or
 fetching, caching.
+
+## 9. Implementation notes (decisions taken)
+
+- `inFlight` clears on `isLoading` true→false, or after `settleMs` (100 ms) if `isLoading` never turns `true` (instant loaders), which is also what makes a short page keep loading.
+- Re-measuring uses `unobserve()` + `observe()`, because `observe()` reports the current intersection again; the test mock reproduces that behavior.
+- Landing on the last item (or pressing past it) with ArrowDown/PageDown/End calls the sentinel's `request()`, so keyboard users never need the sentinel in view.
+- The live region now renders for every Select (not only multiple) unless `announce={false}`; `messages` gained `loading` and `loaded`.
+- Vanilla: the popover/list are plain markup, so pages are appended by the app; `setLoadMore()` reports state and `refresh()` (or the list's MutationObserver) re-reads items.

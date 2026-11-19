@@ -257,7 +257,7 @@ export const Root = defineComponent({
           ),
         );
       }
-      if (props.multiple && props.announce !== false) {
+      if (props.announce !== false) {
         out.push(
           h(
             "span",

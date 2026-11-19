@@ -14,6 +14,8 @@ import {
   runConformance,
   comboboxScenarios,
   formScenarios,
+  installIntersectionObserver,
+  loadMoreScenarios,
   multiScenarios,
   selectScenarios,
   withCallbacks,
@@ -35,9 +37,16 @@ const components = {
   item: Select.Item,
   itemIndicator: Select.ItemIndicator,
   empty: Select.Empty,
+  loadMore: Select.LoadMore,
 } as const;
 
-function build(node: PartNode, index: number): VNode | string | undefined {
+type Extra = { loadMore: Record<string, unknown>; onLoadMore: unknown };
+
+function build(
+  node: PartNode,
+  index: number,
+  extra: Extra,
+): VNode | string | undefined {
   if (node.part === "itemText") {
     return node.text;
   }
@@ -50,15 +59,16 @@ function build(node: PartNode, index: number): VNode | string | undefined {
   }
   const component = components[node.part as keyof typeof components];
   const children = node.children
-    ? () => node.children?.map(build)
+    ? () => node.children?.map((child, i) => build(child, i, extra))
     : () => node.text;
-  return h(
-    component as never,
-    { key: index, ...node.props },
-    { default: children },
-  );
+  const own =
+    node.part === "loadMore"
+      ? { ...extra.loadMore, onLoadMore: extra.onLoadMore }
+      : node.props;
+  return h(component as never, { key: index, ...own }, { default: children });
 }
 
+installIntersectionObserver();
 const mounted: VueWrapper[] = [];
 const settle = async () => {
   for (let i = 0; i < 3; i += 1) {
@@ -71,9 +81,17 @@ const driver: Driver = {
   mount(scenario: Scenario) {
     const calls: { name: string; args: unknown[] }[] = [];
     const rootProps = reactive<Record<string, unknown>>({});
+    const loadMore = reactive<Record<string, unknown>>({});
+    let onLoadMore: unknown;
     const apply = (props: Record<string, unknown>) => {
       for (const [key, value] of Object.entries(props)) {
-        rootProps[key === "value" ? "modelValue" : key] = value;
+        if (key === "loadMore") {
+          Object.assign(loadMore, value);
+        } else if (key === "onLoadMore") {
+          onLoadMore = value;
+        } else {
+          rootProps[key === "value" ? "modelValue" : key] = value;
+        }
       }
     };
     apply(withCallbacks(scenario, calls));
@@ -82,7 +100,12 @@ const driver: Driver = {
         const root = h(
           Select.Root as never,
           { ...rootProps },
-          { default: () => scenario.tree.map(build) },
+          {
+            default: () =>
+              scenario.tree.map((node, i) =>
+                build(node, i, { loadMore: { ...loadMore }, onLoadMore }),
+              ),
+          },
         );
         return h("div", null, [scenario.form ? h("form", null, [root]) : root]);
       },
@@ -120,3 +143,4 @@ runConformance("vue", driver, selectScenarios);
 runConformance("vue", driver, comboboxScenarios);
 runConformance("vue", driver, multiScenarios);
 runConformance("vue", driver, formScenarios);
+runConformance("vue", driver, loadMoreScenarios);

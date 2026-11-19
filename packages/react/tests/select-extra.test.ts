@@ -366,3 +366,67 @@ test("Value render function exposes items, remove, and clear for chips", async (
   await flush();
   assert.deepEqual(chips(), ["B"]);
 });
+
+test("LoadMore: highlight and scroll stay put when a page is appended", async () => {
+  const { installIntersectionObserver } = await import(
+    "../../core/tests/conformance/index.ts"
+  );
+  installIntersectionObserver();
+  const calls: string[] = [];
+  const view = (count: number) =>
+    h(
+      Select.Root as never,
+      {},
+      h(Select.Control, null, h(Select.Trigger, null, "t")),
+      h(
+        Select.Popover,
+        null,
+        h(
+          Select.List,
+          null,
+          ...Array.from({ length: count }, (_, i) =>
+            h(Select.Item as never, { key: i, value: `i${i}` }, `Item ${i}`),
+          ),
+          h(Select.LoadMore, {
+            isLoading: false,
+            hasMore: true,
+            onLoadMore: () => calls.push("load"),
+          }),
+        ),
+      ),
+    );
+  const scrolls: string[] = [];
+  const proto = window.HTMLElement.prototype as unknown as {
+    scrollIntoView?: () => void;
+  };
+  const original = proto.scrollIntoView;
+  proto.scrollIntoView = () => scrolls.push("scroll");
+  try {
+    const rendered = render(view(3));
+    const trigger = document.querySelector("[role=combobox]") as HTMLElement;
+    await act(async () => click(trigger));
+    await flush();
+    const item = document.querySelector(
+      '[role=option][id$="-item-i1"]',
+    ) as HTMLElement;
+    await act(async () =>
+      item.dispatchEvent(new window.Event("pointermove", { bubbles: true })),
+    );
+    await flush();
+    assert.equal(item.getAttribute("data-highlighted"), "");
+    const before = scrolls.length;
+    rendered.rerender(view(6));
+    await flush();
+    assert.equal(document.querySelectorAll("[role=option]").length, 6);
+    assert.equal(
+      (
+        document.querySelector('[role=option][id$="-item-i1"]') as HTMLElement
+      ).getAttribute("data-highlighted"),
+      "",
+      "the same item stays highlighted",
+    );
+    assert.equal(scrolls.length, before, "appending items does not scroll");
+  } finally {
+    proto.scrollIntoView = original;
+  }
+});

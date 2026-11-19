@@ -91,7 +91,11 @@ export const Empty = defineComponent({
     const { machine, version } = useSelectContext("Empty");
     return () => {
       version.value;
-      if (machine.collection.visible().length !== 0) {
+      // While a page is loading the list is not empty yet.
+      if (
+        machine.collection.visible().length !== 0 ||
+        machine.store.get().hasLoading
+      ) {
         return null;
       }
       return h(

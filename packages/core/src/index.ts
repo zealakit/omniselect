@@ -72,3 +72,10 @@ export {
 export { getPopoverVars, type PopoverVars } from "./popover-vars.js";
 export { checkStructure } from "./structure.js";
 export { hiddenSelectKeys, visuallyHiddenStyle } from "./form.js";
+export {
+  createLoadMoreGuard,
+  findScrollParent,
+  type LoadMoreGuard,
+  type LoadMoreGuardOptions,
+  type LoadMoreState,
+} from "./pagination.js";

@@ -254,7 +254,7 @@ export function Root<T>(props: SelectRootProps<T>) {
           focusField={focusField}
         />
       ) : null}
-      {multiple && announce !== false ? <LiveRegion machine={machine} /> : null}
+      {announce !== false ? <LiveRegion machine={machine} /> : null}
     </SelectContext.Provider>
   );
 }

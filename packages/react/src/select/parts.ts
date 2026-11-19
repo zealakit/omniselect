@@ -7,6 +7,7 @@ export { Input } from "./input.js";
 export { Item, ItemIndicator } from "./item.js";
 export { Label } from "./label.js";
 export { List } from "./list.js";
+export { LoadMore } from "./load-more.js";
 export { Popover } from "./popover.js";
 export { Root } from "./root.js";
 export { Trigger } from "./trigger.js";

@@ -290,6 +290,41 @@ Việc lọc không phân biệt dấu và hoa thường. Các item bị lọc v
 
 Với `Select.Input`, mỗi lần chọn sẽ xóa input và giữ danh sách mở theo mặc định (`selectionBehavior="clear-input"`). Reset form khôi phục `defaultValue` (chế độ điều khiển: gọi `onValueChange` với giá trị đó). Autofill qua trường ẩn sẽ ánh xạ key về giá trị và bỏ qua key không rõ.
 
+### Async loading
+
+`Select.LoadMore` là phần tử canh cho dữ liệu phân trang. Đặt nó cuối cùng trong `Select.List`; nó gọi `onLoadMore` khi cuộn tới (hoặc khi bàn phím chạm item cuối) trong lúc danh sách mở, `hasMore` là `true` và `isLoading` là `false`. Thư viện không bao giờ tự fetch: bạn tự quản lý request, trạng thái trang và debounce.
+
+```svelte
+<Select.List>
+  {#each items as item (item.id)}
+    <Select.Item value={item.id}>{item.name}</Select.Item>
+  {/each}
+  <Select.LoadMore isLoading={isFetching} hasMore={hasNextPage} onLoadMore={fetchNextPage}>
+    Loading…
+  </Select.LoadMore>
+</Select.List>
+```
+
+### LoadMore props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `isLoading` | `boolean` | **required** | Một trang đang được tải. |
+| `hasMore` | `boolean` | **required** | Còn trang tiếp theo. |
+| `onLoadMore` | `() => void` | **required** | Tải trang tiếp theo. |
+| `rootMargin` | `string` | `"0px 0px 64px 0px"` | Khoảng tải trước quanh vùng cuộn. |
+| `...div props` | — | — | Được chuyển tiếp tới phần tử canh, vốn có `aria-hidden`. |
+
+### Async hooks
+
+| Attribute | Where | Purpose |
+| --- | --- | --- |
+| `data-loading` | LoadMore | Một trang đang tải. |
+| `data-has-more` | LoadMore | Còn trang tiếp theo. |
+| `aria-busy` | List | Một trang đang tải. |
+
+Request trùng lặp bị chặn khi `isLoading` là `true`. Khi một trang tải xong mà phần tử canh vẫn đang hiển thị (trang ngắn), trang tiếp theo sẽ tải mà không cần cuộn thêm. Các item được thêm vào mà không làm đổi highlight, vị trí cuộn hay focus. List có `aria-busy` khi đang tải, `Empty` chờ đến khi tải xong, và live region thông báo tiến trình (ghi đè bằng `messages.loading` và `messages.loaded`). Với tìm kiếm bất đồng bộ, hãy kết hợp `filter={false}`, `onInputChange` và `LoadMore`; các giá trị đã chọn giữ nhãn nhờ `itemToString`.
+
 ### Notes
 
 - Các item đăng ký khi popover được mount. Trước khi mở, giá trị đã chọn chưa có nhãn: hãy truyền `itemToString`, hoặc đặt `forceMount` cho `Popover` để giữ các item được đăng ký (cách này cũng cho phép type-ahead hoạt động khi đang đóng).
@@ -299,7 +334,7 @@ Với `Select.Input`, mỗi lần chọn sẽ xóa input và giữ danh sách m�
 
 ## Status
 
-`NativeSelect`, `Select` (chọn một và chọn nhiều, có hỗ trợ form) và tìm kiếm combobox đã sẵn sàng. Tải bất đồng bộ sẽ có ở bản release sau, nên package cũng chỉ export các type của Overlay bên dưới.
+`NativeSelect`, `Select` (chọn một, chọn nhiều, form), tìm kiếm combobox và tải bất đồng bộ (`Select.LoadMore`) đã sẵn sàng. Package cũng export các type của Overlay bên dưới.
 
 | Export | From |
 | --- | --- |

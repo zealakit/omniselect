@@ -1,7 +1,9 @@
 import {
   type Attrs,
+  createLoadMoreGuard,
   createSelectMachine,
   type FilterFn,
+  findScrollParent,
   getPopoverVars,
   nextId,
   type SelectCloseReason,
@@ -47,6 +49,8 @@ export type SelectOptions = {
   matchWidth?: boolean;
   /** Where the popover is moved while open. `null` keeps it in place. Default `document.body`. */
   portal?: Element | null;
+  /** Called when the next page should be fetched (needs a `[data-part="load-more"]` sentinel in the list). */
+  onLoadMore?: () => void;
   /** Accessible name of the Clear button. Default "Clear selection". */
   clearLabel?: string;
   /** Used when a `[data-part="input"]` is present. */
@@ -71,6 +75,8 @@ export type SelectHandle = {
   open: () => void;
   close: () => void;
   /** Re-read items and groups after you changed the markup. */
+  /** Tell the select whether a page is loading and whether more pages exist. */
+  setLoadMore: (state: { isLoading?: boolean; hasMore?: boolean }) => void;
   refresh: () => void;
   destroy: () => void;
 };
@@ -254,7 +260,9 @@ export function createSelect(
       clearEl.hidden = machine.selection.isEmpty(state.value);
     }
     if (empty) {
-      empty.hidden = machine.collection.visible().length !== 0;
+      // While a page is loading the list is not empty yet.
+      empty.hidden =
+        machine.collection.visible().length !== 0 || state.hasLoading;
       empty.setAttribute("role", "presentation");
     }
     for (const el of itemElements()) {
@@ -377,7 +385,7 @@ export function createSelect(
     owner?.addEventListener("reset", onReset);
     offReset = () => owner?.removeEventListener("reset", onReset);
   }
-  if (options.multiple && options.announce !== false) {
+  if (options.announce !== false) {
     live = document.createElement("span");
     live.setAttribute("data-part", "live-region");
     live.setAttribute("role", "status");
@@ -403,7 +411,69 @@ export function createSelect(
     }
   };
 
-  const unsubscribe = machine.store.subscribe(render);
+  // Async pagination: a sentinel element, a duplicate-request guard, and an observer.
+  const sentinel = list.querySelector<HTMLElement>('[data-part="load-more"]');
+  const guard = createLoadMoreGuard();
+  let loadState = { isLoading: false, hasMore: false };
+  let sentinelObserver: IntersectionObserver | null = null;
+  const syncGuard = () =>
+    guard.sync({
+      open: machine.isOpen(),
+      hasMore: loadState.hasMore,
+      isLoading: loadState.isLoading,
+      onLoadMore: () => options.onLoadMore?.(),
+    });
+  let offLoadMore = () => {};
+  if (sentinel) {
+    sentinel.setAttribute("aria-hidden", "true");
+    offLoadMore = machine.registerLoadMore({ request: () => guard.request() });
+  }
+  const observeSentinel = () => {
+    sentinelObserver?.disconnect();
+    sentinelObserver = null;
+    if (
+      !sentinel ||
+      !machine.isOpen() ||
+      typeof IntersectionObserver === "undefined"
+    ) {
+      return;
+    }
+    sentinelObserver = new IntersectionObserver(
+      (entries) => {
+        const last = entries[entries.length - 1];
+        if (last) guard.setIntersecting(last.isIntersecting);
+      },
+      {
+        root: findScrollParent(sentinel, popover),
+        rootMargin: "0px 0px 64px 0px",
+      },
+    );
+    sentinelObserver.observe(sentinel);
+  };
+  // observe() reports the current state again: loads the next page when the sentinel is still visible.
+  const remeasure = () => {
+    if (sentinelObserver && sentinel && !loadState.isLoading) {
+      sentinelObserver.unobserve(sentinel);
+      sentinelObserver.observe(sentinel);
+    }
+  };
+  let wasOpen = machine.isOpen();
+  const renderLoad = () => {
+    if (sentinel) {
+      toggleAttr(sentinel, "data-loading", loadState.isLoading);
+      toggleAttr(sentinel, "data-has-more", loadState.hasMore);
+    }
+    if (machine.isOpen() !== wasOpen) {
+      wasOpen = machine.isOpen();
+      observeSentinel();
+    }
+    syncGuard();
+  };
+
+  const unsubscribe = machine.store.subscribe(() => {
+    render();
+    renderLoad();
+  });
   const offCollection = machine.collection.subscribe(render);
 
   const onTriggerClick = () => {
@@ -510,6 +580,7 @@ export function createSelect(
 
   registerItems();
   render();
+  renderLoad();
   if (options.defaultOpen) {
     machine.open("imperative", "selected");
   }
@@ -525,6 +596,15 @@ export function createSelect(
     refresh() {
       registerItems();
       render();
+      remeasure();
+    },
+    setLoadMore(next) {
+      loadState = { ...loadState, ...next };
+      if (next.isLoading !== undefined) {
+        machine.setLoading(loadState.isLoading);
+      }
+      renderLoad();
+      remeasure();
     },
     destroy() {
       observer?.disconnect();
@@ -547,6 +627,10 @@ export function createSelect(
       inputEl?.removeEventListener("click", onInputClick);
       inputEl?.removeEventListener("blur", onInputBlur);
       offInput();
+      observer?.disconnect();
+      sentinelObserver?.disconnect();
+      offLoadMore();
+      guard.destroy();
       offReset();
       hidden?.remove();
       live?.remove();

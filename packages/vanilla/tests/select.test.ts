@@ -12,11 +12,15 @@ import {
   runConformance,
   comboboxScenarios,
   formScenarios,
+  installIntersectionObserver,
+  loadMoreScenarios,
   multiScenarios,
   selectScenarios,
   withCallbacks,
 } from "../../core/tests/conformance/index.ts";
 import { createSelect } from "../dist/select/index.js";
+
+installIntersectionObserver();
 
 const tags: Record<string, string> = {
   label: "span",
@@ -33,6 +37,7 @@ const tags: Record<string, string> = {
   item: "div",
   itemIndicator: "span",
   empty: "div",
+  loadMore: "div",
   outside: "button",
 };
 
@@ -101,12 +106,18 @@ const driver: Driver = {
       onValueChange: log("onValueChange"),
       onOpenChange: log("onOpenChange"),
       onInputChange: log("onInputChange"),
+      onLoadMore: log("onLoadMore"),
       filter: props.filter as false | undefined,
       openOnFocus: props.openOnFocus as boolean | undefined,
       openOnInput: props.openOnInput as boolean | undefined,
       selectionBehavior: props.selectionBehavior as never,
       autoHighlight: props.autoHighlight as boolean | undefined,
     });
+    if (props.loadMore) {
+      handle.setLoadMore(
+        props.loadMore as { isLoading?: boolean; hasMore?: boolean },
+      );
+    }
     return {
       query(ref) {
         const element = querySelectPart(host, ref);
@@ -118,7 +129,14 @@ const driver: Driver = {
       },
       async act(step) {
         if (step.type === "setProps") {
-          throw new Error("vanilla has no controlled props");
+          if (!step.props.loadMore) {
+            throw new Error("vanilla has no controlled props");
+          }
+          handle.setLoadMore(
+            step.props.loadMore as { isLoading?: boolean; hasMore?: boolean },
+          );
+          await new Promise((resolve) => setTimeout(resolve, 0));
+          return;
         }
         performSelectDomStep(host, step);
         await new Promise((resolve) => setTimeout(resolve, 0));
@@ -151,3 +169,4 @@ runConformance("vanilla", driver, selectScenarios);
 runConformance("vanilla", driver, comboboxScenarios);
 runConformance("vanilla", driver, multiScenarios);
 runConformance("vanilla", driver, formScenarios);
+runConformance("vanilla", driver, loadMoreScenarios);

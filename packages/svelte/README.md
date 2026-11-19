@@ -290,6 +290,41 @@ Setting `name` (or `required`) adds a visually hidden native `<select>` inside t
 
 With `Select.Input`, a pick clears the input and keeps the list open by default (`selectionBehavior="clear-input"`). Form reset restores `defaultValue` (controlled: it calls `onValueChange` with it). Autofill through the hidden field maps keys back to values and ignores unknown keys.
 
+### Async loading
+
+`Select.LoadMore` is a sentinel for paginated data. Put it last inside `Select.List`; it calls `onLoadMore` when it scrolls into view (or when the keyboard reaches the last item) while the list is open, `hasMore` is `true`, and `isLoading` is `false`. The library never fetches: you own the request, the page state, and any debouncing.
+
+```svelte
+<Select.List>
+  {#each items as item (item.id)}
+    <Select.Item value={item.id}>{item.name}</Select.Item>
+  {/each}
+  <Select.LoadMore isLoading={isFetching} hasMore={hasNextPage} onLoadMore={fetchNextPage}>
+    Loading…
+  </Select.LoadMore>
+</Select.List>
+```
+
+### LoadMore props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `isLoading` | `boolean` | **required** | A page is being fetched. |
+| `hasMore` | `boolean` | **required** | More pages exist. |
+| `onLoadMore` | `() => void` | **required** | Fetch the next page. |
+| `rootMargin` | `string` | `"0px 0px 64px 0px"` | Prefetch distance around the scroll container. |
+| `...div props` | — | — | Forwarded to the sentinel, which is `aria-hidden`. |
+
+### Async hooks
+
+| Attribute | Where | Purpose |
+| --- | --- | --- |
+| `data-loading` | LoadMore | A page is loading. |
+| `data-has-more` | LoadMore | More pages exist. |
+| `aria-busy` | List | A page is loading. |
+
+Duplicate requests are blocked while `isLoading` is `true`. When a page finishes and the sentinel is still visible (a short page), the next page loads without another scroll. Items append without moving the highlight, the scroll position, or focus. The list gets `aria-busy` while loading, `Empty` waits until loading ends, and a live region announces progress (override with `messages.loading` and `messages.loaded`). For async search, combine `filter={false}` with `onInputChange` and `LoadMore`; selected values keep their labels through `itemToString`.
+
 ### Notes
 
 - Items register while the popover is mounted. Until it opens, a selected value has no label: pass `itemToString`, or set `forceMount` on `Popover` to keep the items registered (this also lets type-ahead work while closed).
@@ -299,7 +334,7 @@ With `Select.Input`, a pick clears the input and keeps the list open by default 
 
 ## Status
 
-`NativeSelect`, `Select` (single and multiple, with forms), and combobox search are available. Async loading lands in a later release, so the package also exports only the Overlay types below.
+`NativeSelect`, `Select` (single, multiple, forms), combobox search, and async loading (`Select.LoadMore`) are available. The package also exports the Overlay types below.
 
 | Export | From |
 | --- | --- |

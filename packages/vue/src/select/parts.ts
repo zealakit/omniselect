@@ -2,6 +2,7 @@ export { Clear } from "./clear.js";
 export { Group, GroupLabel } from "./group.js";
 export { Input } from "./input.js";
 export { Item, ItemIndicator } from "./item.js";
+export { LoadMore } from "./load-more.js";
 export { Popover } from "./popover.js";
 export { Root } from "./root.js";
 export { Control, Empty, Indicator, Label, List } from "./simple.js";

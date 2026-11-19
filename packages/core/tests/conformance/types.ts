@@ -47,7 +47,7 @@ export type Step =
   | { type: "select"; target: PartRef; values: string[] }
   | { type: "invalid"; target: PartRef }
   | { type: "setProps"; props: Record<string, unknown> }
-  | { type: "intersect"; target: PartRef }
+  | { type: "intersect"; target: PartRef; value?: boolean }
   | { type: "resolveLoad" }
   | { type: "submitForm" }
   | { type: "resetForm" }

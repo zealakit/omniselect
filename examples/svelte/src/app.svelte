@@ -11,6 +11,51 @@ const fruits: Fruit[] = [
 ];
 let fruit = $state<Fruit | null>(null);
 let submitted = $state("");
+const ALL = Array.from({ length: 87 }, (_, i) => `Item ${i + 1}`);
+const PAGE = 10;
+let query = $state("");
+let asyncItems = $state<string[]>([]);
+let page = $state(0);
+let more = $state(true);
+let loading = $state(false);
+let requestId = 0;
+function fetchPage(
+  q: string,
+  p: number,
+): Promise<{ rows: string[]; more: boolean }> {
+  const all = ALL.filter((name) =>
+    name.toLowerCase().includes(q.toLowerCase()),
+  );
+  return new Promise((resolve) =>
+    setTimeout(
+      () =>
+        resolve({
+          rows: all.slice(p * PAGE, (p + 1) * PAGE),
+          more: (p + 1) * PAGE < all.length,
+        }),
+      300,
+    ),
+  );
+}
+function load(q: string, p: number) {
+  const id = ++requestId;
+  loading = true;
+  void fetchPage(q, p).then(({ rows, more: hasMore }) => {
+    if (id !== requestId) return;
+    asyncItems = p === 0 ? rows : [...asyncItems, ...rows];
+    page = p;
+    more = hasMore;
+    loading = false;
+  });
+}
+load("", 0);
+let timer: ReturnType<typeof setTimeout> | undefined;
+function onInputChange(text: string, reason: string) {
+  if (reason !== "input") return;
+  query = text;
+  clearTimeout(timer);
+  timer = setTimeout(() => load(text, 0), 250);
+}
 let fruitName = $state<string | null>("apple");
 const names = ["apple", "banana", "cherry", "date"];
 
@@ -107,6 +152,27 @@ function onSubmit(event: SubmitEvent) {
           {#each names as name (name)}
             <Select.Item value={name}>{name}</Select.Item>
           {/each}
+        </Select.List>
+      </Select.Popover>
+    </Select.Root>
+  </div>
+  <h2>Async search with LoadMore</h2>
+  <div class="field">
+    <Select.Root filter={false} itemToString={(value: string) => value} {onInputChange}>
+      <Select.Label>Async search</Select.Label>
+      <Select.Control>
+        <span class="select-control">
+          <Select.Input placeholder="Search 87 items" />
+          <Select.Trigger><Select.Indicator>▾</Select.Indicator></Select.Trigger>
+        </span>
+      </Select.Control>
+      <Select.Popover>
+        <Select.List>
+          {#each asyncItems as name (name)}
+            <Select.Item value={name}>{name}</Select.Item>
+          {/each}
+          <Select.Empty>No results</Select.Empty>
+          <Select.LoadMore isLoading={loading} hasMore={more} onLoadMore={() => load(query, page + 1)}>Loading…</Select.LoadMore>
         </Select.List>
       </Select.Popover>
     </Select.Root>

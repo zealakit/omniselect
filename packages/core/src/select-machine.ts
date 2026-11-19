@@ -43,11 +43,17 @@ export type SelectMessages = {
   added: (label: string, count: number) => string;
   /** Announced when a value is removed in multiple mode. */
   removed: (label: string, count: number) => string;
+  /** Announced when a page starts loading. */
+  loading: () => string;
+  /** Announced when a page finished loading. */
+  loaded: (count: number) => string;
 };
 
 export const defaultMessages: SelectMessages = {
   added: (label, count) => `${label} added, ${count} selected`,
   removed: (label, count) => `${label} removed, ${count} selected`,
+  loading: () => "Loading more results",
+  loaded: (count) => `${count} results`,
 };
 
 export type SelectHighlightSource = "keyboard" | "pointer";
@@ -213,6 +219,8 @@ export type SelectMachine<T> = {
   /** Called by `Select.Clear` while mounted. */
   registerClear: () => () => void;
   setLoading: (loading: boolean) => void;
+  /** Called by `Select.LoadMore` while mounted; `request` loads the next page without the sentinel. */
+  registerLoadMore: (handle: { request: () => boolean }) => () => void;
   attrs: {
     trigger: () => Attrs;
     list: () => Attrs;
@@ -469,6 +477,14 @@ export function createSelectMachine<T>(
       }
     }
     return null;
+  };
+
+  let loadMore: { request: () => boolean } | null = null;
+  /** Landing on the last item (or pressing past it) asks for the next page. */
+  const reachEnd = (target: string | null): void => {
+    if (loadMore && target !== null && target === last(visibleNav())) {
+      loadMore.request();
+    }
   };
 
   let pendingScheduled = false;
@@ -818,6 +834,7 @@ export function createSelectMachine<T>(
       const from = state.highlightedKey;
       const extend = (target: string | null) => {
         machine.highlight(target);
+        reachEnd(target);
         if (
           multiple &&
           event.shiftKey &&
@@ -852,12 +869,18 @@ export function createSelectMachine<T>(
         case "Home":
           machine.highlight(first(nav));
           return handled;
-        case "End":
-          machine.highlight(last(nav));
+        case "End": {
+          const target = last(nav);
+          machine.highlight(target);
+          reachEnd(target);
           return handled;
-        case "PageDown":
-          machine.highlight(pageDown(nav, from));
+        }
+        case "PageDown": {
+          const target = pageDown(nav, from);
+          machine.highlight(target);
+          reachEnd(target);
           return handled;
+        }
         case "PageUp":
           machine.highlight(pageUp(nav, from));
           return handled;
@@ -964,18 +987,24 @@ export function createSelectMachine<T>(
       }
       const from = state.highlightedKey;
       switch (key) {
-        case "ArrowDown":
-          machine.highlight(next(nav, from, { wrap: props.loop }));
+        case "ArrowDown": {
+          const target = next(nav, from, { wrap: props.loop });
+          machine.highlight(target);
+          reachEnd(target);
           return handled;
+        }
         case "ArrowUp":
           if (event.altKey) {
             return none;
           }
           machine.highlight(prev(nav, from, { wrap: props.loop }));
           return handled;
-        case "PageDown":
-          machine.highlight(pageDown(nav, from));
+        case "PageDown": {
+          const target = pageDown(nav, from);
+          machine.highlight(target);
+          reachEnd(target);
           return handled;
+        }
         case "PageUp":
           machine.highlight(pageUp(nav, from));
           return handled;
@@ -1029,7 +1058,23 @@ export function createSelectMachine<T>(
       return () => store.set({ hasClear: false });
     },
     setLoading(loading) {
+      const was = store.get().hasLoading;
       store.set({ hasLoading: loading });
+      if (props.announce && was !== loading) {
+        store.set({
+          announcement: loading
+            ? props.messages.loading()
+            : props.messages.loaded(collection.visible().length),
+        });
+      }
+    },
+    registerLoadMore(handle) {
+      loadMore = handle;
+      return () => {
+        if (loadMore === handle) {
+          loadMore = null;
+        }
+      };
     },
     attrs: {
       root: () => ({
@@ -1103,6 +1148,7 @@ export function createSelectMachine<T>(
         tabindex: "-1",
         "aria-labelledby": ids.label,
         "aria-multiselectable": multiple ? "true" : undefined,
+        "aria-busy": store.get().hasLoading ? "true" : undefined,
         "data-state": store.get().open ? "open" : "closed",
       }),
       item: (key) => {

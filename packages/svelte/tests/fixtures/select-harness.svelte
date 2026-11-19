@@ -18,8 +18,19 @@ let {
 } = $props();
 let rootProps = $state.raw(initial);
 export function setRootProps(next: Record<string, unknown>) {
-  rootProps = { ...rootProps, ...next };
+  const loadMore = next.loadMore
+    ? { ...(rootProps.loadMore as object), ...(next.loadMore as object) }
+    : rootProps.loadMore;
+  rootProps = { ...rootProps, ...next, loadMore };
 }
+const root = $derived.by(() => {
+  const { loadMore: _a, onLoadMore: _b, ...rest } = rootProps;
+  return rest;
+});
+const loadMoreProps = $derived({
+  ...((rootProps.loadMore as object) ?? {}),
+  onLoadMore: rootProps.onLoadMore,
+});
 </script>
 
 {#snippet kids(node: Node)}
@@ -46,12 +57,13 @@ export function setRootProps(next: Record<string, unknown>) {
   {:else if node.part === "groupLabel"}<Select.GroupLabel {...node.props}>{@render kids(node)}</Select.GroupLabel>
   {:else if node.part === "item"}<Select.Item {...(node.props as any)}>{@render kids(node)}</Select.Item>
   {:else if node.part === "itemIndicator"}<Select.ItemIndicator {...node.props}>{@render kids(node)}</Select.ItemIndicator>
+  {:else if node.part === "loadMore"}<Select.LoadMore {...(loadMoreProps as any)}>{@render kids(node)}</Select.LoadMore>
   {:else if node.part === "empty"}<Select.Empty {...node.props}>{@render kids(node)}</Select.Empty>
   {/if}
 {/snippet}
 
 {#snippet body()}
-  <Select.Root {...rootProps}>
+  <Select.Root {...root}>
     {#each tree as node}{@render render(node)}{/each}
   </Select.Root>
 {/snippet}

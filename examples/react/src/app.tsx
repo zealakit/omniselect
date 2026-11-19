@@ -1,5 +1,6 @@
 import { NativeSelect } from "@zealakit/omniselect-react/native";
 import { Select } from "@zealakit/omniselect-react/select";
+import { AsyncSelect } from "./async-select";
 import { type FormEvent, useState } from "react";
 
 type Fruit = { id: number; name: string };
@@ -149,6 +150,10 @@ export function App() {
             </Select.List>
           </Select.Popover>
         </Select.Root>
+      </div>
+      <h2>Async search with LoadMore</h2>
+      <div className="field">
+        <AsyncSelect />
       </div>
     </main>
   );

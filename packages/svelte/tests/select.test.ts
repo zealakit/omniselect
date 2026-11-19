@@ -8,11 +8,15 @@ import {
   runConformance,
   comboboxScenarios,
   formScenarios,
+  installIntersectionObserver,
+  loadMoreScenarios,
   multiScenarios,
   selectScenarios,
   withCallbacks,
 } from "../../core/tests/conformance/index.ts";
 import Harness from "./fixtures/select-harness.svelte";
+
+installIntersectionObserver();
 
 const settle = async () => {
   for (let i = 0; i < 3; i += 1) {
@@ -61,3 +65,4 @@ runConformance("svelte", driver, selectScenarios);
 runConformance("svelte", driver, comboboxScenarios);
 runConformance("svelte", driver, multiScenarios);
 runConformance("svelte", driver, formScenarios);
+runConformance("svelte", driver, loadMoreScenarios);

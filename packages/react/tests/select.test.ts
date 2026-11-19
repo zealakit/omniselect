@@ -14,6 +14,8 @@ import {
   runConformance,
   comboboxScenarios,
   formScenarios,
+  installIntersectionObserver,
+  loadMoreScenarios,
   multiScenarios,
   selectScenarios,
   withCallbacks,
@@ -35,9 +37,12 @@ const components = {
   item: Select.Item,
   itemIndicator: Select.ItemIndicator,
   empty: Select.Empty,
+  loadMore: Select.LoadMore,
 } as const;
 
-function build(node: PartNode, index: number): ReactNode {
+type Extra = { loadMore: Record<string, unknown>; onLoadMore: unknown };
+
+function build(node: PartNode, index: number, extra: Extra): ReactNode {
   if (node.part === "itemText") {
     return node.text;
   }
@@ -50,12 +55,18 @@ function build(node: PartNode, index: number): ReactNode {
   }
   const component = components[node.part as keyof typeof components];
   const children = node.children
-    ? node.children.map(build)
+    ? node.children.map((child, i) => build(child, i, extra))
     : node.text !== undefined
       ? [node.text]
       : [];
-  return h(component as never, { key: index, ...node.props }, ...children);
+  const own =
+    node.part === "loadMore"
+      ? { ...extra.loadMore, onLoadMore: extra.onLoadMore }
+      : node.props;
+  return h(component as never, { key: index, ...own }, ...children);
 }
+
+installIntersectionObserver();
 
 const flush = async () => {
   await act(async () => {
@@ -68,7 +79,19 @@ const driver: Driver = {
     const calls: { name: string; args: unknown[] }[] = [];
     let props = withCallbacks(scenario, calls);
     const tree = (): ReactElement => {
-      const root = h(Select.Root as never, props, ...scenario.tree.map(build));
+      const { onLoadMore, loadMore, ...rootProps } = props as Record<
+        string,
+        unknown
+      >;
+      const extra: Extra = {
+        loadMore: (loadMore ?? {}) as Record<string, unknown>,
+        onLoadMore,
+      };
+      const root = h(
+        Select.Root as never,
+        rootProps,
+        ...scenario.tree.map((node, i) => build(node, i, extra)),
+      );
       return h("div", null, scenario.form ? h("form", null, root) : root);
     };
     const view = render(tree());
@@ -78,7 +101,14 @@ const driver: Driver = {
       async act(step) {
         await act(async () => {
           if (step.type === "setProps") {
-            props = { ...props, ...step.props };
+            const next = { ...step.props } as Record<string, unknown>;
+            if (next.loadMore) {
+              next.loadMore = {
+                ...((props as Record<string, unknown>).loadMore as object),
+                ...(next.loadMore as object),
+              };
+            }
+            props = { ...props, ...next };
             view.rerender(tree());
           } else {
             performSelectDomStep(container, step);
@@ -100,3 +130,4 @@ runConformance("react", driver, selectScenarios);
 runConformance("react", driver, comboboxScenarios);
 runConformance("react", driver, multiScenarios);
 runConformance("react", driver, formScenarios);
+runConformance("react", driver, loadMoreScenarios);

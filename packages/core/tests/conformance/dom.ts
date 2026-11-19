@@ -1,3 +1,4 @@
+import { MockIntersectionObserver } from "../support/intersection-observer.ts";
 import type { PartRef, Scenario } from "./types.ts";
 
 /** Native-select part lookup shared by every adapter driver. */
@@ -222,6 +223,16 @@ export function performSelectDomStep(
         pointer(target, "pointerup");
         target.dispatchEvent(
           new window.MouseEvent("click", { bubbles: true, cancelable: true }),
+        );
+      }
+      return true;
+    }
+    case "intersect": {
+      const target = find(step.target as string);
+      if (target) {
+        MockIntersectionObserver.setIntersecting(
+          target,
+          (step.value as boolean | undefined) ?? true,
         );
       }
       return true;

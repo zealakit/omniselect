@@ -8,10 +8,12 @@ export type SelectEmptyProps = HTMLAttributes<HTMLDivElement>;
 export const Empty = forwardRef<HTMLDivElement, SelectEmptyProps>(
   function SelectEmpty(props, ref) {
     const { machine } = useSelectContext("Empty");
-    const count = useSnapshot(machine, (m) =>
-      String(m.collection.visible().length),
+    const count = useSnapshot(
+      machine,
+      (m) => `${m.collection.visible().length}|${m.store.get().hasLoading}`,
     );
-    if (count !== "0") {
+    // While a page is loading the list is not empty yet.
+    if (count !== "0|false") {
       return null;
     }
     return <div data-part="empty" {...props} role="presentation" ref={ref} />;

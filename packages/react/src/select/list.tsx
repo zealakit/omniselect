@@ -8,7 +8,7 @@ export type SelectListProps = HTMLAttributes<HTMLDivElement>;
 export const List = forwardRef<HTMLDivElement, SelectListProps>(
   function SelectList(props, ref) {
     const { machine } = useSelectContext("List");
-    useSnapshot(machine, (m) => String(m.isOpen()));
+    useSnapshot(machine, (m) => `${m.isOpen()}|${m.store.get().hasLoading}`);
     return (
       <div
         data-part="list"

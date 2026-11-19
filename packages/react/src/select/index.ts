@@ -10,6 +10,7 @@ export type { SelectInputProps } from "./input.js";
 export type { SelectItemIndicatorProps, SelectItemProps } from "./item.js";
 export type { SelectLabelProps } from "./label.js";
 export type { SelectListProps } from "./list.js";
+export type { SelectLoadMoreProps } from "./load-more.js";
 export type { SelectPopoverProps } from "./popover.js";
 export type {
   SelectMultipleProps,

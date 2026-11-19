@@ -291,6 +291,6 @@ $effect(() => {
     {/each}
   </select>
 {/if}
-{#if multiple && announce !== false}
+{#if announce !== false}
   <span data-part="live-region" role="status" aria-live="polite" aria-atomic="true" style={hiddenStyle}>{announcement}</span>
 {/if}
