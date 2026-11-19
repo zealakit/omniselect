@@ -1,0 +1,31 @@
+---
+description: Zealakit Omniselect monorepo conventions — package boundaries, Overlay dependency, SSR safety, build order
+alwaysApply: true
+---
+
+# Zealakit Omniselect conventions
+
+- `@zealakit/omniselect-core` is framework-independent and has zero runtime dependencies. It
+  never imports React / Vue / Svelte or Overlay.
+- Adapters (`vanilla`, `react`, `vue`, `svelte`) depend on core with `workspace:^` and on the
+  published `@zealakit/overlay-<same framework>`; core depends on no adapter. Keep the graph
+  acyclic.
+- Floating UI, layers, dismissal, focus, and portal come only from `@zealakit/overlay-<fw>` via
+  its public exports. Never copy Overlay code, import `@zealakit/overlay-core` or
+  `@floating-ui/*`, or deep-import Overlay's `dist`.
+- SSR safety: no `window` / `document` access at module init or during render. Use framework
+  lifecycle hooks for DOM effects.
+- Do not ship default CSS or a styling system. Styling is the consumer's job (`data-*` hooks OK).
+- New behavior ships with focused tests (`pnpm test`). Do not add a second test framework.
+- Do not export unimplemented APIs or placeholder components.
+- TypeScript only: `type` aliases, `import type`, strict mode, ESM. Files are `kebab-case`.
+- Build order matters: core emits `dist` first; adapters resolve core through its package
+  exports. Run `pnpm build` before `pnpm typecheck`.
+- Verify with `pnpm check` (build + typecheck + test + lint) before reporting work as done.
+- `examples/` are integration/smoke-test projects only. Product documentation lives only in the
+  root and package READMEs (EN, VI, CN); there is no `docs/` folder and no separate docs app.
+- Load `.agents/skills/omniselect/SKILL.md` before code, test, docs, or release work, and
+  `.agents/skills/readme-system/SKILL.md` before touching any README. Run
+  `pnpm readme:check` after README changes.
+- Update the READMEs, `.agents/AGENTS.md`, and `.agents/skills/omniselect/SKILL.md` together when
+  architecture, package boundaries, commands, or documented workflows change.

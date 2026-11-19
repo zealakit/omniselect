@@ -1,0 +1,73 @@
+{
+  "name": "@zealakit/omniselect-vue",
+  "version": "0.0.0",
+  "description": "Accessible, headless Select and Combobox primitives for Vue.",
+  "keywords": [
+    "select",
+    "combobox",
+    "listbox",
+    "multiselect",
+    "autocomplete",
+    "headless",
+    "zealakit",
+    "vue",
+    "vue3",
+    "composable"
+  ],
+  "author": "nqhed - Huy Ed. Nguyen",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zealakit/omniselect.git",
+    "directory": "packages/vue"
+  },
+  "homepage": "https://github.com/zealakit/omniselect#readme",
+  "bugs": {
+    "url": "https://github.com/zealakit/omniselect/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@zealakit/omniselect-core": "workspace:^",
+    "@zealakit/overlay-vue": "^1.0.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@vue/test-utils": "^2.6.0",
+    "happy-dom": "^21.0.4",
+    "vue": "^3.5.45"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tests/tsconfig.json --noEmit",
+    "test": "pnpm build && node --import ./tests/setup.ts --test tests/*.test.ts",
+    "test:watch": "node --import ./tests/setup.ts --test --watch tests/*.test.ts",
+    "clean": "rm -rf dist",
+    "prepack": "pnpm run build"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Zealakit Omniselect">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="300" y="190" width="600" height="72" rx="12" fill="#0b1220" stroke="#475569" stroke-width="2"/>
+  <text x="332" y="236" font-family="Inter, system-ui, sans-serif" font-size="28" fill="#cbd5e1">Select an option</text>
+  <path d="M846 216l14 14 14-14" fill="none" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="300" y="278" width="600" height="190" rx="12" fill="#0b1220" stroke="#475569" stroke-width="2"/>
+  <rect x="312" y="290" width="576" height="48" rx="8" fill="#2563eb" fill-opacity="0.25"/>
+  <text x="332" y="323" font-family="Inter, system-ui, sans-serif" font-size="26" fill="#e2e8f0">Apple</text>
+  <path d="M846 314l8 8 16-18" fill="none" stroke="#60a5fa" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="332" y="381" font-family="Inter, system-ui, sans-serif" font-size="26" fill="#94a3b8">Banana</text>
+  <text x="332" y="433" font-family="Inter, system-ui, sans-serif" font-size="26" fill="#94a3b8">Cherry</text>
+  <text x="600" y="115" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="56" font-weight="700" fill="#f8fafc">Zealakit Omniselect</text>
+  <text x="600" y="160" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="26" fill="#94a3b8">Headless Select and Combobox primitives</text>
+  <text x="600" y="570" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="24" fill="#64748b">Vanilla · React · Vue · Svelte</text>
+</svg>
