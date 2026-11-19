@@ -1,5 +1,6 @@
 <script lang="ts">
 import { NativeSelect } from "@zealakit/omniselect-svelte/native";
+import FormDemo from "./form-demo.svelte";
 import { Select } from "@zealakit/omniselect-svelte/select";
 
 type Fruit = { id: number; name: string };
@@ -177,4 +178,6 @@ function onSubmit(event: SubmitEvent) {
       </Select.Popover>
     </Select.Root>
   </div>
+  <h2>Forms: TanStack Form + zod</h2>
+  <FormDemo />
 </main>

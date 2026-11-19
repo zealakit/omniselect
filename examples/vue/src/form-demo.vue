@@ -57,7 +57,9 @@ const onSubmit = handleSubmit(
   },
   ({ errors }) => {
     // vee-validate does not move focus: focus the first invalid field ourselves.
-    const first = ["country", "fruits", "size", "assignee"].find((name) => name in errors);
+    const first = ["country", "fruits", "size", "assignee"].find(
+      (name) => name in errors,
+    );
     root.value
       ?.querySelector<HTMLElement>(
         `[data-field="${first}"] input, [data-field="${first}"] [data-part="trigger"], [data-field="${first}"] select`,
