@@ -53,7 +53,9 @@ export const Control = defineComponent({
           autocomplete: props.autocomplete,
           "data-disabled": props.disabled ? "" : undefined,
           "data-required": props.required ? "" : undefined,
-          "data-invalid": state.invalid ? "" : undefined,
+          "data-invalid": state.invalid || state.invalidProp ? "" : undefined,
+          "aria-invalid":
+            state.invalid || state.invalidProp ? "true" : undefined,
           "data-placeholder": placeholder ? "" : undefined,
           onChange: (event: Event) => {
             const element = event.currentTarget as HTMLSelectElement;

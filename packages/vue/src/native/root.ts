@@ -35,6 +35,8 @@ export const Root = defineComponent({
     required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     autocomplete: { type: String, default: undefined },
+    /** Mark the field invalid from outside (a form library's error state). */
+    invalid: { type: Boolean, default: undefined },
   },
   emits: {
     "update:modelValue": (_value: unknown) => true,
@@ -58,13 +60,14 @@ export const Root = defineComponent({
     });
     onBeforeUnmount(stop);
     watch(
-      () => props.modelValue,
-      (value) =>
+      () => [props.modelValue, props.invalid],
+      () =>
         controller.sync({
-          value: value as never,
+          value: props.modelValue as never,
           onValueChange: onValueChange as never,
+          invalid: props.invalid,
         }),
-      { flush: "sync" },
+      { flush: "sync", immediate: true },
     );
 
     const context: NativeContext = {

@@ -81,6 +81,7 @@ Import from the `/native` entry so Overlay stays out of the bundle.
 - Add `Select.Input` for a searchable combobox: the input takes `role="combobox"` and keeps focus, the trigger becomes a plain button (`triggerLabel`), and items are filtered as the user types (`filter`, `filter=false` for outside/async filtering, `selectionBehavior`, `restoreOnBlur`, `openOnFocus`). Never put focus in the list.
 - `multiple` selects an array (the list stays open; `Value` exposes `items`, `remove`, `clear` for chips; `maxSelected` caps picks). `name` or `required` adds a hidden native `<select>` so the value joins `<form>`/`FormData`, validation, and reset like `NativeSelect`; object values submit their `itemToKey`.
 - Async pagination: put `Select.LoadMore` (`isLoading`, `hasMore`, `onLoadMore`; vanilla: a `[data-part="load-more"]` sentinel plus `onLoadMore` and `setLoadMore`) last inside `Select.List`. The library never fetches. Duplicate requests are blocked while loading; the highlight, scroll, and focus stay put as items append. For async search use `filter={false}` + `onInputChange` + `LoadMore` and `itemToString` so selected values keep their labels.
+- Form libraries (react-hook-form, vee-validate, TanStack Form, ...): pass their error state with the `invalid` prop (vanilla: `handle.setInvalid(bool)`); it sets `data-invalid` and `aria-invalid` and is not cleared by a change. Hook their blur/ref handlers to the trigger or input.
 
 ## Status
 

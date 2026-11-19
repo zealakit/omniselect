@@ -628,4 +628,35 @@ export const selectScenarios: Scenario[] = [
       },
     ],
   },
+  {
+    ...(open({ invalid: true }) as Scenario),
+    name: "invalid prop: marks the trigger and control until it is cleared, even after a pick",
+    skip: { vanilla: "imperative setInvalid is covered by the vanilla tests" },
+    steps: [
+      {
+        type: "expect",
+        expect: {
+          attrs: {
+            trigger: { "data-invalid": "", "aria-invalid": "true" },
+            control: { "data-invalid": "" },
+          },
+        },
+      },
+      { type: "click", target: "trigger" },
+      { type: "click", target: "item:apple" },
+      {
+        type: "expect",
+        expect: {
+          attrs: { trigger: { "data-invalid": "", "aria-invalid": "true" } },
+        },
+      },
+      { type: "setProps", props: { invalid: false } },
+      {
+        type: "expect",
+        expect: {
+          attrs: { trigger: { "data-invalid": null, "aria-invalid": null } },
+        },
+      },
+    ],
+  },
 ];

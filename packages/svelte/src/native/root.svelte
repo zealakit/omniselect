@@ -8,6 +8,8 @@ import { setContext, untrack, type Snippet } from "svelte";
 import { NATIVE_KEY, type NativeContext } from "./context.js";
 
 type Props = {
+  /** Mark the field invalid from outside (a form library's error state). */
+  invalid?: boolean;
   /** Selected value (`T | null`, or `T[]` with `multiple`). Use `bind:value` or `value` + `onValueChange`. */
   value?: T | null | T[];
   defaultValue?: T | null | T[];
@@ -34,6 +36,7 @@ let {
   required = false,
   disabled = false,
   autocomplete,
+  invalid,
   children,
 }: Props = $props();
 
@@ -53,7 +56,7 @@ const controller = untrack(() =>
 );
 
 $effect.pre(() => {
-  controller.sync({ value, onValueChange: handleChange as never });
+  controller.sync({ value, onValueChange: handleChange as never, invalid });
 });
 
 const snapshot = {

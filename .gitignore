@@ -28,3 +28,5 @@ monitor/reports/*
 !monitor/reports/.gitkeep
 
 artifacts/
+
+plans/

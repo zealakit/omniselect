@@ -283,4 +283,33 @@ export const nativeScenarios: Scenario[] = [
       },
     ],
   },
+  {
+    name: "invalid prop marks the control until it is cleared, even after a change",
+    primitive: "native",
+    props: { invalid: true },
+    skip: { vanilla: "imperative setInvalid is covered by the vanilla tests" },
+    tree: fruit,
+    steps: [
+      {
+        type: "expect",
+        expect: {
+          attrs: { control: { "data-invalid": "", "aria-invalid": "true" } },
+        },
+      },
+      { type: "select", target: "control", values: ["banana"] },
+      {
+        type: "expect",
+        expect: {
+          attrs: { control: { "data-invalid": "", "aria-invalid": "true" } },
+        },
+      },
+      { type: "setProps", props: { invalid: false } },
+      {
+        type: "expect",
+        expect: {
+          attrs: { control: { "data-invalid": null, "aria-invalid": null } },
+        },
+      },
+    ],
+  },
 ];

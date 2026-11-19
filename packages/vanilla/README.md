@@ -72,6 +72,7 @@ handle.destroy();
 | --- | --- | --- |
 | `getValue()` | `string \| string[]` | Current key, or an array of keys when `multiple`. |
 | `setValue(value)` | `void` | Select by key. Does not call `onValueChange`. |
+| `setInvalid(invalid)` | `void` | Mark the field invalid (`data-invalid`, `aria-invalid`). |
 | `refresh()` | `void` | Re-read `disabled`, `required`, and the selection. |
 | `destroy()` | `void` | Remove listeners. |
 
@@ -149,6 +150,7 @@ select.destroy();
 | --- | --- | --- |
 | `getValue()` | `string \| null` | Selected key. |
 | `setValue(value)` | `void` | Select by key. Does not call `onValueChange`. |
+| `setInvalid(invalid)` | `void` | Mark the field invalid (`data-invalid`, `aria-invalid`). |
 | `open()`, `close()` | `void` | Change visibility. |
 | `refresh()` | `void` | Re-read items after changing the markup. |
 | `destroy()` | `void` | Remove listeners and the overlay. |

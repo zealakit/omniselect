@@ -72,6 +72,8 @@ export type SelectState<T> = {
   hasLoading: boolean;
   /** Set by the hidden form control's `invalid` event; cleared on change. */
   invalid: boolean;
+  /** The `invalid` prop (set by a form library); never cleared internally. */
+  invalidProp: boolean;
   /** Latest live-region message (multiple mode). */
   announcement: string;
 };
@@ -143,6 +145,8 @@ export type SelectProps<T> = Partial<
   value?: SelectValue<T> | undefined;
   open?: boolean | undefined;
   inputValue?: string | undefined;
+  /** Mark the field invalid from outside (a form library's error state). */
+  invalid?: boolean | undefined;
 };
 
 /** The subset of a keyboard event the machine needs. */
@@ -199,6 +203,8 @@ export type SelectMachine<T> = {
   /** Restore `defaultValue` (and the input) after a form reset. */
   reset: () => void;
   setInvalid: (invalid: boolean) => void;
+  /** Invalid because of the browser's check or the `invalid` prop. */
+  isInvalid: () => boolean;
   /** Apply keys reported by the hidden form control (autofill); unknown keys are ignored. */
   setFromKeys: (keys: string[]) => void;
   /** Keys of the current value(s), in selection order. */
@@ -321,6 +327,7 @@ export function createSelectMachine<T>(
     hasClear: false,
     hasLoading: false,
     invalid: false,
+    invalidProp: false,
     announcement: "",
   });
 
@@ -580,6 +587,12 @@ export function createSelectMachine<T>(
           setInput(selectedText(), "select");
         }
       }
+      if (
+        next.invalid !== undefined &&
+        next.invalid !== store.get().invalidProp
+      ) {
+        store.set({ invalidProp: next.invalid });
+      }
       if (inputCtl.isControlled() && next.inputValue !== undefined) {
         inputCtl.sync(next.inputValue);
         store.set({ inputValue: next.inputValue });
@@ -738,6 +751,7 @@ export function createSelectMachine<T>(
     setInvalid(invalid) {
       store.set({ invalid });
     },
+    isInvalid: () => store.get().invalid || store.get().invalidProp,
     setFromKeys(keys) {
       const values = keys
         .map((key) => collection.get(key)?.value)
@@ -1089,7 +1103,7 @@ export function createSelectMachine<T>(
       root: () => ({
         "data-state": store.get().open ? "open" : "closed",
         "data-disabled": bool(props.disabled),
-        "data-invalid": bool(store.get().invalid),
+        "data-invalid": bool(machine.isInvalid()),
       }),
       trigger: () => {
         const state = store.get();
@@ -1119,11 +1133,11 @@ export function createSelectMachine<T>(
               : undefined,
           "aria-labelledby": `${ids.label} ${ids.trigger}`,
           "aria-required": props.required ? "true" : undefined,
-          "aria-invalid": state.invalid ? "true" : undefined,
+          "aria-invalid": machine.isInvalid() ? "true" : undefined,
           "aria-disabled": props.disabled ? "true" : undefined,
           "data-state": state.open ? "open" : "closed",
           "data-disabled": bool(props.disabled),
-          "data-invalid": bool(state.invalid),
+          "data-invalid": bool(machine.isInvalid()),
           "data-placeholder": bool(!multiple && selection.isEmpty(state.value)),
         };
       },
@@ -1142,13 +1156,13 @@ export function createSelectMachine<T>(
               : undefined,
           "aria-labelledby": ids.label,
           "aria-required": props.required ? "true" : undefined,
-          "aria-invalid": state.invalid ? "true" : undefined,
+          "aria-invalid": machine.isInvalid() ? "true" : undefined,
           "aria-disabled": props.disabled ? "true" : undefined,
           autocomplete: "off",
           spellcheck: "false",
           "data-state": state.open ? "open" : "closed",
           "data-disabled": bool(props.disabled),
-          "data-invalid": bool(state.invalid),
+          "data-invalid": bool(machine.isInvalid()),
         };
       },
       list: () => ({

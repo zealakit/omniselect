@@ -21,6 +21,8 @@ export type NativeSelectOptions<T> = {
 export type NativeState<T> = {
   value: NativeValue<T>;
   invalid: boolean;
+  /** The `invalid` prop (set by a form library); never cleared internally. */
+  invalidProp: boolean;
 };
 
 export type NativeSelectController<T> = {
@@ -37,6 +39,7 @@ export type NativeSelectController<T> = {
   sync: (options: {
     value?: NativeValue<T> | undefined;
     onValueChange?: ((value: NativeValue<T>) => void) | undefined;
+    invalid?: boolean | undefined;
   }) => void;
   /** Read the user's choice from a `<select>` and report it. */
   fromDom: (select: HTMLSelectElement) => void;
@@ -65,6 +68,7 @@ export function createNativeSelect<T>(
   const store = createStore<NativeState<T>>({
     value: options.value !== undefined ? options.value : defaultValue,
     invalid: false,
+    invalidProp: false,
   });
   const controllable = createControllable<NativeValue<T>>({
     value: options.value,
@@ -105,6 +109,12 @@ export function createNativeSelect<T>(
     isControlled: controllable.isControlled,
     sync(next) {
       onValueChange = next.onValueChange;
+      if (
+        next.invalid !== undefined &&
+        next.invalid !== store.get().invalidProp
+      ) {
+        store.set({ invalidProp: next.invalid });
+      }
       if (controllable.isControlled()) {
         controllable.sync(next.value);
         if (next.value !== undefined) {

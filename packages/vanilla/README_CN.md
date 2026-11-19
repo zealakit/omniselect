@@ -72,6 +72,7 @@ handle.destroy();
 | --- | --- | --- |
 | `getValue()` | `string \| string[]` | 当前 key；`multiple` 时为 key 数组。 |
 | `setValue(value)` | `void` | 按 key 选择。不会调用 `onValueChange`。 |
+| `setInvalid(invalid)` | `void` | 将字段标记为无效（`data-invalid`、`aria-invalid`）。 |
 | `refresh()` | `void` | 重新读取 `disabled`、`required` 和选择状态。 |
 | `destroy()` | `void` | 移除监听器。 |
 
@@ -149,6 +150,7 @@ select.destroy();
 | --- | --- | --- |
 | `getValue()` | `string \| null` | 已选 key。 |
 | `setValue(value)` | `void` | 按 key 选择。不会调用 `onValueChange`。 |
+| `setInvalid(invalid)` | `void` | 将字段标记为无效（`data-invalid`、`aria-invalid`）。 |
 | `open()`、`close()` | `void` | 改变可见性。 |
 | `refresh()` | `void` | 修改标记后重新读取选项。 |
 | `destroy()` | `void` | 移除监听器和 overlay。 |

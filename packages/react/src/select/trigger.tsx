@@ -12,7 +12,7 @@ export const Trigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
     const mergedRef = useMergedRef(ref, setTriggerEl);
     useSnapshot(machine, (m) => {
       const s = m.store.get();
-      return `${s.open}|${s.highlightedKey}|${s.mode}|${s.invalid}|${m.selection.keys(s.value).join(",")}`;
+      return `${s.open}|${s.highlightedKey}|${s.mode}|${m.isInvalid()}|${m.selection.keys(s.value).join(",")}`;
     });
     const attrs = machine.attrs.trigger();
     return (

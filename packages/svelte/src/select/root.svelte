@@ -49,6 +49,8 @@ type Props = {
   autoSelectOnTab?: boolean;
   /** Accessible name of the trigger when an input is present. */
   triggerLabel?: string;
+  /** Mark the field invalid from outside (a form library's error state). */
+  invalid?: boolean;
   /** Selects an array of values instead of one. */
   multiple?: boolean;
   /** Form field name. Renders a hidden native `<select>` so the value joins FormData. */
@@ -92,6 +94,7 @@ let {
   autoHighlight,
   autoSelectOnTab,
   triggerLabel,
+  invalid,
   multiple = false,
   name,
   form,
@@ -180,6 +183,7 @@ $effect.pre(() => {
     autoHighlight,
     autoSelectOnTab,
     triggerLabel,
+    invalid,
     maxSelected,
     announce,
     messages,

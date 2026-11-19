@@ -57,6 +57,7 @@ export function FruitSelect() {
 | `multiple` | `boolean` | `false` | 选择数组而不是单个值。 |
 | `itemToKey` | `(value: T) => string` | `String` | 将值映射为 `<option value>` 以及提交的表单值。 |
 | `name`, `form`, `required`, `disabled`, `autoComplete` | native | — | 转发给 `<select>`。 |
+| `invalid` | `boolean` | `false` | 从外部将字段标记为无效（例如表单库的错误）：设置 `data-invalid` 和 `aria-invalid`。值改变时不会被清除。 |
 | `children` | `ReactNode` | — | 各个 part。Root 不渲染任何元素。 |
 
 ### Parts
@@ -129,6 +130,7 @@ export function FruitSelect() {
 | `itemToKey` | `(value: T) => string` | `String` | 将值映射为稳定的字符串 key。默认 `String`。 |
 | `itemToString` | `(value: T) => string` | `String` | 已选值对应选项尚未挂载时使用的标签。 |
 | `disabled`, `required` | `boolean` | `false` | 禁止打开和选择。 |
+| `invalid` | `boolean` | `false` | 从外部将字段标记为无效（例如表单库的错误）：设置 `data-invalid` 和 `aria-invalid`。值改变时不会被清除。 |
 | `closeOnSelect` | `boolean` | `true` | 选择后关闭。 |
 | `allowsEmptyCollection` | `boolean` | `true` | 为 `false` 时，没有内容可显示就不打开弹层。 |
 | `loop` | `boolean` | `false` | 键盘导航在两端循环。 |

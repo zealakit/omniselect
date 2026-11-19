@@ -72,6 +72,7 @@ handle.destroy();
 | --- | --- | --- |
 | `getValue()` | `string \| string[]` | Key hiện tại, hoặc mảng key khi `multiple`. |
 | `setValue(value)` | `void` | Chọn theo key. Không gọi `onValueChange`. |
+| `setInvalid(invalid)` | `void` | Đánh dấu trường không hợp lệ (`data-invalid`, `aria-invalid`). |
 | `refresh()` | `void` | Đọc lại `disabled`, `required` và lựa chọn. |
 | `destroy()` | `void` | Gỡ các listener. |
 
@@ -149,6 +150,7 @@ select.destroy();
 | --- | --- | --- |
 | `getValue()` | `string \| null` | Key đã chọn. |
 | `setValue(value)` | `void` | Chọn theo key. Không gọi `onValueChange`. |
+| `setInvalid(invalid)` | `void` | Đánh dấu trường không hợp lệ (`data-invalid`, `aria-invalid`). |
 | `open()`, `close()` | `void` | Thay đổi hiển thị. |
 | `refresh()` | `void` | Đọc lại các item sau khi đổi markup. |
 | `destroy()` | `void` | Gỡ listener và overlay. |

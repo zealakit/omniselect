@@ -10,6 +10,8 @@ export type NativeSelectHandle = {
   getValue: () => string | string[];
   /** Select by key. Does not call `onValueChange`. */
   setValue: (value: string | string[]) => void;
+  /** Mark the field invalid from outside (`data-invalid`, `aria-invalid`). */
+  setInvalid: (invalid: boolean) => void;
   /** Re-read `disabled` / `required` / selection and refresh `data-*` attributes. */
   refresh: () => void;
   /** Remove listeners. Attributes stay as they are. */
@@ -120,6 +122,14 @@ export function createNativeSelect(
       }
       last = JSON.stringify(readValue(select));
       sync();
+    },
+    setInvalid(invalid) {
+      toggle(select, "data-invalid", invalid);
+      if (invalid) {
+        select.setAttribute("aria-invalid", "true");
+      } else {
+        select.removeAttribute("aria-invalid");
+      }
     },
     refresh: sync,
     destroy() {

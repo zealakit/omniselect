@@ -63,6 +63,7 @@ export const Root = defineComponent({
     autoHighlight: { type: Boolean, default: undefined },
     autoSelectOnTab: { type: Boolean, default: undefined },
     triggerLabel: { type: String, default: undefined },
+    invalid: { type: Boolean, default: undefined },
     multiple: { type: Boolean, default: false },
     name: { type: String, default: undefined },
     form: { type: String, default: undefined },
@@ -138,6 +139,7 @@ export const Root = defineComponent({
         }
       },
     });
+    machine.sync({ invalid: props.invalid });
     const version = shallowRef(0);
     const stop = machine.store.subscribe(() => {
       version.value += 1;
@@ -164,6 +166,7 @@ export const Root = defineComponent({
         props.autoHighlight,
         props.autoSelectOnTab,
         props.triggerLabel,
+        props.invalid,
         props.maxSelected,
         props.announce,
         props.messages,
@@ -187,6 +190,7 @@ export const Root = defineComponent({
           autoHighlight: props.autoHighlight,
           autoSelectOnTab: props.autoSelectOnTab,
           triggerLabel: props.triggerLabel,
+          invalid: props.invalid,
           maxSelected: props.maxSelected,
           announce: props.announce,
           messages: props.messages,

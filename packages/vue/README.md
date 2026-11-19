@@ -60,6 +60,7 @@ const fruit = ref("apple");
 | `multiple` | `boolean` | `false` | Selects an array instead of one value. |
 | `itemToKey` | `(value) => string` | `String` | Maps a value to `<option value>` and to the submitted form value. |
 | `name`, `form`, `required`, `disabled`, `autocomplete` | native | — | Forwarded to the `<select>`. |
+| `invalid` | `boolean` | `false` | Marks the field invalid from outside, for example a form library's error: sets `data-invalid` and `aria-invalid`. It is not cleared by a change. |
 | default slot | `VNode[]` | — | The parts. The Root renders no element. |
 
 ### Parts
@@ -133,6 +134,7 @@ const fruit = ref<string | null>("apple");
 | `itemToKey` | `(value: T) => string` | `String` | Maps a value to a stable string key. Default `String`. |
 | `itemToString` | `(value: T) => string` | `String` | Label for a selected value whose item is not mounted. |
 | `disabled`, `required` | `boolean` | `false` | Blocks opening and selecting. |
+| `invalid` | `boolean` | `false` | Marks the field invalid from outside, for example a form library's error: sets `data-invalid` and `aria-invalid`. It is not cleared by a change. |
 | `closeOnSelect` | `boolean` | `true` | Close after a pick. |
 | `allowsEmptyCollection` | `boolean` | `true` | When `false`, the popover does not open while there is nothing to show. |
 | `loop` | `boolean` | `false` | Wrap keyboard navigation at the ends. |

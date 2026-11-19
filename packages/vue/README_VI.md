@@ -60,6 +60,7 @@ const fruit = ref("apple");
 | `multiple` | `boolean` | `false` | Chọn một mảng thay vì một giá trị. |
 | `itemToKey` | `(value) => string` | `String` | Ánh xạ giá trị sang `<option value>` và giá trị form được gửi đi. |
 | `name`, `form`, `required`, `disabled`, `autocomplete` | native | — | Được chuyển tiếp tới `<select>`. |
+| `invalid` | `boolean` | `false` | Đánh dấu trường không hợp lệ từ bên ngoài, ví dụ lỗi từ thư viện form: đặt `data-invalid` và `aria-invalid`. Không bị xóa khi giá trị thay đổi. |
 | default slot | `VNode[]` | — | Các part. Root không render phần tử nào. |
 
 ### Parts
@@ -133,6 +134,7 @@ const fruit = ref<string | null>("apple");
 | `itemToKey` | `(value: T) => string` | `String` | Ánh xạ giá trị sang key chuỗi ổn định. Mặc định `String`. |
 | `itemToString` | `(value: T) => string` | `String` | Nhãn cho giá trị đã chọn khi item chưa được mount. |
 | `disabled`, `required` | `boolean` | `false` | Chặn việc mở và chọn. |
+| `invalid` | `boolean` | `false` | Đánh dấu trường không hợp lệ từ bên ngoài, ví dụ lỗi từ thư viện form: đặt `data-invalid` và `aria-invalid`. Không bị xóa khi giá trị thay đổi. |
 | `closeOnSelect` | `boolean` | `true` | Đóng sau khi chọn. |
 | `allowsEmptyCollection` | `boolean` | `true` | Khi `false`, popover không mở nếu không có gì để hiển thị. |
 | `loop` | `boolean` | `false` | Điều hướng bàn phím quay vòng ở hai đầu. |

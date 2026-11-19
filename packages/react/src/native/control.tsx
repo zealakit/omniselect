@@ -81,7 +81,8 @@ export const Control = forwardRef<HTMLSelectElement, NativeSelectControlProps>(
         autoComplete={context.autoComplete}
         data-disabled={context.disabled ? "" : undefined}
         data-required={context.required ? "" : undefined}
-        data-invalid={state.invalid ? "" : undefined}
+        data-invalid={state.invalid || state.invalidProp ? "" : undefined}
+        aria-invalid={state.invalid || state.invalidProp ? true : undefined}
         data-placeholder={isPlaceholder ? "" : undefined}
         onChange={handleChange}
         onInvalid={(event) => {

@@ -14,6 +14,8 @@ type RootBase<T> = {
   required?: boolean;
   disabled?: boolean;
   autoComplete?: string;
+  /** Mark the field invalid from outside (a form library's error state). */
+  invalid?: boolean;
   children?: ReactNode;
 };
 
@@ -51,6 +53,7 @@ export function Root<T>(props: NativeSelectRootProps<T>) {
     required = false,
     disabled = false,
     autoComplete,
+    invalid,
   } = props as RootBase<T> & {
     multiple?: boolean;
     value?: AnyValue<T>;
@@ -71,7 +74,7 @@ export function Root<T>(props: NativeSelectRootProps<T>) {
   const controller = controllerRef.current;
 
   useIsomorphicLayoutEffect(() => {
-    controller.sync({ value, onValueChange });
+    controller.sync({ value, onValueChange, invalid });
   });
 
   const keysOf = (current: AnyValue<T> | undefined): string[] => {

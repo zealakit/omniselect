@@ -77,6 +77,8 @@ export type SelectHandle = {
   /** Re-read items and groups after you changed the markup. */
   /** Tell the select whether a page is loading and whether more pages exist. */
   setLoadMore: (state: { isLoading?: boolean; hasMore?: boolean }) => void;
+  /** Mark the field invalid from outside (`data-invalid`, `aria-invalid`). */
+  setInvalid: (invalid: boolean) => void;
   refresh: () => void;
   destroy: () => void;
 };
@@ -599,6 +601,9 @@ export function createSelect(
       registerItems();
       render();
       remeasure();
+    },
+    setInvalid(invalid) {
+      machine.sync({ invalid });
     },
     setLoadMore(next) {
       loadState = { ...loadState, ...next };

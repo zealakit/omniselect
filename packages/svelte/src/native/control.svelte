@@ -59,7 +59,8 @@ const placeholder = $derived(
   autocomplete={context.props.autocomplete as any}
   data-disabled={context.props.disabled ? "" : undefined}
   data-required={context.props.required ? "" : undefined}
-  data-invalid={$snapshot.invalid ? "" : undefined}
+  data-invalid={$snapshot.invalid || $snapshot.invalidProp ? "" : undefined}
+  aria-invalid={$snapshot.invalid || $snapshot.invalidProp ? "true" : undefined}
   data-placeholder={placeholder ? "" : undefined}
   onchange={handleChange}
   oninvalid={(event) => {

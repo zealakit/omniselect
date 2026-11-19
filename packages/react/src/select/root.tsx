@@ -59,6 +59,8 @@ type SelectRootCommon<T> = {
   autoSelectOnTab?: boolean;
   /** Accessible name of the trigger when an input is present. Default "Show options". */
   triggerLabel?: string;
+  /** Mark the field invalid from outside (a form library's error state). */
+  invalid?: boolean;
   /** Form field name. Renders a hidden native `<select>` so the value joins FormData. */
   name?: string;
   /** Id of the `<form>` the hidden field belongs to. */
@@ -106,6 +108,7 @@ export function Root<T>(props: SelectRootProps<T>) {
     maxSelected,
     announce,
     messages,
+    invalid,
     value,
     defaultValue,
     onValueChange,
@@ -217,6 +220,7 @@ export function Root<T>(props: SelectRootProps<T>) {
       maxSelected,
       announce,
       messages,
+      invalid,
     });
   });
 
