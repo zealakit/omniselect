@@ -42,7 +42,7 @@ npm i @zealakit/omniselect-svelte
 
 ## Examples
 
-Thư mục [`examples/`](https://github.com/zealakit/omniselect/blob/main/examples) chứa các dự án tích hợp chạy được cho Vanilla, React, Vue, Svelte và Next.js. Các dự án này import các package workspace đã build, nên hãy build trước. Mỗi ví dụ minh họa một `NativeSelect` và một `Select`.
+Thư mục [`examples/`](https://github.com/zealakit/omniselect/blob/main/examples) chứa các dự án tích hợp chạy được cho Vanilla, React, Vue, Svelte và Next.js. Các dự án này import các package workspace đã build, nên hãy build trước. Mỗi ví dụ minh họa một `NativeSelect` và một `Select`, cùng một form có validation (react-hook-form + zod, vee-validate + zod, TanStack Form + zod hoặc `FormData` + zod thuần).
 
 ```bash
 pnpm install

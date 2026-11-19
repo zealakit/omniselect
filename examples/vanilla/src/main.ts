@@ -28,3 +28,4 @@ createSelect(document.getElementById("multi") as HTMLElement, {
   multiple: true,
   defaultValue: ["apple"],
 });
+import "./form-demo";

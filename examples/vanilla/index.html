@@ -79,6 +79,86 @@
           </div>
         </div>
       </div>
+      <h2>Forms: FormData + zod</h2>
+      <form id="demo-form" novalidate>
+        <div class="field" data-field="country">
+          <div id="f-country">
+            <span data-part="label">Country (searchable)</span>
+            <div data-part="control">
+              <span class="select-control">
+                <input data-part="input" type="text" placeholder="Type to search" aria-describedby="country-error" />
+                <button data-part="trigger" type="button"><span data-part="indicator">▾</span></button>
+                <button data-part="clear" type="button">×</button>
+              </span>
+            </div>
+            <div data-part="popover">
+              <div data-part="list">
+                <div data-part="item" data-value="vn">Việt Nam</div>
+                <div data-part="item" data-value="us">United States</div>
+                <div data-part="item" data-value="fr">France</div>
+                <div data-part="item" data-value="jp">Japan</div>
+                <div data-part="item" data-value="de">Germany</div>
+                <div data-part="item" data-value="br">Brazil</div>
+                <div data-part="empty">No countries</div>
+              </div>
+            </div>
+          </div>
+          <p id="country-error" class="error" role="alert" hidden></p>
+        </div>
+
+        <div class="field" data-field="fruits">
+          <div id="f-fruits">
+            <span data-part="label">Fruits (pick up to 3)</span>
+            <div data-part="control">
+              <button data-part="trigger" type="button" aria-describedby="fruits-error"><span data-part="value">Pick fruits</span></button>
+            </div>
+            <div data-part="popover">
+              <div data-part="list">
+                <div data-part="item" data-value="apple">apple <span data-part="item-indicator">✓</span></div>
+                <div data-part="item" data-value="banana">banana <span data-part="item-indicator">✓</span></div>
+                <div data-part="item" data-value="cherry">cherry <span data-part="item-indicator">✓</span></div>
+                <div data-part="item" data-value="date">date <span data-part="item-indicator">✓</span></div>
+                <div data-part="item" data-value="elderberry">elderberry <span data-part="item-indicator">✓</span></div>
+              </div>
+            </div>
+          </div>
+          <p id="fruits-error" class="error" role="alert" hidden></p>
+        </div>
+
+        <div class="field" data-field="size">
+          <div id="f-size">
+            <label for="f-size-select">Size (native)</label>
+            <select id="f-size-select" name="size" aria-describedby="size-error">
+              <option value="" disabled selected>Choose a size…</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+            </select>
+          </div>
+          <p id="size-error" class="error" role="alert" hidden></p>
+        </div>
+
+        <div class="field" data-field="assignee">
+          <div id="f-assignee">
+            <span data-part="label">Assignee (async, paginated)</span>
+            <div data-part="control">
+              <button data-part="trigger" type="button" aria-describedby="assignee-error"><span data-part="value">Pick a person</span></button>
+            </div>
+            <div data-part="popover">
+              <div data-part="list">
+                <div data-part="load-more">Loading…</div>
+              </div>
+            </div>
+          </div>
+          <p id="assignee-error" class="error" role="alert" hidden></p>
+        </div>
+
+        <div class="actions">
+          <button type="submit">Submit</button>
+          <button type="reset">Reset</button>
+        </div>
+        <pre id="form-result" aria-live="polite">Submit to see the validated values.</pre>
+      </form>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
