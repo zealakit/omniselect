@@ -2,6 +2,7 @@
 import { NativeSelect } from "@zealakit/omniselect-vue/native";
 import { Select } from "@zealakit/omniselect-vue/select";
 import { ref } from "vue";
+import FormDemo from "./form-demo.vue";
 
 type Fruit = { id: number; name: string };
 
@@ -167,5 +168,7 @@ function onSubmit(event: Event) {
         </Select.Popover>
       </Select.Root>
     </div>
+    <h2>Forms: vee-validate + zod</h2>
+    <FormDemo />
   </main>
 </template>
