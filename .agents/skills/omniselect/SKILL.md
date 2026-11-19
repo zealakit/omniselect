@@ -48,7 +48,6 @@ omniselect/
 ├── examples/                      # vanilla, react, vue, svelte, nextjs
 ├── packages/{core,vanilla,react,vue,svelte}/   # src/, tests/, generated dist/
 ├── monitor/                       # local dependency dashboard
-├── plans/                         # implementation proposals
 ├── scripts/                       # packaging + README check
 ├── skills/omniselect-*.md         # user-facing integration skills
 └── README.md, README_VI.md, README_CN.md

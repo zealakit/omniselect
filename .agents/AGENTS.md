@@ -35,7 +35,6 @@ Load the omniselect skill before code, test, docs, or release work. Keep hard ru
 | README structure check | `scripts/check-readmes.mjs` | — |
 | Agent skills | `.agents/skills/{omniselect,readme-system}/SKILL.md` | — |
 | README cover image | `assets/images/omniselect-cover.svg` | — |
-| Implementation plans | `plans/` (proposals, not documentation) | — |
 
 ## Commands
 
@@ -89,7 +88,7 @@ pnpm monitor      # dependency dashboard at http://127.0.0.1:4177
   `import type` for type-only imports; ESM with explicit `.js` relative specifiers.
 - **Naming:** files and folders are `kebab-case`; exported React components are `PascalCase`.
 - **Package surface:** do not export speculative or unimplemented APIs. No placeholder
-  components, no fake implementations. Each plan in `plans/` lands its own surface.
+  components, no fake implementations.
 - **Public packaging:** only the four adapters are published to npm. Core is `"private": true`
   and never published: `scripts/bundle-core.mjs` copies the built Core into each adapter
   tarball (`dist/vendor/core/`), rewrites `@zealakit/omniselect-core` imports to relative paths,
@@ -104,7 +103,7 @@ pnpm monitor      # dependency dashboard at http://127.0.0.1:4177
   The public surface is frozen at 1.0.0 (`packages/*/tests/api.test.ts`).
 - **Documentation:** There is intentionally no `docs/` folder and no separate docs app. Product
   documentation lives only in the root README and package READMEs, in EN, VI, and CN, following
-  the [readme-system skill](skills/readme-system/SKILL.md). `plans/` are proposals, not docs.
+  the [readme-system skill](skills/readme-system/SKILL.md).
   Keep runnable integration references in `examples/`.
 
 ## Definition of done

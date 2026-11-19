@@ -145,8 +145,7 @@ export function bundleCoreIntoTarball(tarball) {
 
     const rewritten = rewriteSpecifiers(packageRoot);
     if (rewritten === 0) {
-      // Until the component plans land, adapters only re-export Overlay types and
-      // do not import Core yet. Core is still vendored so the tarball shape is final.
+      // An adapter that never imports Core still gets the vendored copy so the tarball shape is stable.
       console.warn(
         `warning: ${basename(tarball)} does not import ${CORE_NAME} yet; vendored copy is unused.`,
       );
