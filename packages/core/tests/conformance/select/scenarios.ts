@@ -517,7 +517,7 @@ export const selectScenarios: Scenario[] = [
         expect: {
           present: ["empty"],
           text: { empty: "No options" },
-          attrs: { empty: { role: "presentation" } },
+          attrs: { empty: { role: "option", "aria-disabled": "true" } },
         },
       },
     ],

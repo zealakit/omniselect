@@ -1,6 +1,6 @@
 # Plan: hardening, documentation, and 1.0.0
 
-Status: **proposal — not implemented**. Release target: **1.0.0** (API freeze).
+Status: **implemented, except the manual screen-reader matrix** (see `08-a11y-results.md`). Release target: **1.0.0** (API freeze).
 
 Order: **8 of 8**. Requires plans 03–07 shipped (0.5.0).
 
@@ -104,3 +104,9 @@ empty. Each entry gets a codemod-free migration snippet.
 
 Virtualization, creatable options, tag/chip components, inline autocomplete,
 `appearance: base-select` enhancement for NativeSelect, Astro example.
+
+## 9. Implementation notes (decisions taken)
+
+- The axe pass runs as a unit test in happy-dom (`packages/react/tests/a11y.test.ts`) rather than a Playwright script against the Next.js example; no browser was available. Results and limits are in `08-a11y-results.md`.
+- Size budgets were raised to 4 kB / 14 kB after measuring (`08-release-notes.md`).
+- The perf budget is a coarse ceiling that catches O(n²) regressions, plus an exact render-count assertion.

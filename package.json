@@ -1,6 +1,6 @@
 {
   "name": "@zealakit/omniselect",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Accessible, headless Select and Combobox primitives for modern UIs.",
   "keywords": [
@@ -48,17 +48,20 @@
     "test": "pnpm --filter @zealakit/omniselect-core run test && pnpm --filter @zealakit/omniselect-vanilla run test && pnpm --filter @zealakit/omniselect-react run test && pnpm --filter @zealakit/omniselect-vue run test && pnpm --filter @zealakit/omniselect-svelte run test",
     "readme:check": "node scripts/check-readmes.mjs",
     "pack:packages": "node scripts/pack-packages.mjs",
-    "release:check": "pnpm check && pnpm pack:packages",
+    "release:check": "pnpm check && pnpm size && pnpm pack:packages",
     "npm:publish:check": "node --strip-types scripts/npm-publish.ts check",
     "npm:publish:vanilla": "node --strip-types scripts/npm-publish.ts vanilla",
     "npm:publish:react": "node --strip-types scripts/npm-publish.ts react",
     "npm:publish:vue": "node --strip-types scripts/npm-publish.ts vue",
     "npm:publish:svelte": "node --strip-types scripts/npm-publish.ts svelte",
-    "npm:publish:all": "node --strip-types scripts/npm-publish.ts all"
+    "npm:publish:all": "node --strip-types scripts/npm-publish.ts all",
+    "size": "node scripts/size.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.8",
     "@types/node": "^24.19.0",
+    "axe-core": "^4.14.1",
+    "esbuild": "^0.28.2",
     "typescript": "^6.0.3"
   }
 }

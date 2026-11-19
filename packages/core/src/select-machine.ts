@@ -412,8 +412,17 @@ export function createSelectMachine<T>(
     applyFilter();
   }
 
+  // Items register one by one (1,000 items = 1,000 notifications). Re-render subscribers once
+  // per microtask, or every subscriber would re-read the collection after every registration.
+  let versionScheduled = false;
   const unsubscribeCollection = collection.subscribe(() => {
-    store.set({ version: collection.version() });
+    if (!versionScheduled) {
+      versionScheduled = true;
+      queueMicrotask(() => {
+        versionScheduled = false;
+        store.set({ version: collection.version() });
+      });
+    }
     const state = store.get();
     if (
       state.open &&

@@ -263,7 +263,9 @@ export function createSelect(
       // While a page is loading the list is not empty yet.
       empty.hidden =
         machine.collection.visible().length !== 0 || state.hasLoading;
-      empty.setAttribute("role", "presentation");
+      empty.setAttribute("role", "option");
+      empty.setAttribute("aria-disabled", "true");
+      empty.setAttribute("aria-selected", "false");
     }
     for (const el of itemElements()) {
       const key = el.dataset.value ?? "";

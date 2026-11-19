@@ -2,6 +2,7 @@
 import { checkStructure } from "@zealakit/omniselect-core";
 import {
   Comment,
+  computed,
   defineComponent,
   h,
   Text,
@@ -88,8 +89,24 @@ export const Item = defineComponent({
     );
     onBeforeUnmount(() => off?.());
 
-    return () => {
+    // A computed only notifies dependents when its value changes, so a highlight move
+    // re-renders the two affected items instead of all of them.
+    const stateKey = computed(() => {
       context.version.value;
+      const state = machine.store.get();
+      const highlighted = state.highlightedKey === key();
+      return [
+        machine.isSelected(key()),
+        highlighted,
+        highlighted ? state.highlightSource : "",
+        machine.collection.get(key())?.disabled,
+        machine.maxReached(),
+        machine.collection.isVisible(key()),
+      ].join("|");
+    });
+
+    return () => {
+      void stateKey.value;
       const content = slots.default?.();
       fallbackText = vnodeText(content);
       if (

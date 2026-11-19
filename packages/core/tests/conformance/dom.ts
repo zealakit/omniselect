@@ -113,11 +113,13 @@ export function querySelectPart(
 
 export function readSelectVisibleItems(root: ParentNode): string[] {
   const doc = root.ownerDocument ?? document;
-  return Array.from(doc.querySelectorAll("[role=option]")).map((el) => {
-    const id = el.getAttribute("id") ?? "";
-    const raw = id.slice(id.indexOf("-item-") + 6);
-    return decodeURIComponent(raw.replaceAll("_", "%"));
-  });
+  return Array.from(doc.querySelectorAll("[role=option]"))
+    .filter((el) => (el.getAttribute("id") ?? "").includes("-item-"))
+    .map((el) => {
+      const id = el.getAttribute("id") ?? "";
+      const raw = id.slice(id.indexOf("-item-") + 6);
+      return decodeURIComponent(raw.replaceAll("_", "%"));
+    });
 }
 
 const keyboardInit = (

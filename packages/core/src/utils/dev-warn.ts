@@ -6,5 +6,7 @@ export function devWarn(message: string): void {
   if (env === "production") {
     return;
   }
-  console.warn(`[omniselect] ${message}`);
+  console.warn(
+    `[omniselect] ${message} (docs: https://github.com/zealakit/omniselect/blob/main/README.md)`,
+  );
 }

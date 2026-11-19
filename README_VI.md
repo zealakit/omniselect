@@ -13,7 +13,7 @@ Các primitive Select và Combobox headless để xây dựng giao diện chọn
 Omniselect chỉ xử lý trạng thái chọn, điều hướng bàn phím, thuộc tính accessibility và kết nối với Overlay. Không kèm style, theme hay icon.
 
 > **Note**
-> Omniselect là bộ primitive headless tập trung cho Select và Combobox, xây dựng trên Zealakit Overlay. Không kèm CSS và không render markup có kiểu dáng, nên mọi quyết định visual đều thuộc về bạn. Tải dữ liệu bất đồng bộ, virtualization, tùy chọn do người dùng tạo và tag input chưa được triển khai.
+> Omniselect là bộ primitive headless tập trung cho Select và Combobox, xây dựng trên Zealakit Overlay. Không kèm CSS và không render markup có kiểu dáng, nên mọi quyết định visual đều thuộc về bạn. Virtualization, tùy chọn do người dùng tạo và component tag dựng sẵn chưa được triển khai.
 >
 > Omniselect không phải là bản thay thế cho một UI library hay design system đầy đủ. Hãy dùng khi bạn cần các primitive chọn giá trị có accessibility mà không phải kéo theo một bộ UI lớn, hoặc khi select trong thư viện hiện tại khó restyle.
 

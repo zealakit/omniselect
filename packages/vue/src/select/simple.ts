@@ -100,7 +100,12 @@ export const Empty = defineComponent({
       }
       return h(
         "div",
-        { "data-part": "empty", role: "presentation" },
+        {
+          "data-part": "empty",
+          role: "option",
+          "aria-disabled": "true",
+          "aria-selected": "false",
+        },
         slots.default?.(),
       );
     };

@@ -90,6 +90,14 @@ omniselect/
   the input with `aria-autocomplete="list"`; the trigger becomes a `tabindex="-1"` button.
 - Focus model: `aria-activedescendant` only; DOM focus never moves into the list.
 
+## Conformance suite
+
+Behavior is specified once, in `packages/core/tests/conformance/` (framework-neutral scenarios made of part names,
+steps, and expectations), and run against every adapter through a small driver. New behavior = a new scenario first, then
+implement it in the core machine, then make each adapter pass. A scenario that an adapter cannot express carries an
+explicit `skip` with a reason (never a silent omission). Helpers serialize forms by hand (happy-dom's `FormData` drops
+all but the first value of a `<select multiple>`) and avoid putting DOM nodes in failing assertions (inspecting them hangs).
+
 ## Change workflow
 
 1. Identify the owning package and existing tests.

@@ -81,7 +81,7 @@ function ItemImpl<T>(
 
   const snapshot = useSnapshot(machine, (m) => {
     const s = m.store.get();
-    return `${m.isSelected(key)}|${s.highlightedKey === key}|${m.collection.get(key)?.disabled}|${s.highlightSource}|${m.maxReached()}|${m.collection.isVisible(key)}`;
+    return `${m.isSelected(key)}|${s.highlightedKey === key}|${m.collection.get(key)?.disabled}|${s.highlightedKey === key ? s.highlightSource : ""}|${m.maxReached()}|${m.collection.isVisible(key)}`;
   });
   const [, highlighted, , source, , visibleFlag] = snapshot.split("|");
   const visible = visibleFlag === "true";

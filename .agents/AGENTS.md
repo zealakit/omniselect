@@ -51,6 +51,7 @@ pnpm pack:packages # pack the four adapter tarballs, Core bundled in, into artif
 pnpm release:check # full checks + package tarballs (no publish)
 pnpm npm:publish:check # build + test all five, pack/bundle/inspect the four adapters (no publish)
 pnpm npm:publish:all   # same preflight, then publish the four adapters (Core is never published)
+pnpm size         # gzip budgets per adapter entry (and `/native` must carry no Overlay code)
 pnpm readme:check # README structure: EN/VI/CN parity, absolute links, H1 = package name
 
 pnpm dev:vanilla
@@ -100,7 +101,7 @@ pnpm monitor      # dependency dashboard at http://127.0.0.1:4177
 - **Scope:** Select and Combobox (`Select` with an optional `Select.Input`) plus `NativeSelect`.
   No bundled CSS/themes, no schema validation, no JS animation engine. Virtualization,
   creatable options, and built-in tag components are out of scope unless explicitly requested.
-  Scaffold stage (plan 00): adapters export only Overlay type re-exports until plan 03 lands.
+  The public surface is frozen at 1.0.0 (`packages/*/tests/api.test.ts`).
 - **Documentation:** There is intentionally no `docs/` folder and no separate docs app. Product
   documentation lives only in the root README and package READMEs, in EN, VI, and CN, following
   the [readme-system skill](skills/readme-system/SKILL.md). `plans/` are proposals, not docs.

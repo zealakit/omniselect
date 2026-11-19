@@ -16,6 +16,16 @@ export const Empty = forwardRef<HTMLDivElement, SelectEmptyProps>(
     if (count !== "0|false") {
       return null;
     }
-    return <div data-part="empty" {...props} role="presentation" ref={ref} />;
+    return (
+      // biome-ignore lint/a11y/useFocusableInteractive: options are reached through aria-activedescendant, never focused
+      <div
+        data-part="empty"
+        {...props}
+        role="option"
+        aria-disabled="true"
+        aria-selected="false"
+        ref={ref}
+      />
+    );
   },
 );

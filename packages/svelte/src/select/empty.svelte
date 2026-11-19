@@ -16,5 +16,5 @@ const isEmpty = $derived.by(() => {
 </script>
 
 {#if isEmpty}
-  <div data-part="empty" {...rest} role="presentation">{@render children?.()}</div>
+  <div data-part="empty" {...rest} role="option" aria-disabled="true" aria-selected="false">{@render children?.()}</div>
 {/if}
