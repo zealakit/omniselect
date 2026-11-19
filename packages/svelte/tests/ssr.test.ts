@@ -82,3 +82,41 @@ test("NativeSelect renders the default option as selected on the server", () => 
     /<option[^>]*value="b"[^>]*selected|<option[^>]*selected[^>]*value="b"/,
   );
 });
+
+test("Select renders closed, select-only markup on the server", () => {
+  const script = `
+    const { render } = await import("svelte/server");
+    const Harness = (await import("./tests/fixtures/select-harness.svelte")).default;
+    const tree = [
+      { part: "label", text: "L" },
+      { part: "control", children: [
+        { part: "trigger", children: [{ part: "value", props: { placeholder: "Pick" } }] },
+        { part: "clear", text: "x" },
+      ] },
+      { part: "popover", children: [{ part: "list", children: [{ part: "item", props: { value: "a" }, text: "A" }] }] },
+    ];
+    const { body } = render(Harness, { props: { tree, initial: { defaultValue: "b", itemToString: (v) => v.toUpperCase() } } });
+    console.log(JSON.stringify({ document: typeof document, html: body }));
+  `;
+  const output = execFileSync(
+    process.execPath,
+    [
+      "--strip-types",
+      "--import",
+      loader,
+      "--input-type=module",
+      "--eval",
+      script,
+    ],
+    { cwd: packageRoot, encoding: "utf8" },
+  );
+  const result = JSON.parse(output.trim()) as {
+    document: string;
+    html: string;
+  };
+  assert.equal(result.document, "undefined");
+  assert.match(result.html, /role="combobox"/);
+  assert.match(result.html, /aria-expanded="false"/);
+  assert.match(result.html, />B</);
+  assert.doesNotMatch(result.html, /role="listbox"/);
+});

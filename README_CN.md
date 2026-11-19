@@ -42,7 +42,7 @@ npm i @zealakit/omniselect-svelte
 
 ## Examples
 
-[`examples/`](https://github.com/zealakit/omniselect/blob/main/examples) 目录包含 Vanilla、React、Vue、Svelte 和 Next.js 的可运行集成项目。它们导入已编译的工作区包，因此请先构建。每个示例都展示了表单中的 `NativeSelect`。
+[`examples/`](https://github.com/zealakit/omniselect/blob/main/examples) 目录包含 Vanilla、React、Vue、Svelte 和 Next.js 的可运行集成项目。它们导入已编译的工作区包，因此请先构建。每个示例都展示了 `NativeSelect` 和 `Select`。
 
 ```bash
 pnpm install

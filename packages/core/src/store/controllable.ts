@@ -12,6 +12,8 @@ export type Controllable<T> = {
   get: () => T;
   /** Request a change. Controlled: only calls `onChange`. */
   set: (next: T) => void;
+  /** Replace the uncontrolled value without calling `onChange`. */
+  setSilently: (next: T) => void;
   /** Adapter pushes the latest `value` prop and `onChange` after each render. */
   sync: (value: T | undefined, onChange?: (value: T) => void) => void;
   isControlled: () => boolean;
@@ -38,6 +40,11 @@ export function createControllable<T>(
         internal = next;
       }
       onChange?.(next);
+    },
+    setSilently(next) {
+      if (!controlled) {
+        internal = next;
+      }
     },
     sync(value, nextOnChange) {
       if (nextOnChange) {

@@ -1,6 +1,6 @@
 # Plan: `Select` — single selection, select-only combobox, popover
 
-Status: **proposal — not implemented**. Release target: **0.2.0**.
+Status: **implemented**. Release target: **0.2.0**.
 
 Order: **4 of 8**. Requires `02-core-foundation.md`, `03-native-select.md` (0.1.0 shipped), and
 Overlay 1.x installed per `00-init-src.md` §2.1.
@@ -171,3 +171,12 @@ Adapter-only tests:
 ## 10. Out of scope
 
 `Input`/filtering (05), `multiple` and `name` (06), `LoadMore` (07).
+
+## 11. Implementation notes (decisions taken)
+
+- **Presence**: Overlay's own presence was not used; core ships `waitForExit(el)` (`getAnimations()` with an `animationend` fallback and a 1 s safety timeout).
+- **Items register while the popover is mounted.** A selected value has no label until then: pass `itemToString`, or set `Popover` `forceMount` (also needed for type-ahead while closed). The machine keeps a *pending highlight* so `ArrowDown`/`End` still land on the right item when items register after opening.
+- **Vanilla** uses `createOverlay` (shared layer stack) and hides the popover immediately on close, so it has no exit animation. Items live in markup (`data-value`).
+- **Svelte** uses its own non-restoring `use:portal` action: Overlay's restoring portal re-inserts an `{#if}` branch's node after Svelte has removed it.
+- **Modal dialogs** mark other body children inert, so a Select inside one must use `portal={false}` (or portal into the dialog content). The nesting test uses `portal={false}`.
+- Overlay's `useLayer` re-registers when `boundaries`/`onDismiss` identities change; React memoizes them.

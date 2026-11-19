@@ -83,9 +83,121 @@ Peer 依赖：`svelte` `^5.0.0`。应用已提供它。
 | `data-invalid` | Control | 浏览器触发 `invalid` 事件后设置，值改变时清除。 |
 | `data-placeholder` | Control | 单选值为空。 |
 
+## Select
+
+带浮动弹层的自定义 select，构建于 Overlay 之上。它遵循 WAI-ARIA 的 select-only combobox 模式：焦点留在触发器上，高亮项通过 `aria-activedescendant` 播报。请从 `/select` 入口导入。
+
+### Quick start
+
+```svelte
+<script lang="ts">
+  import { Select } from "@zealakit/omniselect-svelte/select";
+
+  let fruit = $state<string | null>("apple");
+</script>
+
+<Select.Root bind:value={fruit}>
+  <Select.Label>Fruit</Select.Label>
+  <Select.Control>
+    <Select.Trigger>
+      <Select.Value placeholder="Pick a fruit" />
+      <Select.Indicator>▾</Select.Indicator>
+    </Select.Trigger>
+    <Select.Clear>×</Select.Clear>
+  </Select.Control>
+  <Select.Popover>
+    <Select.List>
+      <Select.Item value="apple">Apple <Select.ItemIndicator>✓</Select.ItemIndicator></Select.Item>
+      <Select.Item value="banana">Banana</Select.Item>
+    </Select.List>
+  </Select.Popover>
+</Select.Root>
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` (`bind:value`) | `T \| null` | — | 已选值。已定义时为受控。 |
+| `defaultValue` | `T \| null` | `null` | 非受控时的初始值。 |
+| `onValueChange` | `(value: T \| null) => void` | — | 值变化时调用。 |
+| `open` (`bind:open`) | `boolean` | — | 受控的打开状态。 |
+| `defaultOpen` | `boolean` | `false` | 初始打开状态。 |
+| `onOpenChange` | `(open, reason) => void` | — | 以新状态和原因调用：`trigger`、`keyboard`、`select`、`escape`、`tab`、`outside`、`toggle`、`empty` 或 `imperative`。 |
+| `itemToKey` | `(value: T) => string` | `String` | 将值映射为稳定的字符串 key。默认 `String`。 |
+| `itemToString` | `(value: T) => string` | `String` | 已选值对应选项尚未挂载时使用的标签。 |
+| `disabled`, `required` | `boolean` | `false` | 禁止打开和选择。 |
+| `closeOnSelect` | `boolean` | `true` | 选择后关闭。 |
+| `allowsEmptyCollection` | `boolean` | `true` | 为 `false` 时，没有内容可显示就不打开弹层。 |
+| `loop` | `boolean` | `false` | 键盘导航在两端循环。 |
+| `placement` | `Placement` | `"bottom-start"` | 弹层的首选位置。 |
+| `offset` | `number` | `4` | 锚点与弹层之间的间距（像素）。 |
+| `matchWidth` | `boolean` | `true` | 在弹层上设置 `--omniselect-anchor-width`。 |
+| `portal` | `boolean \| Element` | `true` | `true` 传送到 `document.body`，传入元素则传送到该元素，`false` 原地渲染。 |
+| `children` | `Snippet` | — | 各个 part。Root 不渲染任何元素。 |
+
+### Parts
+
+| Part | Element | Notes |
+| --- | --- | --- |
+| `Root` | 无 | 持有状态、id 和选项集合。 |
+| `Label` | `span` | 可访问名称，由触发器引用。 |
+| `Control` | `div` | 将触发器和清除按钮组合在一起，弹层锚定于此。 |
+| `Trigger` | `button` | `role="combobox"`；切换弹层并处理键盘。 |
+| `Value` | `span` | 已选标签或占位文本。 |
+| `Clear` | `button` | 重置选择。请放在触发器旁边。 |
+| `Indicator` | `span` | 装饰图标，带 `aria-hidden`。 |
+| `Popover` | `div` | 带翻转和平移的浮动层，可通过 Escape 和外部点击关闭。 |
+| `List` | `div` | `role="listbox"`。 |
+| `Group`、`GroupLabel` | `div` | 由其标签命名的 `role="group"`；`disabled` 会向下级联。 |
+| `Item` | `div` | `role="option"`；接受 `value`、`disabled`、`textValue`。 |
+| `ItemIndicator` | `span` | 仅在所属选项被选中时渲染。 |
+| `Empty` | `div` | 没有内容可显示时渲染。 |
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `Popover` `forceMount` | `boolean` | `false` | 关闭时让弹层保留在 DOM 中（隐藏）。 |
+| `Value` `placeholder` | `string` | — | 未选择时显示。 |
+| `Clear` `label` | `string` | `"Clear selection"` | 清除按钮的可访问名称。 |
+| `Item` `value`, `disabled`, `textValue` | `T`, `boolean`, `string` | — | 选项的值；触发器显示其文本。 用于 Value 和 type-ahead 的文本。 |
+
+### Keyboard
+
+| Key | Closed | Open |
+| --- | --- | --- |
+| ArrowDown / ArrowUp | 在已选项、第一项或最后一项处打开 | 移动高亮 |
+| Home / End | 在第一项 / 最后一项处打开 | 移到第一项 / 最后一项 |
+| PageDown / PageUp | — | 一次移动十项 |
+| Enter / Space | 打开 | 选中高亮项 |
+| Alt+ArrowUp | — | 选中高亮项并关闭 |
+| Tab | — | 选中高亮项、关闭并移动焦点 |
+| Escape | — | 关闭并将焦点还给触发器 |
+| 可打印字符 | 选中匹配项 | 高亮匹配项 |
+| Backspace / Delete | 挂载了 `Clear` 时清除 | — |
+
+### Styling hooks
+
+| Attribute | Where | Purpose |
+| --- | --- | --- |
+| `data-state` | Trigger、Control、Indicator、Popover、List | `open` 或 `closed`。 |
+| `data-placeholder` | Trigger、Value | 尚未选择。 |
+| `data-highlighted` | Item | 键盘或指针高亮。 |
+| `data-selected`、`data-state` | Item | 已选（`checked`）或未选。 |
+| `data-disabled` | Root 各 part、Item、Group | 禁用状态。 |
+| `data-side`、`data-align` | Popover | 解析后的位置。 |
+| `--omniselect-anchor-width` | Popover | control 的宽度，用于 `matchWidth`。 |
+| `--omniselect-available-height` | Popover | 弹层所在一侧的剩余空间。 |
+
+### Notes
+
+- 选项在弹层挂载后才会注册。在打开之前，已选值没有标签：请传入 `itemToString`，或给 `Popover` 设置 `forceMount` 以保持选项处于注册状态（这也让 type-ahead 在关闭时可用）。
+- `Popover` 会以 `data-state="closed"` 保持挂载，直到 CSS 退出动画结束，因此请直接用 CSS 做动画。
+- Escape 和外部点击会经过 Overlay 共享的层栈。位于 Overlay `Dialog` 内的 Select 会在 Escape 时先关闭。在模态 Dialog 内，请设置 `portal={false}`（或传送到对话框内容中），因为模态对话框会把 body 的其他子元素标记为 inert。
+- `Clear` 和 `Indicator` 不能放在 `Trigger` 内，`Item`、`Group` 和 `Empty` 必须放在 `List` 内；开发构建在违反时会给出警告。
+
 ## Status
 
-`NativeSelect` 已可用。`Select` 和 `Combobox` 将在后续版本提供，因此该包同样只导出下面的 Overlay 类型。
+`NativeSelect` 和 `Select` 已可用。Combobox 搜索、多选和异步加载将在后续版本提供，因此该包同样只导出下面的 Overlay 类型。
 
 | Export | From |
 | --- | --- |

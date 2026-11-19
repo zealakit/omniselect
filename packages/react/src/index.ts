@@ -1,6 +1,7 @@
 "use client";
 
 export * from "./native/index.js";
+export * from "./select/index.js";
 export type {
   AnimationConfig,
   AnimationDirection,

@@ -79,6 +79,143 @@ export function readFormData(root: ParentNode): [string, string][] {
   return entries;
 }
 
+function encodeKey(key: string): string {
+  return encodeURIComponent(key).replaceAll("%", "_");
+}
+
+/** Select part lookup. Popover content is portaled, so the whole document is searched. */
+export function querySelectPart(
+  root: ParentNode,
+  ref: PartRef,
+): Element | null {
+  const doc = root.ownerDocument ?? document;
+  const first = (selector: string) => doc.querySelector(selector);
+  if (ref === "trigger") return first("[role=combobox]:not(input)");
+  if (ref === "input") return first("input[role=combobox]");
+  if (ref === "list") return first("[role=listbox]");
+  if (ref === "outside") return first("[data-part=outside]");
+  if (ref.startsWith("item:")) {
+    return first(`[role=option][id$="-item-${encodeKey(ref.slice(5))}"]`);
+  }
+  if (ref.startsWith("group:")) {
+    return first("[role=group]");
+  }
+  if (ref.startsWith("itemIndicator:")) {
+    return first(
+      `[role=option][id$="-item-${encodeKey(ref.slice(14))}"] [data-part=item-indicator]`,
+    );
+  }
+  return first(
+    `[data-part=${ref.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}]`,
+  );
+}
+
+export function readSelectVisibleItems(root: ParentNode): string[] {
+  const doc = root.ownerDocument ?? document;
+  return Array.from(doc.querySelectorAll("[role=option]")).map((el) => {
+    const id = el.getAttribute("id") ?? "";
+    const raw = id.slice(id.indexOf("-item-") + 6);
+    return decodeURIComponent(raw.replaceAll("_", "%"));
+  });
+}
+
+const keyboardInit = (
+  key: string,
+  mods: { shift?: boolean; alt?: boolean; ctrl?: boolean; meta?: boolean } = {},
+) => ({
+  key,
+  shiftKey: mods.shift ?? false,
+  altKey: mods.alt ?? false,
+  ctrlKey: mods.ctrl ?? false,
+  metaKey: mods.meta ?? false,
+  bubbles: true,
+  cancelable: true,
+});
+
+function pointer(target: Element, type: string): void {
+  const event = new window.Event(type, { bubbles: true, cancelable: true });
+  Object.defineProperty(event, "button", { value: 0 });
+  Object.defineProperty(event, "isPrimary", { value: true });
+  Object.defineProperty(event, "pointerType", { value: "mouse" });
+  target.dispatchEvent(event);
+}
+
+/** DOM steps for Select scenarios, identical in every adapter. Returns `true` if handled. */
+export function performSelectDomStep(
+  root: ParentNode,
+  step: { type: string; [key: string]: unknown },
+): boolean {
+  const find = (ref: string) =>
+    querySelectPart(root, ref) as HTMLElement | null;
+  switch (step.type) {
+    case "press": {
+      const target = find((step.target as string | undefined) ?? "trigger");
+      target?.dispatchEvent(
+        new window.KeyboardEvent(
+          "keydown",
+          keyboardInit(step.key as string, step.mods as never),
+        ),
+      );
+      return true;
+    }
+    case "type": {
+      const target = find((step.target as string | undefined) ?? "trigger");
+      for (const char of step.text as string) {
+        target?.dispatchEvent(
+          new window.KeyboardEvent("keydown", keyboardInit(char)),
+        );
+      }
+      return true;
+    }
+    case "click": {
+      const target = find(step.target as string);
+      if (target) {
+        pointer(target, "pointerdown");
+        target.dispatchEvent(
+          new window.MouseEvent("mousedown", {
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+        pointer(target, "pointerup");
+        target.dispatchEvent(
+          new window.MouseEvent("click", { bubbles: true, cancelable: true }),
+        );
+      }
+      return true;
+    }
+    case "hover": {
+      const target = find(step.target as string);
+      if (target) {
+        pointer(target, "pointermove");
+      }
+      return true;
+    }
+    case "focus":
+      find(step.target as string)?.focus();
+      return true;
+    case "blur":
+      (document.activeElement as HTMLElement | null)?.blur();
+      return true;
+    case "submitForm":
+      return true;
+    case "resetForm":
+      (root.querySelector("form") as HTMLFormElement | null)?.reset();
+      return true;
+    default:
+      return false;
+  }
+}
+
+export function makeItemToString(
+  labelBy: string | undefined,
+): ((value: unknown) => string) | undefined {
+  if (!labelBy) {
+    return undefined;
+  }
+  return (value) => String((value as Record<string, unknown>)[labelBy]);
+}
+
 export function makeItemToKey(
   keyBy: string | undefined,
 ): ((value: unknown) => string) | undefined {
@@ -103,6 +240,10 @@ export function withCallbacks(
   const itemToKey = makeItemToKey(scenario.keyBy);
   if (itemToKey) {
     props.itemToKey = itemToKey;
+  }
+  const itemToString = makeItemToString(scenario.labelBy);
+  if (itemToString) {
+    props.itemToString = itemToString;
   }
   return props;
 }

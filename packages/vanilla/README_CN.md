@@ -88,9 +88,109 @@ handle.destroy();
 | `data-invalid` | Control | 浏览器触发 `invalid` 事件后设置，值改变时清除。 |
 | `data-placeholder` | Control | 单选值为空。 |
 
+## Select
+
+带浮动弹层的自定义 select，构建于 Overlay 之上。它遵循 WAI-ARIA 的 select-only combobox 模式：焦点留在触发器上，高亮项通过 `aria-activedescendant` 播报。请从 `/select` 入口导入。
+
+### Quick start
+
+```html
+<div id="fruit">
+  <span data-part="label">Fruit</span>
+  <div data-part="control">
+    <button data-part="trigger"><span data-part="value">Pick a fruit</span></button>
+    <button data-part="clear">×</button>
+  </div>
+  <div data-part="popover">
+    <div data-part="list">
+      <div data-part="item" data-value="apple">Apple <span data-part="item-indicator">✓</span></div>
+      <div data-part="item" data-value="banana">Banana</div>
+    </div>
+  </div>
+</div>
+```
+
+```ts
+import { createSelect } from "@zealakit/omniselect-vanilla/select";
+
+const select = createSelect(document.getElementById("fruit") as HTMLElement, {
+  defaultValue: "apple",
+  onValueChange: (value) => console.log(value),
+});
+
+select.destroy();
+```
+
+### Props
+
+| Marker | Element | Purpose |
+| --- | --- | --- |
+| `[data-part="trigger"]` | `button` | **必需。** 可聚焦的触发器。 |
+| `[data-part="popover"]` | 任意 | **必需。** 浮动层。 |
+| `[data-part="list"]` | 任意 | **必需。** 位于弹层内。 |
+| `[data-part="item"]` | 任意 | `data-value` 是 key；`data-disabled` 将其禁用。 |
+| `label`、`control`、`value`、`clear`、`indicator`、`group`、`group-label`、`item-indicator`、`empty` | 任意 | 可选 part，通过 `data-part` 查找。 |
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `defaultValue` | `string \| null` | `null` | 非受控时的初始值。 |
+| `onValueChange` | `(value: string \| null) => void` | — | 值变化时调用。 |
+| `defaultOpen` | `boolean` | `false` | 初始打开状态。 |
+| `onOpenChange` | `(open, reason) => void` | — | 以新状态和原因调用：`trigger`、`keyboard`、`select`、`escape`、`tab`、`outside`、`toggle`、`empty` 或 `imperative`。 |
+| `disabled`, `required` | `boolean` | `false` | 禁止打开和选择。 |
+| `closeOnSelect` | `boolean` | `true` | 选择后关闭。 |
+| `allowsEmptyCollection` | `boolean` | `true` | 为 `false` 时，没有内容可显示就不打开弹层。 |
+| `loop` | `boolean` | `false` | 键盘导航在两端循环。 |
+| `placement`, `offset`, `matchWidth` | native | see below | 弹层的首选位置。 |
+| `portal` | `Element \| null` | `document.body` | `true` 传送到 `document.body`，传入元素则传送到该元素，`false` 原地渲染。 |
+| `clearLabel` | `string` | `"Clear selection"` | 清除按钮的可访问名称。 |
+
+| Method | Returns | Description |
+| --- | --- | --- |
+| `getValue()` | `string \| null` | 已选 key。 |
+| `setValue(value)` | `void` | 按 key 选择。不会调用 `onValueChange`。 |
+| `open()`、`close()` | `void` | 改变可见性。 |
+| `refresh()` | `void` | 修改标记后重新读取选项。 |
+| `destroy()` | `void` | 移除监听器和 overlay。 |
+
+### Keyboard
+
+| Key | Closed | Open |
+| --- | --- | --- |
+| ArrowDown / ArrowUp | 在已选项、第一项或最后一项处打开 | 移动高亮 |
+| Home / End | 在第一项 / 最后一项处打开 | 移到第一项 / 最后一项 |
+| PageDown / PageUp | — | 一次移动十项 |
+| Enter / Space | 打开 | 选中高亮项 |
+| Alt+ArrowUp | — | 选中高亮项并关闭 |
+| Tab | — | 选中高亮项、关闭并移动焦点 |
+| Escape | — | 关闭并将焦点还给触发器 |
+| 可打印字符 | 选中匹配项 | 高亮匹配项 |
+| Backspace / Delete | 挂载了 `Clear` 时清除 | — |
+
+### Styling hooks
+
+| Attribute | Where | Purpose |
+| --- | --- | --- |
+| `data-state` | Trigger、Control、Indicator、Popover、List | `open` 或 `closed`。 |
+| `data-placeholder` | Trigger、Value | 尚未选择。 |
+| `data-highlighted` | Item | 键盘或指针高亮。 |
+| `data-selected`、`data-state` | Item | 已选（`checked`）或未选。 |
+| `data-disabled` | Root 各 part、Item、Group | 禁用状态。 |
+| `data-side`、`data-align` | Popover | 解析后的位置。 |
+| `--omniselect-anchor-width` | Popover | control 的宽度，用于 `matchWidth`。 |
+| `--omniselect-available-height` | Popover | 弹层所在一侧的剩余空间。 |
+
+### Notes
+
+- 选项在弹层挂载后才会注册。在打开之前，已选值没有标签：请传入 `itemToString`，或给 `Popover` 设置 `forceMount` 以保持选项处于注册状态（这也让 type-ahead 在关闭时可用）。
+- `Popover` 会以 `data-state="closed"` 保持挂载，直到 CSS 退出动画结束，因此请直接用 CSS 做动画。
+- Escape 和外部点击会经过 Overlay 共享的层栈。位于 Overlay `Dialog` 内的 Select 会在 Escape 时先关闭。在模态 Dialog 内，请设置 `portal={false}`（或传送到对话框内容中），因为模态对话框会把 body 的其他子元素标记为 inert。
+- `Clear` 和 `Indicator` 不能放在 `Trigger` 内，`Item`、`Group` 和 `Empty` 必须放在 `List` 内；开发构建在违反时会给出警告。
+- 值是字符串。选项写在标记中，修改后用 `refresh()` 重新读取；弹层在关闭时立即隐藏，因此没有退出动画。
+
 ## Status
 
-`NativeSelect` 已可用。`Select` 和 `Combobox` 将在后续版本提供，因此该包同样只导出下面的 Overlay 类型。
+`NativeSelect` 和 `Select` 已可用。Combobox 搜索、多选和异步加载将在后续版本提供，因此该包同样只导出下面的 Overlay 类型。
 
 | Export | From |
 | --- | --- |

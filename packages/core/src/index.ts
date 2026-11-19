@@ -49,3 +49,20 @@ export {
 } from "./typeahead.js";
 export { devWarn } from "./utils/dev-warn.js";
 export { getGlobalState } from "./utils/global-state.js";
+export { waitForExit } from "./presence.js";
+export {
+  type Attrs,
+  createSelectMachine,
+  type KeyEventLike,
+  type KeyResult,
+  type SelectCloseReason,
+  type SelectHighlightSource,
+  type SelectMachine,
+  type SelectMachineOptions,
+  type SelectOpenReason,
+  type SelectProps,
+  type SelectState,
+  type SelectValue,
+} from "./select-machine.js";
+export { getPopoverVars, type PopoverVars } from "./popover-vars.js";
+export { checkStructure } from "./structure.js";

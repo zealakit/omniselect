@@ -1,4 +1,5 @@
 import { createNativeSelect } from "@zealakit/omniselect-vanilla/native";
+import { createSelect } from "@zealakit/omniselect-vanilla/select";
 import "./styles.css";
 
 const root = document.getElementById("fruit") as HTMLElement;
@@ -15,4 +16,8 @@ createNativeSelect(root, {
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   submitted.textContent = JSON.stringify([...new FormData(form).entries()]);
+});
+
+createSelect(document.getElementById("select") as HTMLElement, {
+  defaultValue: "apple",
 });

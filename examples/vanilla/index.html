@@ -24,6 +24,27 @@
       </form>
       <p>Value: <span id="value">none</span></p>
       <pre id="submitted"></pre>
+      <h2>Select</h2>
+      <div class="field" id="select">
+        <span data-part="label">Fruit</span>
+        <div data-part="control">
+          <span class="select-control">
+            <button data-part="trigger" type="button">
+              <span data-part="value">Pick a fruit</span>
+              <span data-part="indicator">▾</span>
+            </button>
+            <button data-part="clear" type="button">×</button>
+          </span>
+        </div>
+        <div data-part="popover">
+          <div data-part="list">
+            <div data-part="item" data-value="apple">apple <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="banana">banana <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="cherry" data-disabled>cherry <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="date">date <span data-part="item-indicator">✓</span></div>
+          </div>
+        </div>
+      </div>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>

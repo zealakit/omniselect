@@ -1,4 +1,5 @@
 import { NativeSelect } from "@zealakit/omniselect-react/native";
+import { Select } from "@zealakit/omniselect-react/select";
 import { type FormEvent, useState } from "react";
 
 type Fruit = { id: number; name: string };
@@ -49,6 +50,38 @@ export function App() {
         </div>
       </form>
       <p>Value: {fruit?.name ?? "none"}</p>
+      <h2>Select</h2>
+      <div className="field">
+        <Select.Root
+          defaultValue="apple"
+          itemToString={(value: string) => value}
+        >
+          <Select.Label>Fruit</Select.Label>
+          <Select.Control>
+            <span className="select-control">
+              <Select.Trigger>
+                <Select.Value placeholder="Pick a fruit" />
+                <Select.Indicator>▾</Select.Indicator>
+              </Select.Trigger>
+              <Select.Clear>×</Select.Clear>
+            </span>
+          </Select.Control>
+          <Select.Popover>
+            <Select.List>
+              {["apple", "banana", "cherry", "date"].map((name) => (
+                <Select.Item
+                  key={name}
+                  value={name}
+                  disabled={name === "cherry"}
+                >
+                  {name}
+                  <Select.ItemIndicator>✓</Select.ItemIndicator>
+                </Select.Item>
+              ))}
+            </Select.List>
+          </Select.Popover>
+        </Select.Root>
+      </div>
       <pre>{submitted}</pre>
     </main>
   );

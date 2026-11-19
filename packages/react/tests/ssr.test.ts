@@ -64,3 +64,35 @@ test("NativeSelect renders the default option as selected on the server", () => 
   assert.match(result.html, /<option value="b" selected="">B<\/option>/);
   assert.match(result.html, /<label for=/);
 });
+
+test("Select renders closed, select-only markup on the server", () => {
+  const script = `
+    const React = await import("react");
+    const { renderToString } = await import("react-dom/server");
+    const { Select } = await import("./dist/select/index.js");
+    const h = React.createElement;
+    const html = renderToString(
+      h(Select.Root, { defaultValue: "b", itemToString: (v) => v.toUpperCase() },
+        h(Select.Label, null, "L"),
+        h(Select.Control, null,
+          h(Select.Trigger, null, h(Select.Value, { placeholder: "Pick" })),
+          h(Select.Clear, null, "x")),
+        h(Select.Popover, null, h(Select.List, null, h(Select.Item, { value: "a" }, "A")))),
+    );
+    console.log(JSON.stringify({ document: typeof document, html }));
+  `;
+  const output = execFileSync(
+    process.execPath,
+    ["--input-type=module", "--eval", script],
+    { cwd: packageRoot, encoding: "utf8" },
+  );
+  const result = JSON.parse(output.trim()) as {
+    document: string;
+    html: string;
+  };
+  assert.equal(result.document, "undefined");
+  assert.match(result.html, /role="combobox"/);
+  assert.match(result.html, /aria-expanded="false"/);
+  assert.match(result.html, />B</);
+  assert.doesNotMatch(result.html, /role="listbox"/);
+});

@@ -11,7 +11,7 @@ import { useNativeContext } from "./context.js";
 /** The semantic `<select>`. The only focusable element. */
 export const Control = defineComponent({
   name: "NativeSelectControl",
-  setup(_props, { slots, attrs }) {
+  setup(_props, { slots }) {
     const context = useNativeContext("Control");
     const { controller } = context;
     const select = ref<HTMLSelectElement | null>(null);
@@ -44,7 +44,6 @@ export const Control = defineComponent({
         "select",
         {
           id: context.controlId,
-          ...attrs,
           ref: select,
           name: props.name,
           form: props.form,

@@ -19,7 +19,7 @@ export const Option = defineComponent({
     textValue: { type: String, default: undefined },
     disabled: { type: Boolean, default: false },
   },
-  setup(props, { slots, attrs }) {
+  setup(props, { slots }) {
     const context = useNativeContext("Option");
     const group = inject(groupKey, { disabled: false });
     const element = ref<HTMLOptionElement | null>(null);
@@ -49,7 +49,6 @@ export const Option = defineComponent({
       return h(
         "option",
         {
-          ...attrs,
           ref: element,
           value: key(),
           selected,

@@ -42,7 +42,7 @@ npm i @zealakit/omniselect-svelte
 
 ## Examples
 
-The [`examples/`](https://github.com/zealakit/omniselect/blob/main/examples) folder holds runnable integration projects for Vanilla, React, Vue, Svelte, and Next.js. They import the compiled workspace packages, so build first. Each example shows a `NativeSelect` inside a form.
+The [`examples/`](https://github.com/zealakit/omniselect/blob/main/examples) folder holds runnable integration projects for Vanilla, React, Vue, Svelte, and Next.js. They import the compiled workspace packages, so build first. Each example shows a `NativeSelect` and a `Select`.
 
 ```bash
 pnpm install

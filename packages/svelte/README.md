@@ -83,9 +83,121 @@ Render an option whose value is `null` for the empty state. Its key is `""`, and
 | `data-invalid` | Control | Set after the browser `invalid` event, cleared on change. |
 | `data-placeholder` | Control | A single value is empty. |
 
+## Select
+
+A custom select with a floating popover, built on Overlay. It uses the WAI-ARIA select-only combobox pattern: focus stays on the trigger and the highlighted item is announced through `aria-activedescendant`. Import it from the `/select` entry.
+
+### Quick start
+
+```svelte
+<script lang="ts">
+  import { Select } from "@zealakit/omniselect-svelte/select";
+
+  let fruit = $state<string | null>("apple");
+</script>
+
+<Select.Root bind:value={fruit}>
+  <Select.Label>Fruit</Select.Label>
+  <Select.Control>
+    <Select.Trigger>
+      <Select.Value placeholder="Pick a fruit" />
+      <Select.Indicator>▾</Select.Indicator>
+    </Select.Trigger>
+    <Select.Clear>×</Select.Clear>
+  </Select.Control>
+  <Select.Popover>
+    <Select.List>
+      <Select.Item value="apple">Apple <Select.ItemIndicator>✓</Select.ItemIndicator></Select.Item>
+      <Select.Item value="banana">Banana</Select.Item>
+    </Select.List>
+  </Select.Popover>
+</Select.Root>
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` (`bind:value`) | `T \| null` | — | Selected value. Controlled when defined. |
+| `defaultValue` | `T \| null` | `null` | Initial value when uncontrolled. |
+| `onValueChange` | `(value: T \| null) => void` | — | Called when the value changes. |
+| `open` (`bind:open`) | `boolean` | — | Controlled open state. |
+| `defaultOpen` | `boolean` | `false` | Initial open state. |
+| `onOpenChange` | `(open, reason) => void` | — | Called with the new state and a reason: `trigger`, `keyboard`, `select`, `escape`, `tab`, `outside`, `toggle`, `empty`, or `imperative`. |
+| `itemToKey` | `(value: T) => string` | `String` | Maps a value to a stable string key. Default `String`. |
+| `itemToString` | `(value: T) => string` | `String` | Label for a selected value whose item is not mounted. |
+| `disabled`, `required` | `boolean` | `false` | Blocks opening and selecting. |
+| `closeOnSelect` | `boolean` | `true` | Close after a pick. |
+| `allowsEmptyCollection` | `boolean` | `true` | When `false`, the popover does not open while there is nothing to show. |
+| `loop` | `boolean` | `false` | Wrap keyboard navigation at the ends. |
+| `placement` | `Placement` | `"bottom-start"` | Preferred popover placement. |
+| `offset` | `number` | `4` | Gap between the anchor and the popover, in pixels. |
+| `matchWidth` | `boolean` | `true` | Set `--omniselect-anchor-width` on the popover. |
+| `portal` | `boolean \| Element` | `true` | `true` portals to `document.body`, an element portals there, `false` renders in place. |
+| `children` | `Snippet` | — | The parts. The Root renders no element. |
+
+### Parts
+
+| Part | Element | Notes |
+| --- | --- | --- |
+| `Root` | none | State, ids, and the option collection. |
+| `Label` | `span` | Accessible name, referenced by the trigger. |
+| `Control` | `div` | Groups trigger and clear; the popover anchors to it. |
+| `Trigger` | `button` | `role="combobox"`; toggles the popover and handles the keyboard. |
+| `Value` | `span` | Selected label or placeholder. |
+| `Clear` | `button` | Resets the selection. Place it beside the trigger. |
+| `Indicator` | `span` | Decorative icon, `aria-hidden`. |
+| `Popover` | `div` | Floating surface with flip and shift, dismissed by Escape and outside press. |
+| `List` | `div` | `role="listbox"`. |
+| `Group`, `GroupLabel` | `div` | `role="group"` labelled by its label; `disabled` cascades. |
+| `Item` | `div` | `role="option"`; takes `value`, `disabled`, `textValue`. |
+| `ItemIndicator` | `span` | Renders only while its item is selected. |
+| `Empty` | `div` | Rendered while there is nothing to show. |
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `Popover` `forceMount` | `boolean` | `false` | Keep the popover in the DOM (hidden) while closed. |
+| `Value` `placeholder` | `string` | — | Shown while nothing is selected. |
+| `Clear` `label` | `string` | `"Clear selection"` | Accessible name of the Clear button. |
+| `Item` `value`, `disabled`, `textValue` | `T`, `boolean`, `string` | — | Value of the option; the trigger shows its text. Text used for the Value and type-ahead. |
+
+### Keyboard
+
+| Key | Closed | Open |
+| --- | --- | --- |
+| ArrowDown / ArrowUp | Opens on the selected, first, or last item | Moves the highlight |
+| Home / End | Opens on the first / last item | Moves to the first / last item |
+| PageDown / PageUp | — | Moves by ten items |
+| Enter / Space | Opens | Selects the highlighted item |
+| Alt+ArrowUp | — | Selects the highlighted item and closes |
+| Tab | — | Selects the highlighted item, closes, and moves focus on |
+| Escape | — | Closes and returns focus to the trigger |
+| Printable characters | Selects the matching item | Highlights the matching item |
+| Backspace / Delete | Clears, when a `Clear` is mounted | — |
+
+### Styling hooks
+
+| Attribute | Where | Purpose |
+| --- | --- | --- |
+| `data-state` | Trigger, Control, Indicator, Popover, List | `open` or `closed`. |
+| `data-placeholder` | Trigger, Value | Nothing is selected. |
+| `data-highlighted` | Item | The keyboard or pointer highlight. |
+| `data-selected`, `data-state` | Item | Selected (`checked`) or not. |
+| `data-disabled` | Root parts, Item, Group | Disabled state. |
+| `data-side`, `data-align` | Popover | Resolved placement. |
+| `--omniselect-anchor-width` | Popover | Width of the control, for `matchWidth`. |
+| `--omniselect-available-height` | Popover | Room left on the popover's side. |
+
+### Notes
+
+- Items register while the popover is mounted. Until it opens, a selected value has no label: pass `itemToString`, or set `forceMount` on `Popover` to keep the items registered (this also lets type-ahead work while closed).
+- `Popover` stays mounted with `data-state="closed"` until its CSS exit animation finishes, so animate with plain CSS.
+- Escape and outside presses go through Overlay's shared layer stack. A Select inside an Overlay `Dialog` closes first on Escape. Inside a modal Dialog, set `portal={false}` (or portal into the dialog content), because a modal marks other body children inert.
+- `Clear` and `Indicator` must not sit inside `Trigger`, and `Item`, `Group`, and `Empty` must sit inside `List`; development builds warn otherwise.
+
 ## Status
 
-`NativeSelect` is available. `Select` and `Combobox` land in later releases, so the package also exports only the Overlay types below.
+`NativeSelect` and `Select` are available. Combobox search, multiple selection, and async loading land in later releases, so the package also exports only the Overlay types below.
 
 | Export | From |
 | --- | --- |

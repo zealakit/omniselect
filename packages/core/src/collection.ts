@@ -57,6 +57,7 @@ export function createCollection<T>(
     v: number;
     items: CollectionItem<T>[];
     visible: CollectionItem<T>[];
+    byKey: Map<string, CollectionItem<T>>;
   } | null = null;
 
   const bump = (): void => {
@@ -87,7 +88,12 @@ export function createCollection<T>(
       filter === false
         ? items
         : items.filter((item) => (filter as FilterFn<T>)(item, query));
-    cache = { v: version, items, visible };
+    cache = {
+      v: version,
+      items,
+      visible,
+      byKey: new Map(items.map((item) => [item.key, item])),
+    };
     return cache;
   };
 
@@ -140,7 +146,7 @@ export function createCollection<T>(
     },
     items: () => resolve().items,
     visible: () => resolve().visible,
-    get: (key) => resolve().items.find((item) => item.key === key),
+    get: (key) => resolve().byKey.get(key),
     setFilter(nextQuery, nextFilter) {
       query = nextQuery;
       filter = nextFilter === undefined ? defaultFilter : nextFilter;

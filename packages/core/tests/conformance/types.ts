@@ -35,6 +35,7 @@ export type Step =
   | { type: "press"; key: string; target?: PartRef; mods?: Mods }
   | { type: "type"; text: string; target?: PartRef }
   | { type: "click"; target: PartRef }
+  | { type: "hover"; target: PartRef }
   | { type: "focus"; target: PartRef }
   | { type: "blur"; target?: PartRef }
   | { type: "select"; target: PartRef; values: string[] }
@@ -64,6 +65,8 @@ export type Scenario = {
   form?: boolean;
   /** Build `itemToKey` as `String(value[keyBy])` (`null` stays `""`). */
   keyBy?: string;
+  /** Build `itemToString` as `String(value[labelBy])`. */
+  labelBy?: string;
   /** Adapters that cannot express this scenario (documented, not silent). */
   skip?: Partial<Record<"vanilla" | "react" | "vue" | "svelte", string>>;
   tree: PartNode[];

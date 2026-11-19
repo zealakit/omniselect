@@ -7,7 +7,16 @@ function check(mounted: Mounted, expect: Expectation, where: string): void {
     const el = mounted.query(ref);
     assert.ok(el, `${where}: part "${ref}" is not mounted`);
     for (const [name, want] of Object.entries(attrs)) {
-      assert.equal(el.getAttribute(name), want, `${where}: ${ref}[${name}]`);
+      // "@id:<part>" stands for the generated id of another part.
+      const expected =
+        typeof want === "string" && want.startsWith("@id:")
+          ? (mounted.query(want.slice(4))?.id ?? null)
+          : want;
+      assert.equal(
+        el.getAttribute(name),
+        expected,
+        `${where}: ${ref}[${name}]`,
+      );
     }
   }
   if (expect.active !== undefined) {
@@ -16,10 +25,10 @@ function check(mounted: Mounted, expect: Expectation, where: string): void {
       const el = active && active !== document.body ? active : null;
       assert.equal(el, null, `${where}: expected no active part`);
     } else {
-      assert.equal(
-        active,
-        mounted.query(expect.active),
-        `${where}: active part should be ${expect.active}`,
+      // Compare as booleans: inspecting DOM nodes in a failed assertion hangs.
+      assert.ok(
+        active === mounted.query(expect.active),
+        `${where}: active part should be ${expect.active} (active: ${active?.tagName ?? "none"} ${active?.getAttribute?.("data-part") ?? ""})`,
       );
     }
   }
@@ -27,9 +36,8 @@ function check(mounted: Mounted, expect: Expectation, where: string): void {
     assert.ok(mounted.query(ref), `${where}: "${ref}" should be present`);
   }
   for (const ref of expect.absent ?? []) {
-    assert.equal(
-      mounted.query(ref),
-      null,
+    assert.ok(
+      mounted.query(ref) === null,
       `${where}: "${ref}" should be absent`,
     );
   }
@@ -82,7 +90,14 @@ export function runConformance(
         for (const step of scenario.steps) {
           index += 1;
           if (step.type === "expect") {
-            check(mounted, step.expect, `step ${index}`);
+            try {
+              check(mounted, step.expect, `step ${index}`);
+            } catch (error) {
+              // Keep failures readable: diffs of whole DOM strings can be huge.
+              const message =
+                error instanceof Error ? error.message : String(error);
+              throw new Error(message.slice(0, 600));
+            }
           } else {
             await mounted.act(step);
           }

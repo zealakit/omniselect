@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { NativeSelect } from "@zealakit/omniselect-vue/native";
+import { Select } from "@zealakit/omniselect-vue/select";
 import { ref } from "vue";
 
 type Fruit = { id: number; name: string };
@@ -11,6 +12,8 @@ const fruits: Fruit[] = [
 ];
 const fruit = ref<Fruit | null>(null);
 const submitted = ref("");
+const fruitName = ref<string | null>("apple");
+const names = ["apple", "banana", "cherry", "date"];
 const itemToKey = (value: Fruit) => String(value.id);
 
 function onSubmit(event: Event) {
@@ -40,5 +43,28 @@ function onSubmit(event: Event) {
     </form>
     <p>Value: {{ fruit?.name ?? "none" }}</p>
     <pre>{{ submitted }}</pre>
+    <h2>Select</h2>
+    <div class="field">
+      <Select.Root v-model="fruitName" :item-to-string="(value: string) => value">
+        <Select.Label>Fruit</Select.Label>
+        <Select.Control>
+          <span class="select-control">
+            <Select.Trigger>
+              <Select.Value placeholder="Pick a fruit" />
+              <Select.Indicator>▾</Select.Indicator>
+            </Select.Trigger>
+            <Select.Clear>×</Select.Clear>
+          </span>
+        </Select.Control>
+        <Select.Popover>
+          <Select.List>
+            <Select.Item v-for="name in names" :key="name" :value="name" :disabled="name === 'cherry'">
+              {{ name }}
+              <Select.ItemIndicator>✓</Select.ItemIndicator>
+            </Select.Item>
+          </Select.List>
+        </Select.Popover>
+      </Select.Root>
+    </div>
   </main>
 </template>

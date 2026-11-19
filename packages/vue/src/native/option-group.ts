@@ -8,7 +8,7 @@ export const OptionGroup = defineComponent({
     label: { type: String, default: undefined },
     disabled: { type: Boolean, default: false },
   },
-  setup(props, { slots, attrs }) {
+  setup(props, { slots }) {
     const state = reactive({
       get disabled() {
         return props.disabled;
@@ -19,7 +19,6 @@ export const OptionGroup = defineComponent({
       h(
         "optgroup",
         {
-          ...attrs,
           label: props.label,
           disabled: props.disabled,
           "data-disabled": props.disabled ? "" : undefined,
