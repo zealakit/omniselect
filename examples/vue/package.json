@@ -11,13 +11,16 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@vee-validate/zod": "^4.15.1",
     "@zealakit/omniselect-vue": "workspace:*",
-    "vue": "^3.5.22"
+    "vee-validate": "^4.15.1",
+    "vue": "^3.5.22",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",
-    "vue-tsc": "^3.1.1",
     "typescript": "^5.9.3",
-    "vite": "^7.1.12"
+    "vite": "^7.1.12",
+    "vue-tsc": "^3.1.1"
   }
 }

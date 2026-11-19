@@ -3,6 +3,7 @@
 import { NativeSelect } from "@zealakit/omniselect-react/native";
 import { Select } from "@zealakit/omniselect-react/select";
 import { AsyncSelect } from "./async-select";
+import { FormDemo } from "./form-demo";
 import { type FormEvent, useState } from "react";
 
 const fruits = ["apple", "banana", "cherry"];
@@ -148,6 +149,8 @@ export function NativeDemo() {
       <div className="field">
         <AsyncSelect />
       </div>
+      <h2>Forms: react-hook-form + zod</h2>
+      <FormDemo />
     </>
   );
 }

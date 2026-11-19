@@ -158,3 +158,21 @@ pre {
   font: inherit;
   cursor: pointer;
 }
+
+.error {
+  margin: 0;
+  color: #f87171;
+  font-size: 0.875rem;
+}
+
+[aria-invalid="true"],
+[data-part="trigger"][data-invalid],
+[data-part="input"][data-invalid] {
+  border-color: #f87171;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
