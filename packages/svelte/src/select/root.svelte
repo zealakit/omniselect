@@ -4,7 +4,9 @@ import {
   type FilterFn,
   nextId,
   type SelectInputChangeReason,
+  type SelectMessages,
   type SelectionBehavior,
+  visuallyHiddenStyle,
   type SelectCloseReason,
   type SelectOpenReason,
   type SelectState,
@@ -15,9 +17,9 @@ import { SELECT_KEY, type SelectContext } from "./context.js";
 
 type Props = {
   /** Selected value. Use `bind:value`, or `value` + `onValueChange`. */
-  value?: T | null;
-  defaultValue?: T | null;
-  onValueChange?: (value: T | null) => void;
+  value?: T | null | T[];
+  defaultValue?: T | null | T[];
+  onValueChange?: (value: T | null | T[]) => void;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (
@@ -47,6 +49,17 @@ type Props = {
   autoSelectOnTab?: boolean;
   /** Accessible name of the trigger when an input is present. */
   triggerLabel?: string;
+  /** Selects an array of values instead of one. */
+  multiple?: boolean;
+  /** Form field name. Renders a hidden native `<select>` so the value joins FormData. */
+  name?: string;
+  /** Id of the `<form>` the hidden field belongs to. */
+  form?: string;
+  /** Multiple mode: stop accepting picks at this many values. */
+  maxSelected?: number;
+  /** Announce adds and removes in a polite live region (multiple mode). Default `true`. */
+  announce?: boolean;
+  messages?: Partial<SelectMessages>;
   placement?: Placement;
   offset?: number;
   matchWidth?: boolean;
@@ -79,6 +92,12 @@ let {
   autoHighlight,
   autoSelectOnTab,
   triggerLabel,
+  multiple = false,
+  name,
+  form,
+  maxSelected,
+  announce,
+  messages,
   placement = "bottom-start",
   offset = 4,
   matchWidth = true,
@@ -91,13 +110,17 @@ let controlEl: HTMLElement | null = $state(null);
 let inputEl: HTMLInputElement | null = $state(null);
 
 const handleValue = (next: unknown) => {
-  value = next as T | null;
-  onValueChange?.(next as T | null);
+  value = next as T | null | T[];
+  onValueChange?.(next as T | null | T[]);
 };
 
 const machine = untrack(() =>
   createSelectMachine<T>({
     rootId: nextId("omniselect"),
+    multiple,
+    maxSelected,
+    announce,
+    messages,
     itemToKey,
     itemToString,
     value: value as never,
@@ -157,6 +180,9 @@ $effect.pre(() => {
     autoHighlight,
     autoSelectOnTab,
     triggerLabel,
+    maxSelected,
+    announce,
+    messages,
   });
 });
 
@@ -206,6 +232,65 @@ const context: SelectContext = {
   },
 };
 setContext(SELECT_KEY, context);
+
+let hiddenEl: HTMLSelectElement | undefined = $state();
+const hiddenStyle = Object.entries(visuallyHiddenStyle)
+  .map(
+    ([prop, value]) =>
+      `${prop.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}:${value}`,
+  )
+  .join(";");
+const keys = $derived.by(() => {
+  void $snapshot;
+  return machine.selectedKeys();
+});
+const announcement = $derived.by(() => {
+  void $snapshot;
+  return machine.store.get().announcement;
+});
+// `multiple` can be set after the options exist; select them again so none are dropped.
+$effect(() => {
+  void keys;
+  for (const option of Array.from(hiddenEl?.options ?? []))
+    option.selected = true;
+});
+$effect(() => {
+  const owner = hiddenEl?.form;
+  if (!owner) return;
+  // The browser resets controls after the event; restore the default value afterwards.
+  const onReset = () => queueMicrotask(() => machine.reset());
+  owner.addEventListener("reset", onReset);
+  return () => owner.removeEventListener("reset", onReset);
+});
 </script>
 
 {@render children?.()}
+{#if name !== undefined || required}
+  <select
+    bind:this={hiddenEl}
+    data-part="hidden-select"
+    {name}
+    {form}
+    {multiple}
+    {required}
+    {disabled}
+    tabindex="-1"
+    aria-hidden="true"
+    style={hiddenStyle}
+    onchange={(event) =>
+      machine.setFromKeys(
+        Array.from((event.currentTarget as HTMLSelectElement).selectedOptions).map((o) => o.value),
+      )}
+    oninvalid={() => {
+      machine.setInvalid(true);
+      (inputEl ?? triggerEl)?.focus();
+    }}
+  >
+    {#each keys as key (key)}
+      <option value={key} selected>{key}</option>
+    {/each}
+  </select>
+{/if}
+{#if multiple && announce !== false}
+  <span data-part="live-region" role="status" aria-live="polite" aria-atomic="true" style={hiddenStyle}>{announcement}</span>
+{/if}

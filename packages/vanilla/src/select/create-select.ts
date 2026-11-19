@@ -6,8 +6,10 @@ import {
   nextId,
   type SelectCloseReason,
   type SelectInputChangeReason,
+  type SelectMessages,
   type SelectionBehavior,
   type SelectOpenReason,
+  visuallyHiddenStyle,
 } from "@zealakit/omniselect-core";
 import {
   createOverlay,
@@ -17,8 +19,19 @@ import {
 } from "@zealakit/overlay-vanilla";
 
 export type SelectOptions = {
-  defaultValue?: string | null;
-  onValueChange?: (value: string | null) => void;
+  /** Keys are strings. An array of strings with `multiple`. */
+  defaultValue?: string | string[] | null;
+  onValueChange?: (value: string | string[] | null) => void;
+  /** Select several keys; the value becomes an array. */
+  multiple?: boolean;
+  /** Form field name. A hidden native `<select>` is added inside the root so the value joins FormData. */
+  name?: string;
+  form?: string;
+  /** Multiple mode: stop accepting picks at this many values. */
+  maxSelected?: number;
+  /** Announce adds and removes in a polite live region (multiple mode). Default `true`. */
+  announce?: boolean;
+  messages?: Partial<SelectMessages>;
   defaultOpen?: boolean;
   onOpenChange?: (
     open: boolean,
@@ -52,9 +65,9 @@ export type SelectOptions = {
 };
 
 export type SelectHandle = {
-  getValue: () => string | null;
+  getValue: () => string | string[] | null;
   /** Select by key. Does not call `onValueChange`. */
-  setValue: (value: string | null) => void;
+  setValue: (value: string | string[] | null) => void;
   open: () => void;
   close: () => void;
   /** Re-read items and groups after you changed the markup. */
@@ -129,8 +142,14 @@ export function createSelect(
 
   const machine = createSelectMachine<string>({
     rootId: nextId("omniselect"),
-    defaultValue: options.defaultValue ?? null,
-    onValueChange: (value) => options.onValueChange?.(value as string | null),
+    multiple: options.multiple,
+    maxSelected: options.maxSelected,
+    announce: options.announce,
+    messages: options.messages,
+    defaultValue: (options.defaultValue ??
+      (options.multiple ? [] : null)) as never,
+    onValueChange: (value) =>
+      options.onValueChange?.(value as string | string[] | null),
     defaultOpen: options.defaultOpen,
     disabled: options.disabled,
     required: options.required,
@@ -203,6 +222,7 @@ export function createSelect(
   const itemElements = () =>
     Array.from(list.querySelectorAll<HTMLElement>('[data-part="item"]'));
 
+  let renderForm: () => void = () => {};
   const render = () => {
     const state = machine.store.get();
     const open = state.open;
@@ -272,6 +292,7 @@ export function createSelect(
       );
       el?.scrollIntoView?.({ block: "nearest" });
     }
+    renderForm();
     // Keep the overlay in step with the machine.
     if (overlay && overlay.isOpen !== open) {
       if (open) {
@@ -324,6 +345,63 @@ export function createSelect(
       }
     },
   });
+
+  // Form participation: a visually hidden native <select> (FormData, validation, reset).
+  let hidden: HTMLSelectElement | null = null;
+  let live: HTMLElement | null = null;
+  let offReset = () => {};
+  if (options.name !== undefined || options.required) {
+    hidden = document.createElement("select");
+    hidden.setAttribute("data-part", "hidden-select");
+    hidden.tabIndex = -1;
+    hidden.setAttribute("aria-hidden", "true");
+    Object.assign(hidden.style, visuallyHiddenStyle);
+    if (options.name !== undefined) hidden.name = options.name;
+    if (options.form !== undefined) hidden.setAttribute("form", options.form);
+    hidden.multiple = options.multiple ?? false;
+    hidden.required = options.required ?? false;
+    hidden.disabled = options.disabled ?? false;
+    hidden.addEventListener("change", () => {
+      machine.setFromKeys(
+        Array.from(hidden?.selectedOptions ?? []).map((o) => o.value),
+      );
+    });
+    hidden.addEventListener("invalid", () => {
+      machine.setInvalid(true);
+      (inputEl ?? trigger).focus();
+    });
+    root.append(hidden);
+    const owner = hidden.form;
+    // The browser resets controls after the event; restore the default value afterwards.
+    const onReset = () => queueMicrotask(() => machine.reset());
+    owner?.addEventListener("reset", onReset);
+    offReset = () => owner?.removeEventListener("reset", onReset);
+  }
+  if (options.multiple && options.announce !== false) {
+    live = document.createElement("span");
+    live.setAttribute("data-part", "live-region");
+    live.setAttribute("role", "status");
+    live.setAttribute("aria-live", "polite");
+    live.setAttribute("aria-atomic", "true");
+    Object.assign(live.style, visuallyHiddenStyle);
+    root.append(live);
+  }
+  renderForm = () => {
+    if (hidden) {
+      hidden.replaceChildren(
+        ...machine.selectedKeys().map((key) => {
+          const option = document.createElement("option");
+          option.value = key;
+          option.textContent = key;
+          option.selected = true;
+          return option;
+        }),
+      );
+    }
+    if (live) {
+      live.textContent = machine.store.get().announcement;
+    }
+  };
 
   const unsubscribe = machine.store.subscribe(render);
   const offCollection = machine.collection.subscribe(render);
@@ -437,7 +515,7 @@ export function createSelect(
   }
 
   return {
-    getValue: () => machine.store.get().value as string | null,
+    getValue: () => machine.store.get().value as string | string[] | null,
     setValue(value) {
       machine.setValue(value as never);
       render();
@@ -469,6 +547,9 @@ export function createSelect(
       inputEl?.removeEventListener("click", onInputClick);
       inputEl?.removeEventListener("blur", onInputBlur);
       offInput();
+      offReset();
+      hidden?.remove();
+      live?.remove();
       overlay?.destroy();
       machine.destroy();
     },

@@ -81,11 +81,11 @@ function ItemImpl<T>(
 
   const snapshot = useSnapshot(machine, (m) => {
     const s = m.store.get();
-    return `${m.isSelected(key)}|${s.highlightedKey === key}|${m.collection.get(key)?.disabled}|${s.highlightSource}|${m.collection.isVisible(key)}`;
+    return `${m.isSelected(key)}|${s.highlightedKey === key}|${m.collection.get(key)?.disabled}|${s.highlightSource}|${m.maxReached()}|${m.collection.isVisible(key)}`;
   });
-  const visible = snapshot.endsWith("|true");
-  const highlightedByKeyboard =
-    snapshot.includes("|true|") && snapshot.includes("|keyboard|");
+  const [, highlighted, , source, , visibleFlag] = snapshot.split("|");
+  const visible = visibleFlag === "true";
+  const highlightedByKeyboard = highlighted === "true" && source === "keyboard";
   useEffect(() => {
     if (highlightedByKeyboard) {
       elementRef.current?.scrollIntoView?.({ block: "nearest" });

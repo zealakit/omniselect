@@ -10,7 +10,7 @@ export const Control = forwardRef<HTMLDivElement, SelectControlProps>(
   function SelectControl(props, ref) {
     const { machine, setControlEl } = useSelectContext("Control");
     const mergedRef = useMergedRef(ref, setControlEl);
-    useSnapshot(machine, (m) => String(m.isOpen()));
+    useSnapshot(machine, (m) => `${m.isOpen()}|${m.store.get().invalid}`);
     return (
       <div
         data-part="control"

@@ -1,12 +1,19 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: values are user-defined
-import { createSelectMachine, nextId } from "@zealakit/omniselect-core";
+import {
+  createSelectMachine,
+  nextId,
+  visuallyHiddenStyle,
+} from "@zealakit/omniselect-core";
 import type { Placement } from "@zealakit/overlay-vue";
 import {
   defineComponent,
+  h,
+  onMounted,
   onBeforeUnmount,
   type PropType,
   provide,
   shallowRef,
+  type VNodeArrayChildren,
   watch,
 } from "vue";
 import { type SelectContext, selectKey } from "./context.js";
@@ -56,6 +63,12 @@ export const Root = defineComponent({
     autoHighlight: { type: Boolean, default: undefined },
     autoSelectOnTab: { type: Boolean, default: undefined },
     triggerLabel: { type: String, default: undefined },
+    multiple: { type: Boolean, default: false },
+    name: { type: String, default: undefined },
+    form: { type: String, default: undefined },
+    maxSelected: { type: Number, default: undefined },
+    announce: { type: Boolean, default: undefined },
+    messages: { type: Object as PropType<any>, default: undefined },
     placement: { type: String as PropType<Placement>, default: "bottom-start" },
     offset: { type: Number, default: 4 },
     matchWidth: { type: Boolean, default: true },
@@ -84,6 +97,10 @@ export const Root = defineComponent({
     };
     const machine = createSelectMachine<any>({
       rootId: nextId("omniselect"),
+      multiple: props.multiple,
+      maxSelected: props.maxSelected,
+      announce: props.announce,
+      messages: props.messages,
       itemToKey: props.itemToKey,
       itemToString: props.itemToString,
       value: props.modelValue,
@@ -147,6 +164,9 @@ export const Root = defineComponent({
         props.autoHighlight,
         props.autoSelectOnTab,
         props.triggerLabel,
+        props.maxSelected,
+        props.announce,
+        props.messages,
       ],
       () =>
         machine.sync({
@@ -167,6 +187,9 @@ export const Root = defineComponent({
           autoHighlight: props.autoHighlight,
           autoSelectOnTab: props.autoSelectOnTab,
           triggerLabel: props.triggerLabel,
+          maxSelected: props.maxSelected,
+          announce: props.announce,
+          messages: props.messages,
         }),
       { flush: "sync" },
     );
@@ -184,6 +207,72 @@ export const Root = defineComponent({
       }),
     };
     provide(selectKey, context);
-    return () => slots.default?.();
+    const hidden = shallowRef<HTMLSelectElement | null>(null);
+    let offReset: (() => void) | undefined;
+    onMounted(() => {
+      const owner = hidden.value?.form;
+      if (!owner) {
+        return;
+      }
+      // The browser resets controls after the event; restore the default value afterwards.
+      const onReset = () => queueMicrotask(() => machine.reset());
+      owner.addEventListener("reset", onReset);
+      offReset = () => owner.removeEventListener("reset", onReset);
+    });
+    onBeforeUnmount(() => offReset?.());
+
+    return () => {
+      version.value;
+      const keys = machine.selectedKeys();
+      const out: VNodeArrayChildren = [slots.default?.()];
+      if (props.name !== undefined || props.required) {
+        out.push(
+          h(
+            "select",
+            {
+              ref: hidden,
+              "data-part": "hidden-select",
+              name: props.name,
+              form: props.form,
+              multiple: props.multiple,
+              required: props.required,
+              disabled: props.disabled,
+              tabindex: "-1",
+              "aria-hidden": "true",
+              style: visuallyHiddenStyle,
+              onChange: (event: Event) =>
+                machine.setFromKeys(
+                  Array.from(
+                    (event.target as HTMLSelectElement).selectedOptions,
+                  ).map((o) => o.value),
+                ),
+              onInvalid: () => {
+                machine.setInvalid(true);
+                (inputEl.value ?? triggerEl.value)?.focus();
+              },
+            },
+            keys.map((key) =>
+              h("option", { key, value: key, selected: true }, key),
+            ),
+          ),
+        );
+      }
+      if (props.multiple && props.announce !== false) {
+        out.push(
+          h(
+            "span",
+            {
+              "data-part": "live-region",
+              role: "status",
+              "aria-live": "polite",
+              "aria-atomic": "true",
+              style: visuallyHiddenStyle,
+            },
+            machine.store.get().announcement,
+          ),
+        );
+      }
+      return out;
+    };
   },
 });

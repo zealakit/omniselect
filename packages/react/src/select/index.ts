@@ -11,6 +11,11 @@ export type { SelectItemIndicatorProps, SelectItemProps } from "./item.js";
 export type { SelectLabelProps } from "./label.js";
 export type { SelectListProps } from "./list.js";
 export type { SelectPopoverProps } from "./popover.js";
-export type { SelectOpenChangeReason, SelectRootProps } from "./root.js";
+export type {
+  SelectMultipleProps,
+  SelectOpenChangeReason,
+  SelectRootProps,
+  SelectSingleProps,
+} from "./root.js";
 export type { SelectTriggerProps } from "./trigger.js";
 export type { SelectValueInfo, SelectValueProps } from "./value.js";

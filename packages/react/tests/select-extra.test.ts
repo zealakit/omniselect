@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
 import { act, cleanup, render } from "@testing-library/react";
+import { readFormData } from "../../core/tests/conformance/index.ts";
 import { Dialog, DialogContent, DialogTitle } from "@zealakit/overlay-react";
 import { createElement as h, type ReactNode } from "react";
 import { Select } from "../dist/select/index.js";
@@ -259,4 +260,109 @@ test("hydration: server markup is select-only; the client switches to combobox w
     "A",
   );
   container.remove();
+});
+
+test("parity: NativeSelect and Select submit identical FormData for the same config", async () => {
+  const { NativeSelect } = await import("../dist/native/index.js");
+  const options = ["apple", "banana", "cherry"];
+  const entries = async (multiple: boolean, value: string | string[]) => {
+    const native = render(
+      h(
+        "form",
+        { "data-testid": "native" },
+        h(
+          NativeSelect.Root as never,
+          { name: "fruit", multiple, defaultValue: value },
+          h(
+            NativeSelect.Control,
+            null,
+            ...options.map((o) =>
+              h(NativeSelect.Option as never, { key: o, value: o }, o),
+            ),
+          ),
+        ),
+      ),
+    );
+    await flush();
+    const read = (form: Element) =>
+      readFormData(form.parentElement as ParentNode);
+    const nativeEntries = read(
+      native.container.querySelector("form") as Element,
+    );
+    native.unmount();
+    const custom = render(
+      h(
+        "form",
+        null,
+        h(
+          Select.Root as never,
+          { name: "fruit", multiple, defaultValue: value },
+          h(
+            Select.Control,
+            null,
+            h(Select.Trigger, null, h(Select.Value, null)),
+          ),
+        ),
+      ),
+    );
+    await flush();
+    const selectEntries = read(
+      custom.container.querySelector("form") as Element,
+    );
+    custom.unmount();
+    return [nativeEntries, selectEntries] as const;
+  };
+  const [nativeSingle, selectSingle] = await entries(false, "banana");
+  assert.deepEqual(selectSingle, nativeSingle);
+  const [nativeMulti, selectMulti] = await entries(true, ["apple", "cherry"]);
+  assert.deepEqual(selectMulti, nativeMulti);
+});
+
+test("Value render function exposes items, remove, and clear for chips", async () => {
+  render(
+    h(
+      Select.Root as never,
+      {
+        multiple: true,
+        defaultValue: ["a", "b"],
+        itemToString: (v: string) => v.toUpperCase(),
+      },
+      h(
+        Select.Control,
+        null,
+        h(
+          Select.Trigger,
+          null,
+          h(Select.Value as never, null, ((info: {
+            items: { key: string; label: string }[];
+            remove: (value: string) => void;
+          }) =>
+            info.items.map((item) =>
+              h(
+                "span",
+                {
+                  key: item.key,
+                  "data-chip": item.key,
+                  onClick: () => info.remove(item.key),
+                },
+                item.label,
+              ),
+            )) as never),
+        ),
+      ),
+    ),
+  );
+  await flush();
+  const chips = () =>
+    Array.from(document.querySelectorAll("[data-chip]")).map(
+      (el) => el.textContent,
+    );
+  assert.deepEqual(chips(), ["A", "B"]);
+  await act(async () =>
+    (document.querySelector("[data-chip=a]") as HTMLElement).dispatchEvent(
+      new window.MouseEvent("click", { bubbles: true }),
+    ),
+  );
+  await flush();
+  assert.deepEqual(chips(), ["B"]);
 });

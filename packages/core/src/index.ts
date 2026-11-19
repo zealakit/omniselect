@@ -57,7 +57,9 @@ export {
   type KeyResult,
   type SelectCloseReason,
   type SelectHighlightSource,
+  defaultMessages,
   type SelectInputChangeReason,
+  type SelectMessages,
   type SelectionBehavior,
   type SelectMode,
   type SelectMachine,
@@ -69,3 +71,4 @@ export {
 } from "./select-machine.js";
 export { getPopoverVars, type PopoverVars } from "./popover-vars.js";
 export { checkStructure } from "./structure.js";
+export { hiddenSelectKeys, visuallyHiddenStyle } from "./form.js";

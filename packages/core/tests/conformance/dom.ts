@@ -239,6 +239,11 @@ export function performSelectDomStep(
     case "blur":
       (document.activeElement as HTMLElement | null)?.blur();
       return true;
+    case "invalid":
+      find(step.target as string)?.dispatchEvent(
+        new window.Event("invalid", { cancelable: true }),
+      );
+      return true;
     case "submitForm":
       return true;
     case "resetForm":

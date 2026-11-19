@@ -108,6 +108,48 @@ export function App() {
           </Select.Popover>
         </Select.Root>
       </div>
+      <h2>Multiple (with chips)</h2>
+      <div className="field">
+        <Select.Root
+          multiple
+          name="fruits"
+          defaultValue={["apple"]}
+          itemToString={(value: string) => value}
+        >
+          <Select.Label>Fruits</Select.Label>
+          <Select.Control>
+            <Select.Trigger>
+              <Select.Value placeholder="Pick fruit">
+                {({ items, remove }) =>
+                  items.map((item) => (
+                    <button
+                      type="button"
+                      key={item.key}
+                      className="chip"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        remove(item.value);
+                      }}
+                    >
+                      {item.label} ×
+                    </button>
+                  ))
+                }
+              </Select.Value>
+            </Select.Trigger>
+          </Select.Control>
+          <Select.Popover>
+            <Select.List>
+              {["apple", "banana", "cherry", "date"].map((name) => (
+                <Select.Item key={name} value={name}>
+                  {name}
+                  <Select.ItemIndicator>✓</Select.ItemIndicator>
+                </Select.Item>
+              ))}
+            </Select.List>
+          </Select.Popover>
+        </Select.Root>
+      </div>
     </main>
   );
 }

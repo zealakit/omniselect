@@ -8,10 +8,13 @@ import type {
 } from "../../core/tests/conformance/index.ts";
 import {
   performSelectDomStep,
+  readFormData,
   querySelectPart,
   readSelectVisibleItems,
   runConformance,
   comboboxScenarios,
+  formScenarios,
+  multiScenarios,
   selectScenarios,
   withCallbacks,
 } from "../../core/tests/conformance/index.ts";
@@ -75,14 +78,14 @@ const driver: Driver = {
     };
     apply(withCallbacks(scenario, calls));
     const Wrapper = defineComponent({
-      render: () =>
-        h("div", null, [
-          h(
-            Select.Root as never,
-            { ...rootProps },
-            { default: () => scenario.tree.map(build) },
-          ),
-        ]),
+      render: () => {
+        const root = h(
+          Select.Root as never,
+          { ...rootProps },
+          { default: () => scenario.tree.map(build) },
+        );
+        return h("div", null, [scenario.form ? h("form", null, [root]) : root]);
+      },
     });
     const wrapper = mount(Wrapper, { attachTo: document.body });
     mounted.push(wrapper);
@@ -98,7 +101,7 @@ const driver: Driver = {
         await settle();
       },
       calls: () => calls,
-      formData: () => [],
+      formData: () => readFormData(container),
       value: () => null,
       visibleItems: () => readSelectVisibleItems(container),
       unmount: () => wrapper.unmount(),
@@ -115,3 +118,5 @@ after(() => {
 });
 runConformance("vue", driver, selectScenarios);
 runConformance("vue", driver, comboboxScenarios);
+runConformance("vue", driver, multiScenarios);
+runConformance("vue", driver, formScenarios);

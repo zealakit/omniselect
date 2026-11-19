@@ -39,7 +39,7 @@ export const Input = forwardRef<HTMLInputElement, SelectInputProps>(
     useIsomorphicLayoutEffect(() => machine.registerInput(), [machine]);
     useSnapshot(machine, (m) => {
       const s = m.store.get();
-      return `${s.open}|${s.highlightedKey}|${s.inputValue}`;
+      return `${s.open}|${s.highlightedKey}|${s.inputValue}|${s.invalid}`;
     });
     const attrs = machine.attrs.input();
     return (

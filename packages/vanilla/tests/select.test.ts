@@ -6,10 +6,13 @@ import type {
 } from "../../core/tests/conformance/index.ts";
 import {
   performSelectDomStep,
+  readFormData,
   querySelectPart,
   readSelectVisibleItems,
   runConformance,
   comboboxScenarios,
+  formScenarios,
+  multiScenarios,
   selectScenarios,
   withCallbacks,
 } from "../../core/tests/conformance/index.ts";
@@ -76,14 +79,20 @@ const driver: Driver = {
     const calls: { name: string; args: unknown[] }[] = [];
     const props = withCallbacks(scenario, calls);
     const host = document.createElement("div");
-    for (const node of scenario.tree) host.append(build(node));
+    const root = scenario.form ? document.createElement("form") : host;
+    for (const node of scenario.tree) root.append(build(node));
+    if (root !== host) host.append(root);
     document.body.append(host);
     const log =
       (name: string) =>
       (...args: unknown[]) =>
         (props[name] as ((...a: unknown[]) => void) | undefined)?.(...args);
-    const handle = createSelect(host, {
-      defaultValue: (props.defaultValue as string | undefined) ?? null,
+    const handle = createSelect(root, {
+      defaultValue:
+        (props.defaultValue as string | string[] | undefined) ?? null,
+      multiple: props.multiple as boolean | undefined,
+      name: props.name as string | undefined,
+      maxSelected: props.maxSelected as number | undefined,
       disabled: props.disabled as boolean | undefined,
       required: props.required as boolean | undefined,
       loop: props.loop as boolean | undefined,
@@ -115,7 +124,7 @@ const driver: Driver = {
         await new Promise((resolve) => setTimeout(resolve, 0));
       },
       calls: () => calls,
-      formData: () => [],
+      formData: () => readFormData(host),
       value: () => handle.getValue(),
       visibleItems: () =>
         readSelectVisibleItems(host).filter((key) => {
@@ -140,3 +149,5 @@ after(() => {
 });
 runConformance("vanilla", driver, selectScenarios);
 runConformance("vanilla", driver, comboboxScenarios);
+runConformance("vanilla", driver, multiScenarios);
+runConformance("vanilla", driver, formScenarios);

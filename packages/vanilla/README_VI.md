@@ -218,6 +218,50 @@ Thêm `Select.Input` để biến Select thành combobox có tìm kiếm (mẫu 
 
 Việc lọc không phân biệt dấu và hoa thường. Các item bị lọc vẫn được đăng ký nhưng không render gì, và nhóm không có kết quả sẽ tự ẩn. Khi đang gõ bằng IME, phím và việc lọc chờ đến khi kết thúc composition. Server render markup select-only, và effect đầu tiên ở client chuyển sang ngữ nghĩa combobox.
 
+### Multiple selection
+
+Đặt `multiple` để chọn một mảng giá trị. Danh sách vẫn mở sau mỗi lần chọn, `Value` nối các nhãn lại, và `Value` cũng cung cấp các item đã chọn để bạn render chip. Đây là mẫu listbox multiselectable của APG: `aria-multiselectable` trên list và `aria-selected` trên từng item.
+
+```ts
+const select = createSelect(root, {
+  multiple: true,
+  name: "fruits",
+  defaultValue: ["apple"],
+  onValueChange: (keys) => console.log(keys),
+});
+
+select.getValue(); // ["apple"]
+```
+
+### Multiple props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `multiple` | `boolean` | `false` | Chọn một mảng giá trị; `closeOnSelect` mặc định là `false`. |
+| `maxSelected` | `number` | — | Vô hiệu hóa các item còn lại khi đã chọn đủ số này. |
+| `announce`, `messages` | `boolean`, `{ added, removed }` | `true` | Thông báo thêm/bớt bằng live region lịch sự; ghi đè nội dung để hỗ trợ i18n. |
+
+### Multiple keyboard
+
+| Key | Closed | Open |
+| --- | --- | --- |
+| Enter / Space | Mở | Bật/tắt item đang highlight và giữ danh sách mở |
+| Shift+ArrowDown / Shift+ArrowUp | — | Di chuyển và thêm item vào lựa chọn |
+| Ctrl+A / Cmd+A | — | Chọn mọi item đang hiển thị (khi không có `maxSelected`) |
+| Backspace | Xóa giá trị cuối khi input trống (combobox) | Xóa giá trị cuối khi input trống (combobox) |
+
+### Forms
+
+Đặt `name` (hoặc `required`) sẽ thêm một `<select>` gốc ẩn về mặt hiển thị vào trong Root, nên giá trị tham gia vào việc submit `<form>`, `FormData`, validation và reset form giống hệt `NativeSelect`. Nhiều giá trị được gửi dưới dạng các entry lặp lại.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `name`, `form` | `string` | — | Tên trường và id của `<form>` sở hữu. |
+| `required` | `boolean` | `false` | Chặn submit form khi chưa chọn gì; trigger nhận `data-invalid` và focus. |
+| `value` in FormData | keys | — | Mỗi giá trị được gửi dưới dạng chuỗi `itemToKey`. |
+
+Với `Select.Input`, mỗi lần chọn sẽ xóa input và giữ danh sách mở theo mặc định (`selectionBehavior="clear-input"`). Reset form khôi phục `defaultValue` (chế độ điều khiển: gọi `onValueChange` với giá trị đó). Autofill qua trường ẩn sẽ ánh xạ key về giá trị và bỏ qua key không rõ.
+
 ### Notes
 
 - Các item đăng ký khi popover được mount. Trước khi mở, giá trị đã chọn chưa có nhãn: hãy truyền `itemToString`, hoặc đặt `forceMount` cho `Popover` để giữ các item được đăng ký (cách này cũng cho phép type-ahead hoạt động khi đang đóng).
@@ -228,7 +272,7 @@ Việc lọc không phân biệt dấu và hoa thường. Các item bị lọc v
 
 ## Status
 
-`NativeSelect`, `Select` và tìm kiếm combobox (`Select.Input`) đã sẵn sàng. Chọn nhiều và tải bất đồng bộ sẽ có ở các bản release sau, nên package cũng chỉ export các type của Overlay bên dưới.
+`NativeSelect`, `Select` (chọn một và chọn nhiều, có hỗ trợ form) và tìm kiếm combobox đã sẵn sàng. Tải bất đồng bộ sẽ có ở bản release sau, nên package cũng chỉ export các type của Overlay bên dưới.
 
 | Export | From |
 | --- | --- |

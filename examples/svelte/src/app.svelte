@@ -87,4 +87,28 @@ function onSubmit(event: SubmitEvent) {
       </Select.Popover>
     </Select.Root>
   </div>
+  <h2>Multiple (with chips)</h2>
+  <div class="field">
+    <Select.Root multiple name="fruits" defaultValue={["apple"]} itemToString={(value: string) => value}>
+      <Select.Label>Fruits</Select.Label>
+      <Select.Control>
+        <Select.Trigger>
+          <Select.Value placeholder="Pick fruit">
+            {#snippet children({ items, remove })}
+              {#each items as item (item.key)}
+                <button type="button" class="chip" onclick={(event) => { event.stopPropagation(); remove(item.value); }}>{item.label} ×</button>
+              {/each}
+            {/snippet}
+          </Select.Value>
+        </Select.Trigger>
+      </Select.Control>
+      <Select.Popover>
+        <Select.List>
+          {#each names as name (name)}
+            <Select.Item value={name}>{name}</Select.Item>
+          {/each}
+        </Select.List>
+      </Select.Popover>
+    </Select.Root>
+  </div>
 </main>

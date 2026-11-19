@@ -515,3 +515,93 @@ test("groupHasVisible follows the filter", () => {
   assert.equal(machine.collection.groupHasVisible("g"), false);
   assert.equal(machine.collection.isVisible("b"), true);
 });
+
+test("multiple: announcements, removeKey, and maxSelected", () => {
+  const { machine } = make(fruit, { multiple: true, maxSelected: 2 });
+  machine.open("imperative");
+  machine.selectKey("apple");
+  assert.equal(machine.store.get().announcement, "apple added, 1 selected");
+  machine.selectKey("banana");
+  assert.equal(machine.maxReached(), true);
+  machine.selectKey("date");
+  assert.deepEqual(machine.selectedKeys(), ["apple", "banana"]);
+  assert.equal(machine.attrs.item("date")["aria-disabled"], "true");
+  assert.equal(machine.attrs.item("apple")["aria-disabled"], undefined);
+  machine.highlight("apple");
+  key(machine, "ArrowDown");
+  assert.equal(machine.store.get().highlightedKey, "banana");
+  machine.removeKey("apple");
+  assert.equal(machine.store.get().announcement, "apple removed, 1 selected");
+  assert.equal(machine.maxReached(), false);
+  machine.removeKey("zzz");
+  assert.deepEqual(machine.selectedKeys(), ["banana"]);
+});
+
+test("announce=false and custom messages", () => {
+  const quiet = make(fruit, { multiple: true, announce: false });
+  quiet.machine.selectKey("apple");
+  assert.equal(quiet.machine.store.get().announcement, "");
+  const custom = make(fruit, {
+    multiple: true,
+    messages: { added: (label, count) => `+${label}:${count}` },
+  });
+  custom.machine.selectKey("apple");
+  assert.equal(custom.machine.store.get().announcement, "+apple:1");
+  custom.machine.sync({ messages: { removed: (label) => `-${label}` } });
+  custom.machine.removeKey("apple");
+  assert.equal(custom.machine.store.get().announcement, "-apple");
+});
+
+test("reset restores the default value and input; invalid clears on change", () => {
+  const { machine, events } = make(fruit, { defaultValue: "banana" });
+  machine.selectKey("apple");
+  machine.setInvalid(true);
+  assert.equal(machine.attrs.trigger()["data-invalid"], "");
+  assert.equal(machine.attrs.trigger()["aria-invalid"], "true");
+  machine.reset();
+  assert.equal(machine.store.get().value, "banana");
+  assert.equal(machine.store.get().invalid, false);
+  assert.deepEqual(events.at(-1), ["value", "banana"]);
+  const c = combo(fruits, {
+    defaultValue: "apple",
+    defaultInputValue: "Apple",
+  });
+  c.machine.onInput("zzz");
+  c.machine.reset();
+  assert.equal(c.machine.store.get().inputValue, "Apple");
+  assert.deepEqual(c.inputs.at(-1), ["Apple", "reset"]);
+});
+
+test("setFromKeys maps autofill keys to values and ignores unknown keys", () => {
+  const multi = make(fruit, { multiple: true });
+  multi.machine.setFromKeys(["banana", "nope", "apple"]);
+  assert.deepEqual(multi.machine.selectedKeys(), ["banana", "apple"]);
+  const single = make(fruit);
+  single.machine.setFromKeys(["date"]);
+  assert.equal(single.machine.store.get().value, "date");
+  single.machine.setFromKeys(["nope"]);
+  assert.equal(single.machine.store.get().value, "date");
+});
+
+test("multiple keyboard: Shift+Arrow extends, Ctrl+A selects all, Enter toggles and stays open", () => {
+  const { machine } = make(fruit, { multiple: true });
+  key(machine, "ArrowDown");
+  assert.equal(machine.store.get().highlightedKey, "apple");
+  key(machine, "ArrowDown", { shiftKey: true });
+  assert.deepEqual(machine.selectedKeys(), ["banana"]);
+  key(machine, "ArrowDown", { shiftKey: true });
+  assert.deepEqual(machine.selectedKeys(), ["banana", "date"]);
+  key(machine, "Enter");
+  assert.deepEqual(machine.selectedKeys(), ["banana"]);
+  assert.equal(machine.isOpen(), true);
+  key(machine, "a", { ctrlKey: true });
+  assert.deepEqual(machine.selectedKeys(), ["banana", "apple", "date"]);
+  assert.deepEqual(
+    machine.selectedItems().map((i) => i.label),
+    ["banana", "apple", "date"],
+  );
+  const capped = make(fruit, { multiple: true, maxSelected: 2 });
+  capped.machine.open("imperative");
+  capped.machine.selectAll();
+  assert.deepEqual(capped.machine.selectedKeys(), []);
+});

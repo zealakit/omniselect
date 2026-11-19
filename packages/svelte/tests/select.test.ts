@@ -2,10 +2,13 @@ import { flushSync, mount, unmount } from "svelte";
 import type { Driver, Scenario } from "../../core/tests/conformance/index.ts";
 import {
   performSelectDomStep,
+  readFormData,
   querySelectPart,
   readSelectVisibleItems,
   runConformance,
   comboboxScenarios,
+  formScenarios,
+  multiScenarios,
   selectScenarios,
   withCallbacks,
 } from "../../core/tests/conformance/index.ts";
@@ -25,7 +28,11 @@ const driver: Driver = {
     document.body.append(target);
     const instance = mount(Harness, {
       target,
-      props: { tree: scenario.tree, initial: withCallbacks(scenario, calls) },
+      props: {
+        tree: scenario.tree,
+        initial: withCallbacks(scenario, calls),
+        form: scenario.form ?? false,
+      },
     }) as { setRootProps: (props: Record<string, unknown>) => void };
     await settle();
     return {
@@ -39,7 +46,7 @@ const driver: Driver = {
         await settle();
       },
       calls: () => calls,
-      formData: () => [],
+      formData: () => readFormData(target),
       value: () => null,
       visibleItems: () => readSelectVisibleItems(target),
       unmount: () => {
@@ -52,3 +59,5 @@ const driver: Driver = {
 
 runConformance("svelte", driver, selectScenarios);
 runConformance("svelte", driver, comboboxScenarios);
+runConformance("svelte", driver, multiScenarios);
+runConformance("svelte", driver, formScenarios);

@@ -218,6 +218,50 @@ Add `Select.Input` to turn the Select into a searchable combobox (WAI-ARIA edita
 
 Filtering is diacritic- and case-insensitive. Filtered-out items stay registered but render nothing, and a group with no match hides itself. During IME composition, keys and filtering wait for the composition to end. The server renders the select-only markup, and the first client effect switches to combobox semantics.
 
+### Multiple selection
+
+Set `multiple` to select an array of values. The list stays open after a pick, `Value` joins the labels, and `Value` also exposes the selected items so you can render chips. The pattern is APG's multiselectable listbox: `aria-multiselectable` on the list and `aria-selected` on each item.
+
+```ts
+const select = createSelect(root, {
+  multiple: true,
+  name: "fruits",
+  defaultValue: ["apple"],
+  onValueChange: (keys) => console.log(keys),
+});
+
+select.getValue(); // ["apple"]
+```
+
+### Multiple props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `multiple` | `boolean` | `false` | Select an array of values; `closeOnSelect` defaults to `false`. |
+| `maxSelected` | `number` | — | Disable the remaining items once this many are selected. |
+| `announce`, `messages` | `boolean`, `{ added, removed }` | `true` | Polite live-region announcements of adds and removes; override the text for i18n. |
+
+### Multiple keyboard
+
+| Key | Closed | Open |
+| --- | --- | --- |
+| Enter / Space | Opens | Toggles the highlighted item and stays open |
+| Shift+ArrowDown / Shift+ArrowUp | — | Moves and adds the item to the selection |
+| Ctrl+A / Cmd+A | — | Selects every visible item (without `maxSelected`) |
+| Backspace | Removes the last value when the input is empty (combobox) | Removes the last value when the input is empty (combobox) |
+
+### Forms
+
+Setting `name` (or `required`) adds a visually hidden native `<select>` inside the Root, so the value takes part in `<form>` submission, `FormData`, constraint validation, and form reset exactly like a `NativeSelect`. Multiple values submit as repeated entries.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `name`, `form` | `string` | — | Field name and the id of the owning `<form>`. |
+| `required` | `boolean` | `false` | Blocks form submission while nothing is selected; the trigger gets `data-invalid` and focus. |
+| `value` in FormData | keys | — | Each value is sent as its `itemToKey` string. |
+
+With `Select.Input`, a pick clears the input and keeps the list open by default (`selectionBehavior="clear-input"`). Form reset restores `defaultValue` (controlled: it calls `onValueChange` with it). Autofill through the hidden field maps keys back to values and ignores unknown keys.
+
 ### Notes
 
 - Items register while the popover is mounted. Until it opens, a selected value has no label: pass `itemToString`, or set `forceMount` on `Popover` to keep the items registered (this also lets type-ahead work while closed).
@@ -228,7 +272,7 @@ Filtering is diacritic- and case-insensitive. Filtered-out items stay registered
 
 ## Status
 
-`NativeSelect`, `Select`, and combobox search (`Select.Input`) are available. Multiple selection and async loading land in later releases, so the package also exports only the Overlay types below.
+`NativeSelect`, `Select` (single and multiple, with forms), and combobox search are available. Async loading lands in a later release, so the package also exports only the Overlay types below.
 
 | Export | From |
 | --- | --- |

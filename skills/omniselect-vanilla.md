@@ -63,8 +63,9 @@ const select = createSelect(rootElement, {
 - Items are `data-part="item"` elements with `data-value`; call `select.refresh()` after changing markup. Style with `data-state`, `data-highlighted`, `data-selected`, `data-disabled`, `data-placeholder`, and `--omniselect-anchor-width`. Animate exit with CSS only; `Popover` stays mounted until it ends.
 - Inside a modal Overlay Dialog, set `portal: null` in the options (a modal marks other body children inert).
 - Add `Select.Input` for a searchable combobox: the input takes `role="combobox"` and keeps focus, the trigger becomes a plain button (`triggerLabel`), and items are filtered as the user types (`filter`, `filter=false` for outside/async filtering, `selectionBehavior`, `restoreOnBlur`, `openOnFocus`). Never put focus in the list.
-- Not implemented yet: multiple selection, form `name`, async loading.
+- `multiple` selects an array (the list stays open; `Value` exposes `items`, `remove`, `clear` for chips; `maxSelected` caps picks). `name` or `required` adds a hidden native `<select>` so the value joins `<form>`/`FormData`, validation, and reset like `NativeSelect`; object values submit their `itemToKey`.
+- Not implemented yet: async loading (`Select.LoadMore`).
 
 ## Status
 
-`NativeSelect`, `Select`, and `Select.Input` (combobox) are available. multiple selection and `Select.LoadMore` land in later releases; do not generate code for them until a release documents them.
+`NativeSelect`, `Select` (single and multiple, with forms), and `Select.Input` (combobox) are available. `Select.LoadMore` lands in a later release; do not generate code for them until a release documents them.

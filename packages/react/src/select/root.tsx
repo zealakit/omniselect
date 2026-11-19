@@ -5,20 +5,26 @@ import {
   type SelectInputChangeReason,
   type SelectionBehavior,
   type SelectMachine,
+  type SelectMessages,
   type SelectOpenReason,
+  visuallyHiddenStyle,
 } from "@zealakit/omniselect-core";
 import type { Placement } from "@zealakit/overlay-react";
-import { type ReactNode, useCallback, useId, useRef, useState } from "react";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import { useIsomorphicLayoutEffect } from "../internal/use-isomorphic-layout-effect.js";
 import { SelectContext, type SelectContextValue } from "./context.js";
+import { useSnapshot } from "./internal.js";
 
 export type SelectOpenChangeReason = SelectOpenReason | SelectCloseReason;
 
-export type SelectRootProps<T> = {
-  /** Selected value. Controlled when defined. */
-  value?: T | null;
-  defaultValue?: T | null;
-  onValueChange?: (value: T | null) => void;
+type SelectRootCommon<T> = {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean, reason: SelectOpenChangeReason) => void;
@@ -53,6 +59,16 @@ export type SelectRootProps<T> = {
   autoSelectOnTab?: boolean;
   /** Accessible name of the trigger when an input is present. Default "Show options". */
   triggerLabel?: string;
+  /** Form field name. Renders a hidden native `<select>` so the value joins FormData. */
+  name?: string;
+  /** Id of the `<form>` the hidden field belongs to. */
+  form?: string;
+  /** Multiple mode: stop accepting picks at this many values. */
+  maxSelected?: number;
+  /** Announce adds and removes in a polite live region (multiple mode). Default `true`. */
+  announce?: boolean;
+  /** Override the live-region messages (for i18n). */
+  messages?: Partial<SelectMessages>;
   placement?: Placement;
   offset?: number;
   /** Set `--omniselect-anchor-width` on the popover. Default `true`. */
@@ -62,9 +78,34 @@ export type SelectRootProps<T> = {
   children?: ReactNode;
 };
 
-/** State orchestrator. Renders no element. */
+export type SelectSingleProps<T> = SelectRootCommon<T> & {
+  multiple?: false;
+  /** Selected value. Controlled when defined. */
+  value?: T | null;
+  defaultValue?: T | null;
+  onValueChange?: (value: T | null) => void;
+};
+
+export type SelectMultipleProps<T> = SelectRootCommon<T> & {
+  multiple: true;
+  value?: T[];
+  defaultValue?: T[];
+  onValueChange?: (value: T[]) => void;
+};
+
+export type SelectRootProps<T> = SelectSingleProps<T> | SelectMultipleProps<T>;
+
+type AnyValue<T> = T | null | T[];
+
+/** State orchestrator. Renders a hidden form control and a live region, nothing visible. */
 export function Root<T>(props: SelectRootProps<T>) {
   const {
+    multiple = false,
+    name,
+    form,
+    maxSelected,
+    announce,
+    messages,
     value,
     defaultValue,
     onValueChange,
@@ -94,7 +135,12 @@ export function Root<T>(props: SelectRootProps<T>) {
     matchWidth = true,
     portal = true,
     children,
-  } = props;
+  } = props as SelectRootCommon<T> & {
+    multiple?: boolean;
+    value?: AnyValue<T>;
+    defaultValue?: AnyValue<T>;
+    onValueChange?: (value: AnyValue<T>) => void;
+  };
   const rootId = `omniselect-${useId().replaceAll(":", "")}`;
   const [triggerEl, setTriggerEl] = useState<HTMLElement | null>(null);
   const [controlEl, setControlEl] = useState<HTMLElement | null>(null);
@@ -108,6 +154,10 @@ export function Root<T>(props: SelectRootProps<T>) {
   if (machineRef.current === null) {
     machineRef.current = createSelectMachine<T>({
       rootId,
+      multiple,
+      maxSelected,
+      announce,
+      messages,
       itemToKey,
       itemToString,
       value: value as never,
@@ -164,6 +214,9 @@ export function Root<T>(props: SelectRootProps<T>) {
       autoHighlight,
       autoSelectOnTab,
       triggerLabel,
+      maxSelected,
+      announce,
+      messages,
     });
   });
 
@@ -188,6 +241,103 @@ export function Root<T>(props: SelectRootProps<T>) {
     portal,
   };
   return (
-    <SelectContext.Provider value={context}>{children}</SelectContext.Provider>
+    <SelectContext.Provider value={context}>
+      {children}
+      {name !== undefined || required ? (
+        <HiddenSelect
+          machine={machine}
+          name={name}
+          form={form}
+          required={required}
+          disabled={disabled}
+          multiple={multiple}
+          focusField={focusField}
+        />
+      ) : null}
+      {multiple && announce !== false ? <LiveRegion machine={machine} /> : null}
+    </SelectContext.Provider>
+  );
+}
+
+type HiddenSelectProps = {
+  // biome-ignore lint/suspicious/noExplicitAny: the value type is erased
+  machine: SelectMachine<any>;
+  name: string | undefined;
+  form: string | undefined;
+  required: boolean;
+  disabled: boolean;
+  multiple: boolean;
+  focusField: () => void;
+};
+
+/** Visually hidden native `<select>`: FormData, constraint validation, and form reset. */
+function HiddenSelect({
+  machine,
+  name,
+  form,
+  required,
+  disabled,
+  multiple,
+  focusField,
+}: HiddenSelectProps) {
+  const ref = useRef<HTMLSelectElement | null>(null);
+  useSnapshot(machine, (m) => m.selectedKeys().join("\u0000"));
+  const keys = machine.selectedKeys();
+  useEffect(() => {
+    const owner = ref.current?.form;
+    if (!owner) {
+      return;
+    }
+    // The browser resets controls after the event; restore the default value afterwards.
+    const onReset = () => queueMicrotask(() => machine.reset());
+    owner.addEventListener("reset", onReset);
+    return () => owner.removeEventListener("reset", onReset);
+  }, [machine]);
+  return (
+    <select
+      ref={ref}
+      data-part="hidden-select"
+      name={name}
+      form={form}
+      multiple={multiple}
+      required={required}
+      disabled={disabled}
+      tabIndex={-1}
+      aria-hidden="true"
+      style={visuallyHiddenStyle}
+      value={multiple ? keys : (keys[0] ?? "")}
+      onChange={(event) =>
+        machine.setFromKeys(
+          Array.from(event.currentTarget.selectedOptions).map((o) => o.value),
+        )
+      }
+      onInvalid={() => {
+        machine.setInvalid(true);
+        focusField();
+      }}
+    >
+      {keys.map((key) => (
+        <option key={key} value={key}>
+          {key}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+/** Polite live region for add/remove announcements. */
+// biome-ignore lint/suspicious/noExplicitAny: the value type is erased
+function LiveRegion({ machine }: { machine: SelectMachine<any> }) {
+  const message = useSnapshot(machine, (m) => m.store.get().announcement);
+  return (
+    <span
+      data-part="live-region"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      style={visuallyHiddenStyle}
+    >
+      {message}
+    </span>
   );
 }

@@ -8,10 +8,13 @@ import type {
 } from "../../core/tests/conformance/index.ts";
 import {
   performSelectDomStep,
+  readFormData,
   querySelectPart,
   readSelectVisibleItems,
   runConformance,
   comboboxScenarios,
+  formScenarios,
+  multiScenarios,
   selectScenarios,
   withCallbacks,
 } from "../../core/tests/conformance/index.ts";
@@ -64,12 +67,10 @@ const driver: Driver = {
   mount(scenario: Scenario) {
     const calls: { name: string; args: unknown[] }[] = [];
     let props = withCallbacks(scenario, calls);
-    const tree = (): ReactElement =>
-      h(
-        "div",
-        null,
-        h(Select.Root as never, props, ...scenario.tree.map(build)),
-      );
+    const tree = (): ReactElement => {
+      const root = h(Select.Root as never, props, ...scenario.tree.map(build));
+      return h("div", null, scenario.form ? h("form", null, root) : root);
+    };
     const view = render(tree());
     const container = view.container;
     return {
@@ -86,7 +87,7 @@ const driver: Driver = {
         await flush();
       },
       calls: () => calls,
-      formData: () => [],
+      formData: () => readFormData(container),
       value: () => null,
       visibleItems: () => readSelectVisibleItems(container),
       unmount: () => view.unmount(),
@@ -97,3 +98,5 @@ const driver: Driver = {
 after(() => cleanup());
 runConformance("react", driver, selectScenarios);
 runConformance("react", driver, comboboxScenarios);
+runConformance("react", driver, multiScenarios);
+runConformance("react", driver, formScenarios);

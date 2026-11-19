@@ -7,8 +7,15 @@ type Node = {
   text?: string;
   children?: Node[];
 };
-let { tree, initial }: { tree: Node[]; initial: Record<string, unknown> } =
-  $props();
+let {
+  tree,
+  initial,
+  form = false,
+}: {
+  tree: Node[];
+  initial: Record<string, unknown>;
+  form?: boolean;
+} = $props();
 let rootProps = $state.raw(initial);
 export function setRootProps(next: Record<string, unknown>) {
   rootProps = { ...rootProps, ...next };
@@ -43,8 +50,16 @@ export function setRootProps(next: Record<string, unknown>) {
   {/if}
 {/snippet}
 
-<div>
+{#snippet body()}
   <Select.Root {...rootProps}>
     {#each tree as node}{@render render(node)}{/each}
   </Select.Root>
+{/snippet}
+
+<div>
+  {#if form}
+    <form>{@render body()}</form>
+  {:else}
+    {@render body()}
+  {/if}
 </div>

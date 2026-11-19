@@ -1,6 +1,6 @@
 # Plan: multi-value `Select` and native form participation
 
-Status: **proposal — not implemented**. Release target: **0.4.0** (additive).
+Status: **implemented**. Release target: **0.4.0** (additive).
 
 Order: **6 of 8**. Requires `05-select-input-combobox.md` (0.3.0 shipped).
 
@@ -110,3 +110,10 @@ Conformance (`conformance/multi/*.ts`, `conformance/form/*.ts`):
 ## 8. Out of scope
 
 Built-in chip/tag components, drag-reorder of selections, schema validation (BRD non-goal).
+
+## 9. Implementation notes (decisions taken)
+
+- The hidden `<select>` is rendered by each adapter's Root (Vanilla appends it inside the root element, so the root must be, or sit inside, the `<form>`). Options are only the selected keys.
+- `invalid` events set `data-invalid`/`aria-invalid` on the trigger/input/control and move focus there; the flag clears on the next value change.
+- happy-dom's `FormData` drops every value but the first of a `<select multiple>`, so the conformance helper serializes forms by hand.
+- Vue part handlers cannot be vetoed with `preventDefault` by user listeners (only React/Svelte forward the user's handler first); documented limitation.

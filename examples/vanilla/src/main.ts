@@ -23,3 +23,8 @@ createSelect(document.getElementById("select") as HTMLElement, {
 });
 
 createSelect(document.getElementById("combobox") as HTMLElement);
+
+createSelect(document.getElementById("multi") as HTMLElement, {
+  multiple: true,
+  defaultValue: ["apple"],
+});

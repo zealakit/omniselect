@@ -1,6 +1,6 @@
 {
   "name": "@zealakit/omniselect",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Accessible, headless Select and Combobox primitives for modern UIs.",
   "keywords": [

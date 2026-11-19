@@ -14,7 +14,13 @@ export const Value = defineComponent({
       version.value;
       const labels = machine.selectedLabels();
       const isPlaceholder = labels.length === 0;
-      const custom = slots.default?.({ labels, isPlaceholder });
+      const custom = slots.default?.({
+        labels,
+        isPlaceholder,
+        items: machine.selectedItems(),
+        remove: (value: unknown) => machine.removeKey(machine.itemToKey(value)),
+        clear: () => machine.clear(),
+      });
       // A slot function that renders nothing returns an empty array or comments.
       const provided = (custom ?? []).some(
         (node: VNode) => node.type !== Comment,

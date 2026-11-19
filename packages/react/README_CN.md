@@ -240,6 +240,63 @@ export function FruitSelect() {
 
 过滤不区分重音和大小写。被过滤掉的选项仍保持注册但不渲染内容，没有匹配项的分组会自行隐藏。使用 IME 输入时，按键处理和过滤会等到输入法组合结束。服务端渲染 select-only 标记，客户端的第一个 effect 会切换为 combobox 语义。
 
+### Multiple selection
+
+设置 `multiple` 即可选择一个值数组。选择后列表保持打开，`Value` 会把标签连接起来，并且还提供已选项以便你渲染 chip。这是 APG 的 multiselectable listbox 模式：列表上有 `aria-multiselectable`，每个选项上有 `aria-selected`。
+
+```tsx
+<Select.Root multiple name="fruits" defaultValue={["apple"]}>
+  <Select.Control>
+    <Select.Trigger>
+      <Select.Value placeholder="Pick fruit">
+        {({ items, remove }) =>
+          items.map((item) => (
+            <span key={item.key} onClick={() => remove(item.value)}>
+              {item.label} ×
+            </span>
+          ))
+        }
+      </Select.Value>
+    </Select.Trigger>
+  </Select.Control>
+  <Select.Popover>
+    <Select.List>
+      <Select.Item value="apple">Apple</Select.Item>
+      <Select.Item value="banana">Banana</Select.Item>
+    </Select.List>
+  </Select.Popover>
+</Select.Root>
+```
+
+### Multiple props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `multiple` | `boolean` | `false` | 选择值数组；`closeOnSelect` 默认为 `false`。 |
+| `maxSelected` | `number` | — | 选满该数量后禁用其余选项。 |
+| `announce`、`messages` | `boolean`、`{ added, removed }` | `true` | 通过礼貌的 live region 播报添加和移除；可覆盖文本用于 i18n。 |
+
+### Multiple keyboard
+
+| Key | Closed | Open |
+| --- | --- | --- |
+| Enter / Space | 打开 | 切换高亮项并保持列表打开 |
+| Shift+ArrowDown / Shift+ArrowUp | — | 移动并将该项加入选择 |
+| Ctrl+A / Cmd+A | — | 选中所有可见项（未设置 `maxSelected` 时） |
+| Backspace | 输入框为空时移除最后一个值（combobox） | 输入框为空时移除最后一个值（combobox） |
+
+### Forms
+
+设置 `name`（或 `required`）会在 Root 内添加一个视觉隐藏的原生 `<select>`，因此值会像 `NativeSelect` 一样参与 `<form>` 提交、`FormData`、约束验证和表单重置。多个值会以重复条目的形式提交。
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `name`、`form` | `string` | — | 字段名称以及所属 `<form>` 的 id。 |
+| `required` | `boolean` | `false` | 未选择时阻止表单提交；触发器会获得 `data-invalid` 和焦点。 |
+| `value` in FormData | keys | — | 每个值以其 `itemToKey` 字符串提交。 |
+
+使用 `Select.Input` 时，选择后默认会清空输入框并保持列表打开（`selectionBehavior="clear-input"`）。表单重置会恢复 `defaultValue`（受控时会以它调用 `onValueChange`）。通过隐藏字段触发的自动填充会把 key 映射回值，并忽略未知 key。
+
 ### Notes
 
 - 选项在弹层挂载后才会注册。在打开之前，已选值没有标签：请传入 `itemToString`，或给 `Popover` 设置 `forceMount` 以保持选项处于注册状态（这也让 type-ahead 在关闭时可用）。
@@ -249,7 +306,7 @@ export function FruitSelect() {
 
 ## Status
 
-`NativeSelect`、`Select` 和 combobox 搜索（`Select.Input`）已可用。多选和异步加载将在后续版本提供，因此该包同样只导出下面的 Overlay 类型。
+`NativeSelect`、`Select`（单选和多选，支持表单）以及 combobox 搜索已可用。异步加载将在后续版本提供，因此该包同样只导出下面的 Overlay 类型。
 
 | Export | From |
 | --- | --- |

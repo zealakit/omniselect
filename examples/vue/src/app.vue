@@ -85,5 +85,23 @@ function onSubmit(event: Event) {
         </Select.Popover>
       </Select.Root>
     </div>
+    <h2>Multiple (with chips)</h2>
+    <div class="field">
+      <Select.Root multiple name="fruits" :default-value="['apple']" :item-to-string="(value: string) => value">
+        <Select.Label>Fruits</Select.Label>
+        <Select.Control>
+          <Select.Trigger>
+            <Select.Value placeholder="Pick fruit" v-slot="{ items, remove }">
+              <button v-for="item in items" :key="item.key" type="button" class="chip" @click.stop="remove(item.value)">{{ item.label }} ×</button>
+            </Select.Value>
+          </Select.Trigger>
+        </Select.Control>
+        <Select.Popover>
+          <Select.List>
+            <Select.Item v-for="name in names" :key="name" :value="name">{{ name }}</Select.Item>
+          </Select.List>
+        </Select.Popover>
+      </Select.Root>
+    </div>
   </main>
 </template>

@@ -38,6 +38,18 @@ export type SelectionBehavior = "replace-input" | "keep-input" | "clear-input";
 
 export type SelectMode = "select-only" | "combobox";
 
+export type SelectMessages = {
+  /** Announced when a value is added in multiple mode. */
+  added: (label: string, count: number) => string;
+  /** Announced when a value is removed in multiple mode. */
+  removed: (label: string, count: number) => string;
+};
+
+export const defaultMessages: SelectMessages = {
+  added: (label, count) => `${label} added, ${count} selected`,
+  removed: (label, count) => `${label} removed, ${count} selected`,
+};
+
 export type SelectHighlightSource = "keyboard" | "pointer";
 
 export type SelectState<T> = {
@@ -52,6 +64,10 @@ export type SelectState<T> = {
   version: number;
   hasClear: boolean;
   hasLoading: boolean;
+  /** Set by the hidden form control's `invalid` event; cleared on change. */
+  invalid: boolean;
+  /** Latest live-region message (multiple mode). */
+  announcement: string;
 };
 
 export type SelectMachineOptions<T> = {
@@ -85,6 +101,11 @@ export type SelectMachineOptions<T> = {
   autoHighlight?: boolean;
   autoSelectOnTab?: boolean;
   triggerLabel?: string;
+  /** Multiple mode: stop accepting new picks at this many values. */
+  maxSelected?: number;
+  /** Live-region announcements in multiple mode. Default `true`. */
+  announce?: boolean;
+  messages?: Partial<SelectMessages>;
   typeaheadTimeout?: number;
   now?: () => number;
 };
@@ -108,6 +129,9 @@ export type SelectProps<T> = Partial<
     | "autoHighlight"
     | "autoSelectOnTab"
     | "triggerLabel"
+    | "maxSelected"
+    | "announce"
+    | "messages"
   >
 > & {
   value?: SelectValue<T> | undefined;
@@ -164,6 +188,21 @@ export type SelectMachine<T> = {
   onInputBlur: () => void;
   /** Remove the last selected value (multiple mode). */
   removeLast: () => void;
+  /** Remove one value by key (multiple mode, chips). */
+  removeKey: (key: string) => void;
+  /** Restore `defaultValue` (and the input) after a form reset. */
+  reset: () => void;
+  setInvalid: (invalid: boolean) => void;
+  /** Apply keys reported by the hidden form control (autofill); unknown keys are ignored. */
+  setFromKeys: (keys: string[]) => void;
+  /** Keys of the current value(s), in selection order. */
+  selectedKeys: () => string[];
+  /** Current value(s) with their keys and labels, in selection order. */
+  selectedItems: () => { value: T; key: string; label: string }[];
+  /** Select every visible, enabled item (multiple mode, no `maxSelected`). */
+  selectAll: () => void;
+  /** `true` when `maxSelected` values are already chosen. */
+  maxReached: () => boolean;
   /** Keys of items that should render (the visible subset). */
   visibleKeys: () => string[];
   /** Label of one value: label cache, then `itemToString`, then its key. */
@@ -219,12 +258,17 @@ export function createSelectMachine<T>(
       | "autoHighlight"
       | "autoSelectOnTab"
       | "triggerLabel"
+      | "announce"
     >
   > &
     Pick<
       SelectProps<T>,
-      "onValueChange" | "onOpenChange" | "onInputChange" | "filter"
-    > = {
+      | "onValueChange"
+      | "onOpenChange"
+      | "onInputChange"
+      | "filter"
+      | "maxSelected"
+    > & { messages: SelectMessages } = {
     disabled: options.disabled ?? false,
     required: options.required ?? false,
     closeOnSelect: options.closeOnSelect ?? !multiple,
@@ -238,6 +282,9 @@ export function createSelectMachine<T>(
     autoHighlight: options.autoHighlight ?? true,
     autoSelectOnTab: options.autoSelectOnTab ?? false,
     triggerLabel: options.triggerLabel ?? "Show options",
+    announce: options.announce ?? true,
+    maxSelected: options.maxSelected,
+    messages: { ...defaultMessages, ...options.messages },
     onValueChange: options.onValueChange,
     onOpenChange: options.onOpenChange,
     onInputChange: options.onInputChange,
@@ -265,6 +312,8 @@ export function createSelectMachine<T>(
     version: 0,
     hasClear: false,
     hasLoading: false,
+    invalid: false,
+    announcement: "",
   });
 
   let reason: SelectOpenReason | SelectCloseReason = "imperative";
@@ -286,6 +335,7 @@ export function createSelectMachine<T>(
       if (!valueCtl.isControlled()) {
         store.set({ value: next });
       }
+      store.set({ invalid: false });
       props.onValueChange?.(next);
     },
   });
@@ -395,10 +445,19 @@ export function createSelectMachine<T>(
     }
   });
 
+  const maxReached = (): boolean =>
+    multiple &&
+    props.maxSelected !== undefined &&
+    selection.keys(store.get().value).length >= props.maxSelected;
+
+  const blockedByMax = (key: string): boolean =>
+    maxReached() && !selection.keys(store.get().value).includes(key);
+
   const visibleNav = () =>
-    collection
-      .visible()
-      .map((item) => ({ key: item.key, disabled: item.disabled }));
+    collection.visible().map((item) => ({
+      key: item.key,
+      disabled: item.disabled || blockedByMax(item.key),
+    }));
 
   const firstSelectedVisibleKey = (): string | null => {
     const keys = selection.keys(store.get().value);
@@ -472,7 +531,11 @@ export function createSelectMachine<T>(
     typeahead,
     itemToKey,
     sync(next) {
-      props = { ...props, ...stripUndefined(next) };
+      const { messages, ...rest } = next;
+      props = { ...props, ...stripUndefined(rest) };
+      if (messages) {
+        props.messages = { ...props.messages, ...messages };
+      }
       if (next.onValueChange !== undefined) {
         props.onValueChange = next.onValueChange;
       }
@@ -558,14 +621,24 @@ export function createSelectMachine<T>(
     },
     selectKey(key, selectOptions) {
       const item = collection.get(key);
-      if (!item || item.disabled || props.disabled) {
+      if (!item || item.disabled || props.disabled || blockedByMax(key)) {
         return;
       }
       const current = store.get().value;
+      const wasSelected = machine.isSelected(key);
       const next = multiple
         ? selection.toggle(current, item.value)
         : selection.select(current, item.value);
       valueCtl.set(next);
+      if (multiple && props.announce) {
+        const label = machine.labelOf(item.value);
+        const count = selection.keys(next).length;
+        store.set({
+          announcement: wasSelected
+            ? props.messages.removed(label, count)
+            : props.messages.added(label, count),
+        });
+      }
       if (store.get().mode === "combobox") {
         const behavior = props.selectionBehavior;
         if (behavior === "replace-input" && !multiple) {
@@ -601,8 +674,78 @@ export function createSelectMachine<T>(
       if (!Array.isArray(value) || value.length === 0 || props.disabled) {
         return;
       }
-      valueCtl.set(value.slice(0, -1));
+      machine.removeKey(itemToKey(value[value.length - 1] as T));
     },
+    removeKey(key) {
+      const value = store.get().value;
+      if (!Array.isArray(value) || props.disabled) {
+        return;
+      }
+      const target = value.find((item) => itemToKey(item as T) === key);
+      if (target === undefined) {
+        return;
+      }
+      valueCtl.set(value.filter((item) => itemToKey(item as T) !== key));
+      if (props.announce) {
+        store.set({
+          announcement: props.messages.removed(
+            machine.labelOf(target as T),
+            value.length - 1,
+          ),
+        });
+      }
+    },
+    reset() {
+      store.set({ invalid: false });
+      valueCtl.set(defaultValue);
+      if (store.get().mode === "combobox") {
+        filterQuery = "";
+        setInput(
+          options.defaultInputValue ??
+            (!multiple && defaultValue !== null
+              ? machine.labelOf(defaultValue as T)
+              : ""),
+          "reset",
+        );
+        applyFilter();
+      }
+    },
+    setInvalid(invalid) {
+      store.set({ invalid });
+    },
+    setFromKeys(keys) {
+      const values = keys
+        .map((key) => collection.get(key)?.value)
+        .filter((value): value is T => value !== undefined);
+      if (multiple) {
+        valueCtl.set(values);
+      } else if (values[0] !== undefined) {
+        valueCtl.set(values[0]);
+      }
+    },
+    selectedKeys: () => selection.keys(store.get().value),
+    selectedItems() {
+      const value = store.get().value;
+      const list = Array.isArray(value) ? value : value === null ? [] : [value];
+      return list.map((item) => ({
+        value: item as T,
+        key: itemToKey(item as T),
+        label: machine.labelOf(item as T),
+      }));
+    },
+    selectAll() {
+      if (!multiple || props.disabled || props.maxSelected !== undefined) {
+        return;
+      }
+      let current = store.get().value;
+      for (const item of collection.visible()) {
+        if (!item.disabled) {
+          current = selection.select(current, item.value);
+        }
+      }
+      valueCtl.set(current);
+    },
+    maxReached,
     setValue(next) {
       valueCtl.setSilently(next);
       store.set({ value: next });
@@ -673,9 +816,28 @@ export function createSelectMachine<T>(
       }
 
       const from = state.highlightedKey;
+      const extend = (target: string | null) => {
+        machine.highlight(target);
+        if (
+          multiple &&
+          event.shiftKey &&
+          target !== null &&
+          !machine.isSelected(target)
+        ) {
+          machine.selectKey(target);
+        }
+      };
+      if (
+        multiple &&
+        (event.ctrlKey || event.metaKey) &&
+        key.toLowerCase() === "a"
+      ) {
+        machine.selectAll();
+        return handled;
+      }
       switch (key) {
         case "ArrowDown":
-          machine.highlight(next(nav, from, { wrap: props.loop }));
+          extend(next(nav, from, { wrap: props.loop }));
           return handled;
         case "ArrowUp":
           if (event.altKey) {
@@ -685,7 +847,7 @@ export function createSelectMachine<T>(
             machine.close("select");
             return handled;
           }
-          machine.highlight(prev(nav, from, { wrap: props.loop }));
+          extend(prev(nav, from, { wrap: props.loop }));
           return handled;
         case "Home":
           machine.highlight(first(nav));
@@ -873,6 +1035,7 @@ export function createSelectMachine<T>(
       root: () => ({
         "data-state": store.get().open ? "open" : "closed",
         "data-disabled": bool(props.disabled),
+        "data-invalid": bool(store.get().invalid),
       }),
       trigger: () => {
         const state = store.get();
@@ -902,9 +1065,11 @@ export function createSelectMachine<T>(
               : undefined,
           "aria-labelledby": `${ids.label} ${ids.trigger}`,
           "aria-required": props.required ? "true" : undefined,
+          "aria-invalid": state.invalid ? "true" : undefined,
           "aria-disabled": props.disabled ? "true" : undefined,
           "data-state": state.open ? "open" : "closed",
           "data-disabled": bool(props.disabled),
+          "data-invalid": bool(state.invalid),
           "data-placeholder": bool(!multiple && selection.isEmpty(state.value)),
         };
       },
@@ -923,11 +1088,13 @@ export function createSelectMachine<T>(
               : undefined,
           "aria-labelledby": ids.label,
           "aria-required": props.required ? "true" : undefined,
+          "aria-invalid": state.invalid ? "true" : undefined,
           "aria-disabled": props.disabled ? "true" : undefined,
           autocomplete: "off",
           spellcheck: "false",
           "data-state": state.open ? "open" : "closed",
           "data-disabled": bool(props.disabled),
+          "data-invalid": bool(state.invalid),
         };
       },
       list: () => ({
@@ -943,7 +1110,7 @@ export function createSelectMachine<T>(
         const state = store.get();
         const selected = machine.isSelected(key);
         const highlighted = state.highlightedKey === key;
-        const disabled = item?.disabled === true;
+        const disabled = item?.disabled === true || blockedByMax(key);
         return {
           id: ids.item(key),
           role: "option",
