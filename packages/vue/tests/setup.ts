@@ -24,6 +24,7 @@ const values: Record<string, unknown> = {
   FocusEvent: window.FocusEvent,
   MutationObserver: window.MutationObserver,
   FormData: window.FormData,
+  HTMLInputElement: window.HTMLInputElement,
   HTMLButtonElement: window.HTMLButtonElement,
   HTMLDivElement: window.HTMLDivElement,
   HTMLSelectElement: window.HTMLSelectElement,

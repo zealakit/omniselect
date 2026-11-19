@@ -1,6 +1,9 @@
 import {
   createSelectMachine,
+  type FilterFn,
   type SelectCloseReason,
+  type SelectInputChangeReason,
+  type SelectionBehavior,
   type SelectMachine,
   type SelectOpenReason,
 } from "@zealakit/omniselect-core";
@@ -31,6 +34,25 @@ export type SelectRootProps<T> = {
   allowsEmptyCollection?: boolean;
   /** Wrap keyboard navigation at the ends. Default `false`. */
   loop?: boolean;
+  /** Search text. Controlled when defined. Only used with `Select.Input`. */
+  inputValue?: string;
+  defaultInputValue?: string;
+  onInputChange?: (value: string, reason: SelectInputChangeReason) => void;
+  /** Custom filter, or `false` to filter outside (async search). Default: diacritic-insensitive contains. */
+  filter?: FilterFn<T> | false;
+  openOnFocus?: boolean;
+  /** Open while typing. Default `true`. */
+  openOnInput?: boolean;
+  /** What the input shows after a pick. Default `replace-input`. */
+  selectionBehavior?: SelectionBehavior;
+  /** Put the selected label back when the input loses focus. Default `true`. */
+  restoreOnBlur?: boolean;
+  /** Highlight the first match while typing. Default `true`. */
+  autoHighlight?: boolean;
+  /** Select the highlighted item on Tab. Default `false`. */
+  autoSelectOnTab?: boolean;
+  /** Accessible name of the trigger when an input is present. Default "Show options". */
+  triggerLabel?: string;
   placement?: Placement;
   offset?: number;
   /** Set `--omniselect-anchor-width` on the popover. Default `true`. */
@@ -56,6 +78,17 @@ export function Root<T>(props: SelectRootProps<T>) {
     closeOnSelect,
     allowsEmptyCollection,
     loop,
+    inputValue,
+    defaultInputValue,
+    onInputChange,
+    filter,
+    openOnFocus,
+    openOnInput,
+    selectionBehavior,
+    restoreOnBlur,
+    autoHighlight,
+    autoSelectOnTab,
+    triggerLabel,
     placement = "bottom-start",
     offset = 4,
     matchWidth = true,
@@ -67,6 +100,7 @@ export function Root<T>(props: SelectRootProps<T>) {
   const [controlEl, setControlEl] = useState<HTMLElement | null>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
   triggerRef.current = triggerEl;
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const latest = useRef({ onOpenChange });
   latest.current = { onOpenChange };
 
@@ -86,13 +120,24 @@ export function Root<T>(props: SelectRootProps<T>) {
       closeOnSelect,
       allowsEmptyCollection,
       loop,
+      inputValue,
+      defaultInputValue,
+      onInputChange,
+      filter,
+      openOnFocus,
+      openOnInput,
+      selectionBehavior,
+      restoreOnBlur,
+      autoHighlight,
+      autoSelectOnTab,
+      triggerLabel,
       onOpenChange(next, reason) {
         latest.current.onOpenChange?.(next, reason);
         if (
           !next &&
           (reason === "select" || reason === "escape" || reason === "tab")
         ) {
-          triggerRef.current?.focus();
+          (inputRef.current ?? triggerRef.current)?.focus();
         }
       },
     });
@@ -109,10 +154,24 @@ export function Root<T>(props: SelectRootProps<T>) {
       closeOnSelect,
       allowsEmptyCollection,
       loop,
+      inputValue,
+      onInputChange,
+      filter,
+      openOnFocus,
+      openOnInput,
+      selectionBehavior,
+      restoreOnBlur,
+      autoHighlight,
+      autoSelectOnTab,
+      triggerLabel,
     });
   });
 
   const focusTrigger = useCallback(() => triggerRef.current?.focus(), []);
+  const focusField = useCallback(
+    () => (inputRef.current ?? triggerRef.current)?.focus(),
+    [],
+  );
 
   const context: SelectContextValue = {
     machine,
@@ -121,6 +180,8 @@ export function Root<T>(props: SelectRootProps<T>) {
     controlEl,
     setControlEl,
     focusTrigger,
+    focusField,
+    inputRef,
     placement,
     offset,
     matchWidth,

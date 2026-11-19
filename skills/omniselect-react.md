@@ -78,8 +78,9 @@ Import from the `/native` entry so Overlay stays out of the bundle.
 - Items register while the popover is mounted. For a selected value without a mounted item, pass `itemToString`; set `forceMount` on `Popover` to keep items registered (needed for type-ahead while closed).
 - Style with `data-state`, `data-highlighted`, `data-selected`, `data-disabled`, `data-placeholder`, and `--omniselect-anchor-width`. Animate exit with CSS only; `Popover` stays mounted until it ends.
 - Inside a modal Overlay Dialog, set `portal={false}` on `Root` (a modal marks other body children inert).
-- Not implemented yet: search input (combobox), multiple selection, form `name`, async loading.
+- Add `Select.Input` for a searchable combobox: the input takes `role="combobox"` and keeps focus, the trigger becomes a plain button (`triggerLabel`), and items are filtered as the user types (`filter`, `filter=false` for outside/async filtering, `selectionBehavior`, `restoreOnBlur`, `openOnFocus`). Never put focus in the list.
+- Not implemented yet: multiple selection, form `name`, async loading.
 
 ## Status
 
-`NativeSelect` and `Select` are available. `Select.Input`, multiple selection, and `Select.LoadMore` land in later releases; do not generate code for them until a release documents them.
+`NativeSelect`, `Select`, and `Select.Input` (combobox) are available. multiple selection and `Select.LoadMore` land in later releases; do not generate code for them until a release documents them.

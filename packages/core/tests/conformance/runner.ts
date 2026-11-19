@@ -51,6 +51,21 @@ function check(mounted: Mounted, expect: Expectation, where: string): void {
   if (expect.calls) {
     assert.deepEqual(mounted.calls(), expect.calls, `${where}: calls`);
   }
+  if (expect.includesCalls) {
+    const log = mounted.calls();
+    let from = 0;
+    for (const wanted of expect.includesCalls) {
+      const at = log.findIndex(
+        (call, index) =>
+          index >= from && JSON.stringify(call) === JSON.stringify(wanted),
+      );
+      assert.ok(
+        at !== -1,
+        `${where}: missing call ${JSON.stringify(wanted)} in ${JSON.stringify(log)}`,
+      );
+      from = at + 1;
+    }
+  }
   if (expect.lastCall) {
     const all = mounted.calls();
     assert.deepEqual(
@@ -64,6 +79,10 @@ function check(mounted: Mounted, expect: Expectation, where: string): void {
   }
   if ("value" in expect) {
     assert.deepEqual(mounted.value(), expect.value, `${where}: value`);
+  }
+  if (expect.inputValue !== undefined) {
+    const field = mounted.query("input") as HTMLInputElement | null;
+    assert.equal(field?.value, expect.inputValue, `${where}: input value`);
   }
   if (expect.visibleItems) {
     assert.deepEqual(

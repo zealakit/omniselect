@@ -28,7 +28,10 @@ $effect(() => {
   bind:this={element}
   onclick={(event) => {
     (onclick as ((e: MouseEvent) => void) | undefined)?.(event as MouseEvent);
-    if (!event.defaultPrevented) machine.toggle();
+    if (!event.defaultPrevented) {
+      machine.toggle();
+      if (machine.store.get().mode === "combobox") context.focusField();
+    }
   }}
   onkeydown={(event) => {
     (onkeydown as ((e: KeyboardEvent) => void) | undefined)?.(event as KeyboardEvent);

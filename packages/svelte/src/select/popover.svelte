@@ -19,7 +19,7 @@ type Props = HTMLAttributes<HTMLDivElement> & {
   forceMount?: boolean;
   children?: Snippet;
 };
-let { forceMount = false, children, ...rest }: Props = $props();
+let { forceMount = false, children, onmousedown, ...rest }: Props = $props();
 
 const context = getSelectContext("Popover");
 const { machine, snapshot } = context;
@@ -88,10 +88,16 @@ function onUpdate(result: PositionerResult) {
 </script>
 
 {#if mounted || forceMount}
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     data-part="popover"
     {...rest}
     bind:this={element}
+    onmousedown={(event) => {
+      (onmousedown as ((e: MouseEvent) => void) | undefined)?.(event as MouseEvent);
+      // Keep focus on the trigger/input (also when grabbing the scrollbar).
+      event.preventDefault();
+    }}
     hidden={!open && !mounted}
     data-state={open ? "open" : "closed"}
     data-side={side}

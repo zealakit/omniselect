@@ -29,3 +29,4 @@ globals.HTMLSpanElement = window.HTMLSpanElement;
 globals.PointerEvent = window.PointerEvent;
 globals.MutationObserver = window.MutationObserver;
 globals.ResizeObserver = window.ResizeObserver;
+globals.HTMLInputElement = window.HTMLInputElement;

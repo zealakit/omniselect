@@ -1,8 +1,11 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: values are user-defined
 import { checkStructure } from "@zealakit/omniselect-core";
 import {
+  Comment,
   defineComponent,
   h,
+  Text,
+  type VNode,
   inject,
   onBeforeUnmount,
   onMounted,
@@ -15,6 +18,29 @@ import { groupKey, itemKey, useSelectContext } from "./context.js";
 import { attrsOf } from "./simple.js";
 
 /** One option. Registers with the Root; exposes `data-highlighted`, `data-selected`, `data-disabled`. */
+/** Plain text of rendered slot content (strings only). */
+function vnodeText(nodes: VNode[] | undefined): string {
+  if (!nodes) {
+    return "";
+  }
+  return nodes
+    .map((node) => {
+      if (node.type === Comment) {
+        return "";
+      }
+      if (typeof node.children === "string") {
+        return node.children;
+      }
+      return Array.isArray(node.children)
+        ? vnodeText(node.children as VNode[])
+        : "";
+    })
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+void Text;
+
 export const Item = defineComponent({
   name: "SelectItem",
   props: {
@@ -29,13 +55,15 @@ export const Item = defineComponent({
     const element = ref<HTMLElement | null>(null);
     const key = () => machine.itemToKey(props.value);
     provide(itemKey, { key });
+    let fallbackText = "";
     let off: (() => void) | undefined;
     const register = () => {
       off?.();
       off = machine.collection.register({
         key: key(),
         value: props.value,
-        textValue: props.textValue ?? element.value?.textContent?.trim() ?? "",
+        textValue:
+          props.textValue ?? element.value?.textContent?.trim() ?? fallbackText,
         disabled: props.disabled,
         groupId: group?.groupId ?? null,
         node: element.value,
@@ -48,10 +76,35 @@ export const Item = defineComponent({
     watch([key, () => props.disabled, () => props.textValue], register, {
       flush: "post",
     });
+    // Back from a filter: the element is new, so refresh the DOM-order node.
+    watch(
+      () => element.value,
+      (node) => {
+        if (node && machine.collection.get(key())?.node !== node) {
+          machine.collection.update(key(), { node });
+        }
+      },
+      { flush: "post" },
+    );
     onBeforeUnmount(() => off?.());
 
     return () => {
       context.version.value;
+      const content = slots.default?.();
+      fallbackText = vnodeText(content);
+      if (
+        !machine.collection.isVisible(key()) &&
+        machine.collection.get(key())
+      ) {
+        // Filtered out: stay registered, render nothing.
+        // Drop the stale node once (updating on every render would loop).
+        if (machine.collection.get(key())?.node) {
+          queueMicrotask(() =>
+            machine.collection.update(key(), { node: null }),
+          );
+        }
+        return null;
+      }
       const attrs = machine.attrs.item(key());
       const state = machine.store.get();
       if (
@@ -76,7 +129,7 @@ export const Item = defineComponent({
           },
           onClick: () => machine.selectKey(key()),
         },
-        slots.default?.(),
+        content,
       );
     };
   },

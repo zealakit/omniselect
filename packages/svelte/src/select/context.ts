@@ -11,9 +11,13 @@ export type SelectContext = {
   };
   readonly triggerEl: HTMLElement | null;
   readonly controlEl: HTMLElement | null;
+  readonly inputEl: HTMLInputElement | null;
   setTriggerEl: (element: HTMLElement | null) => void;
   setControlEl: (element: HTMLElement | null) => void;
+  setInputEl: (element: HTMLInputElement | null) => void;
   focusTrigger: () => void;
+  /** Focus the input in combobox mode, the trigger otherwise. */
+  focusField: () => void;
   props: {
     readonly placement: Placement;
     readonly offset: number;

@@ -1,6 +1,6 @@
 # Plan: `Select.Input` — combobox mode and filtering
 
-Status: **proposal — not implemented**. Release target: **0.3.0** (additive).
+Status: **implemented**. Release target: **0.3.0** (additive).
 
 Order: **5 of 8**. Requires `04-select-listbox.md` (0.2.0 shipped).
 
@@ -125,3 +125,11 @@ Adapter-only: hydration mode switch, IME composition, caret preservation (React)
 
 Inline autocomplete (`aria-autocomplete="both"`, completing the text in the field), creatable
 options, multi interactions (06), async fetching (07).
+
+## 10. Implementation notes (decisions taken)
+
+- `filterQuery` (the text the filter runs on) is separate from `inputValue`: opening with the selected label showing does not filter the list down to that one item.
+- Filtered-out items stay registered; React/Vue/Svelte render `null` for them and refresh the DOM-order `node` when they return. Svelte shows an item until its first registration, because the filter does not know it yet.
+- `Item` text falls back to the text of its children when the element is not mounted (React/Vue), so an item that starts filtered out still has a label.
+- The popover and items prevent `mousedown`/`pointerdown` so focus stays on the input.
+- Multiple + combobox behavior (clear-input after a pick, Backspace removes the last value) already lives in the core machine; plan 06 exposes `multiple` in the adapters.

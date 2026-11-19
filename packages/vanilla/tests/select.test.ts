@@ -9,6 +9,7 @@ import {
   querySelectPart,
   readSelectVisibleItems,
   runConformance,
+  comboboxScenarios,
   selectScenarios,
   withCallbacks,
 } from "../../core/tests/conformance/index.ts";
@@ -17,6 +18,7 @@ import { createSelect } from "../dist/select/index.js";
 const tags: Record<string, string> = {
   label: "span",
   control: "div",
+  input: "input",
   trigger: "button",
   value: "span",
   clear: "button",
@@ -45,6 +47,9 @@ function build(node: PartNode): Node {
   }
   if (node.part === "group" && props.disabled) {
     element.setAttribute("data-disabled", "");
+  }
+  if (node.part === "input") {
+    element.setAttribute("type", "text");
   }
   if (node.part === "value") {
     element.textContent = String(props.placeholder ?? "");
@@ -86,11 +91,21 @@ const driver: Driver = {
       allowsEmptyCollection: props.allowsEmptyCollection as boolean | undefined,
       onValueChange: log("onValueChange"),
       onOpenChange: log("onOpenChange"),
+      onInputChange: log("onInputChange"),
+      filter: props.filter as false | undefined,
+      openOnFocus: props.openOnFocus as boolean | undefined,
+      openOnInput: props.openOnInput as boolean | undefined,
+      selectionBehavior: props.selectionBehavior as never,
+      autoHighlight: props.autoHighlight as boolean | undefined,
     });
     return {
       query(ref) {
         const element = querySelectPart(host, ref);
-        return ref === "clear" || !hiddenAncestor(element) ? element : null;
+        return ref === "clear" ||
+          ref.startsWith("group:") ||
+          !hiddenAncestor(element)
+          ? element
+          : null;
       },
       async act(step) {
         if (step.type === "setProps") {
@@ -124,3 +139,4 @@ after(() => {
   document.body.replaceChildren();
 });
 runConformance("vanilla", driver, selectScenarios);
+runConformance("vanilla", driver, comboboxScenarios);

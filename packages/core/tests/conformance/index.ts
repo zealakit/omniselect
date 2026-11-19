@@ -11,6 +11,6 @@ export {
   withCallbacks,
 } from "./dom.ts";
 export { nativeScenarios } from "./native/index.ts";
-export { selectScenarios } from "./select/index.ts";
+export { comboboxScenarios, selectScenarios } from "./select/index.ts";
 export { runConformance } from "./runner.ts";
 export type * from "./types.ts";

@@ -1,7 +1,10 @@
 <script lang="ts" generics="T">
 import {
   createSelectMachine,
+  type FilterFn,
   nextId,
+  type SelectInputChangeReason,
+  type SelectionBehavior,
   type SelectCloseReason,
   type SelectOpenReason,
   type SelectState,
@@ -30,6 +33,20 @@ type Props = {
   closeOnSelect?: boolean;
   allowsEmptyCollection?: boolean;
   loop?: boolean;
+  /** Search text. Use `bind:inputValue`, or `inputValue` + `onInputChange`. */
+  inputValue?: string;
+  defaultInputValue?: string;
+  onInputChange?: (value: string, reason: SelectInputChangeReason) => void;
+  /** Custom filter, or `false` to filter outside (async search). */
+  filter?: FilterFn<T> | false;
+  openOnFocus?: boolean;
+  openOnInput?: boolean;
+  selectionBehavior?: SelectionBehavior;
+  restoreOnBlur?: boolean;
+  autoHighlight?: boolean;
+  autoSelectOnTab?: boolean;
+  /** Accessible name of the trigger when an input is present. */
+  triggerLabel?: string;
   placement?: Placement;
   offset?: number;
   matchWidth?: boolean;
@@ -51,6 +68,17 @@ let {
   closeOnSelect,
   allowsEmptyCollection,
   loop,
+  inputValue = $bindable(),
+  defaultInputValue,
+  onInputChange,
+  filter,
+  openOnFocus,
+  openOnInput,
+  selectionBehavior,
+  restoreOnBlur,
+  autoHighlight,
+  autoSelectOnTab,
+  triggerLabel,
   placement = "bottom-start",
   offset = 4,
   matchWidth = true,
@@ -60,6 +88,7 @@ let {
 
 let triggerEl: HTMLElement | null = $state(null);
 let controlEl: HTMLElement | null = $state(null);
+let inputEl: HTMLInputElement | null = $state(null);
 
 const handleValue = (next: unknown) => {
   value = next as T | null;
@@ -81,6 +110,20 @@ const machine = untrack(() =>
     closeOnSelect,
     allowsEmptyCollection,
     loop,
+    inputValue,
+    defaultInputValue,
+    onInputChange(next, reason) {
+      inputValue = next;
+      onInputChange?.(next, reason);
+    },
+    filter,
+    openOnFocus,
+    openOnInput,
+    selectionBehavior,
+    restoreOnBlur,
+    autoHighlight,
+    autoSelectOnTab,
+    triggerLabel,
     onOpenChange(next, reason) {
       open = next;
       onOpenChange?.(next, reason);
@@ -88,7 +131,7 @@ const machine = untrack(() =>
         !next &&
         (reason === "select" || reason === "escape" || reason === "tab")
       ) {
-        triggerEl?.focus();
+        (inputEl ?? triggerEl)?.focus();
       }
     },
   }),
@@ -105,6 +148,15 @@ $effect.pre(() => {
     closeOnSelect,
     allowsEmptyCollection,
     loop,
+    inputValue,
+    filter,
+    openOnFocus,
+    openOnInput,
+    selectionBehavior,
+    restoreOnBlur,
+    autoHighlight,
+    autoSelectOnTab,
+    triggerLabel,
   });
 });
 
@@ -124,13 +176,20 @@ const context: SelectContext = {
   get controlEl() {
     return controlEl;
   },
+  get inputEl() {
+    return inputEl;
+  },
   setTriggerEl: (element) => {
     triggerEl = element;
   },
   setControlEl: (element) => {
     controlEl = element;
   },
+  setInputEl: (element) => {
+    inputEl = element;
+  },
   focusTrigger: () => triggerEl?.focus(),
+  focusField: () => (inputEl ?? triggerEl)?.focus(),
   props: {
     get placement() {
       return placement;

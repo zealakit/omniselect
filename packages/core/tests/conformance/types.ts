@@ -21,12 +21,16 @@ export type Expectation = {
   text?: Record<PartRef, string>;
   /** Exact callback log so far. */
   calls?: CallLog[];
+  /** Every listed call must appear in the log, in this order (other calls may sit between). */
+  includesCalls?: CallLog[];
   /** Last callback only. */
   lastCall?: CallLog;
   /** `FormData` entries of the scenario form, in order. */
   formData?: [string, string][];
   /** Current value as the primitive reports it (see `Mounted.value`). */
   value?: unknown;
+  /** Text in the Select.Input. */
+  inputValue?: string;
   /** Visible item keys in order (items that render). */
   visibleItems?: string[];
 };
@@ -36,6 +40,8 @@ export type Step =
   | { type: "type"; text: string; target?: PartRef }
   | { type: "click"; target: PartRef }
   | { type: "hover"; target: PartRef }
+  | { type: "fill"; text: string; target?: PartRef }
+  | { type: "compose"; text: string; target?: PartRef }
   | { type: "focus"; target: PartRef }
   | { type: "blur"; target?: PartRef }
   | { type: "select"; target: PartRef; values: string[] }

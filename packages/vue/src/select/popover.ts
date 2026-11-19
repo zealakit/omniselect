@@ -123,6 +123,8 @@ export const Popover = defineComponent({
         {
           "data-part": "popover",
           ref: element,
+          // Keep focus on the trigger/input (also when grabbing the scrollbar).
+          onMousedown: (event: Event) => event.preventDefault(),
           hidden: !open.value && !mounted.value,
           "data-state": open.value ? "open" : "closed",
           "data-side": side,

@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
-import { after, test } from "node:test";
+import { afterEach, test } from "node:test";
 import { act, cleanup, render } from "@testing-library/react";
 import { Dialog, DialogContent, DialogTitle } from "@zealakit/overlay-react";
 import { createElement as h, type ReactNode } from "react";
 import { Select } from "../dist/select/index.js";
 
-after(() => cleanup());
+afterEach(() => cleanup());
 
 const flush = () =>
   act(async () => {
@@ -182,4 +182,81 @@ test("structure: Clear inside Trigger warns in development", async () => {
     warnings.some((w) => w.includes("Select.Clear is inside Select.Trigger")),
     warnings.join("\n"),
   );
+});
+
+function comboTree(withInput: boolean) {
+  return h(
+    Select.Root as never,
+    { defaultValue: "a", itemToString: (v: string) => v.toUpperCase() },
+    h(
+      Select.Control,
+      null,
+      withInput ? h(Select.Input, { "aria-label": "Search" }) : null,
+      h(Select.Trigger, null, h(Select.Value, { placeholder: "Pick" })),
+    ),
+  );
+}
+
+test("mode switch: mounting and unmounting an Input flips the ARIA pattern at runtime", async () => {
+  const view = render(comboTree(false));
+  await flush();
+  assert.equal(
+    document.querySelector("[data-part=trigger]")?.getAttribute("role"),
+    "combobox",
+  );
+  view.rerender(comboTree(true));
+  await flush();
+  assert.equal(
+    document.querySelector("[data-part=trigger]")?.getAttribute("role"),
+    null,
+  );
+  assert.equal(
+    document.querySelector("[data-part=trigger]")?.getAttribute("tabindex"),
+    "-1",
+  );
+  assert.equal(
+    document.querySelector("input")?.getAttribute("role"),
+    "combobox",
+  );
+  view.rerender(comboTree(false));
+  await flush();
+  assert.equal(
+    document.querySelector("[data-part=trigger]")?.getAttribute("role"),
+    "combobox",
+  );
+});
+
+test("hydration: server markup is select-only; the client switches to combobox without mismatch warnings", async () => {
+  const { renderToString } = await import("react-dom/server");
+  const { hydrateRoot } = await import("react-dom/client");
+  const container = document.createElement("div");
+  document.body.append(container);
+  container.innerHTML = renderToString(comboTree(true));
+  assert.equal(
+    container.querySelector("[data-part=trigger]")?.getAttribute("role"),
+    "combobox",
+    "server renders select-only",
+  );
+  const errors: string[] = [];
+  const original = console.error;
+  console.error = (...args: unknown[]) =>
+    errors.push(args.map(String).join(" "));
+  try {
+    await act(async () => {
+      hydrateRoot(container, comboTree(true));
+    });
+    await flush();
+  } finally {
+    console.error = original;
+  }
+  assert.deepEqual(errors, []);
+  assert.equal(
+    container.querySelector("[data-part=trigger]")?.getAttribute("role"),
+    null,
+  );
+  assert.equal(
+    (container.querySelector("input") as HTMLInputElement).value,
+    "A",
+  );
+  container.remove();
 });

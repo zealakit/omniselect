@@ -194,6 +194,53 @@ const fruit = ref<string | null>("apple");
 | `--omniselect-anchor-width` | Popover | control 的宽度，用于 `matchWidth`。 |
 | `--omniselect-available-height` | Popover | 弹层所在一侧的剩余空间。 |
 
+### Combobox
+
+添加 `Select.Input` 即可把 Select 变成可搜索的 combobox（WAI-ARIA 带列表自动补全的可编辑 combobox 模式）。输入框拥有 `role="combobox"` 并保持焦点；触发器变为带有 `triggerLabel` 名称的普通按钮。用户输入时会过滤选项。
+
+```vue
+<Select.Root v-model="fruit">
+  <Select.Control>
+    <Select.Input placeholder="Search fruit" />
+    <Select.Trigger><Select.Indicator>▾</Select.Indicator></Select.Trigger>
+    <Select.Clear>×</Select.Clear>
+  </Select.Control>
+  <Select.Popover>
+    <Select.List>
+      <Select.Item value="apple">Apple</Select.Item>
+      <Select.Empty>No results</Select.Empty>
+    </Select.List>
+  </Select.Popover>
+</Select.Root>
+```
+
+### Combobox props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `inputValue`、`defaultInputValue` | `string` | `""` | 搜索文本。定义 `inputValue` 时为受控。 |
+| `onInputChange` | `(text, reason) => void` | — | 原因：`input`、`select`、`clear`、`close` 或 `reset`。 |
+| `filter` | `FilterFn \| false` | contains | 自定义 `(item, query) => boolean`，或 `false` 表示在外部过滤（异步搜索）。 |
+| `openOnFocus`、`openOnInput` | `boolean` | `false`、`true` | 输入框获得焦点时或输入时打开。 |
+| `selectionBehavior` | `"replace-input" \| "keep-input" \| "clear-input"` | `"replace-input"` | 选择后输入框显示的内容。 |
+| `restoreOnBlur` | `boolean` | `true` | 输入框失焦时还原已选标签。 |
+| `autoHighlight`、`autoSelectOnTab` | `boolean` | `true`、`false` | 输入时高亮第一个匹配项；按 Tab 时选中高亮项。 |
+| `triggerLabel` | `string` | `"Show options"` | combobox 模式下触发器的可访问名称。 |
+
+### Combobox keyboard
+
+| Key | Closed | Open |
+| --- | --- | --- |
+| 输入 | 编辑文本并打开列表 | 过滤选项 |
+| ArrowDown / ArrowUp | 在第一项 / 最后一项处打开 | 移动高亮 |
+| Alt+ArrowDown | 打开但不高亮 | — |
+| Enter | 交给表单处理 | 选中高亮项 |
+| Escape | 清除文本 | 关闭并还原已选标签 |
+| Tab | — | 关闭；仅在 `autoSelectOnTab` 时选中 |
+| Space | 输入空格 | 输入空格 |
+
+过滤不区分重音和大小写。被过滤掉的选项仍保持注册但不渲染内容，没有匹配项的分组会自行隐藏。使用 IME 输入时，按键处理和过滤会等到输入法组合结束。服务端渲染 select-only 标记，客户端的第一个 effect 会切换为 combobox 语义。
+
 ### Notes
 
 - 选项在弹层挂载后才会注册。在打开之前，已选值没有标签：请传入 `itemToString`，或给 `Popover` 设置 `forceMount` 以保持选项处于注册状态（这也让 type-ahead 在关闭时可用）。
@@ -203,7 +250,7 @@ const fruit = ref<string | null>("apple");
 
 ## Status
 
-`NativeSelect` 和 `Select` 已可用。Combobox 搜索、多选和异步加载将在后续版本提供，因此该包同样只导出下面的 Overlay 类型。
+`NativeSelect`、`Select` 和 combobox 搜索（`Select.Input`）已可用。多选和异步加载将在后续版本提供，因此该包同样只导出下面的 Overlay 类型。
 
 | Export | From |
 | --- | --- |

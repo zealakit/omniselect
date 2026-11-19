@@ -10,6 +10,7 @@ import {
 } from "./selection.js";
 import { createControllable, type Controllable } from "./store/controllable.js";
 import { createStore, type Store } from "./store/store.js";
+import { defaultFilter, type FilterFn } from "./filter.js";
 import { createTypeahead, type Typeahead } from "./typeahead.js";
 
 export type SelectValue<T> = T | null | T[];
@@ -26,6 +27,17 @@ export type SelectCloseReason =
 
 export type SelectOpenReason = "trigger" | "keyboard" | "imperative";
 
+export type SelectInputChangeReason =
+  | "input"
+  | "select"
+  | "clear"
+  | "close"
+  | "reset";
+
+export type SelectionBehavior = "replace-input" | "keep-input" | "clear-input";
+
+export type SelectMode = "select-only" | "combobox";
+
 export type SelectHighlightSource = "keyboard" | "pointer";
 
 export type SelectState<T> = {
@@ -33,6 +45,9 @@ export type SelectState<T> = {
   highlightedKey: string | null;
   highlightSource: SelectHighlightSource | null;
   value: SelectValue<T>;
+  inputValue: string;
+  /** `combobox` while a `Select.Input` is mounted. */
+  mode: SelectMode;
   /** Bumped when the collection changes, so adapters re-render derived output. */
   version: number;
   hasClear: boolean;
@@ -58,6 +73,18 @@ export type SelectMachineOptions<T> = {
   closeOnSelect?: boolean;
   allowsEmptyCollection?: boolean;
   loop?: boolean;
+  inputValue?: string | undefined;
+  defaultInputValue?: string;
+  onInputChange?: (value: string, reason: SelectInputChangeReason) => void;
+  /** Custom filter, or `false` for manual filtering. Default: diacritic-insensitive contains. */
+  filter?: FilterFn<T> | false;
+  openOnFocus?: boolean;
+  openOnInput?: boolean;
+  selectionBehavior?: SelectionBehavior;
+  restoreOnBlur?: boolean;
+  autoHighlight?: boolean;
+  autoSelectOnTab?: boolean;
+  triggerLabel?: string;
   typeaheadTimeout?: number;
   now?: () => number;
 };
@@ -72,8 +99,21 @@ export type SelectProps<T> = Partial<
     | "closeOnSelect"
     | "allowsEmptyCollection"
     | "loop"
+    | "onInputChange"
+    | "filter"
+    | "openOnFocus"
+    | "openOnInput"
+    | "selectionBehavior"
+    | "restoreOnBlur"
+    | "autoHighlight"
+    | "autoSelectOnTab"
+    | "triggerLabel"
   >
-> & { value?: SelectValue<T> | undefined; open?: boolean | undefined };
+> & {
+  value?: SelectValue<T> | undefined;
+  open?: boolean | undefined;
+  inputValue?: string | undefined;
+};
 
 /** The subset of a keyboard event the machine needs. */
 export type KeyEventLike = {
@@ -101,7 +141,7 @@ export type SelectMachine<T> = {
   isOpen: () => boolean;
   open: (
     reason?: SelectOpenReason,
-    highlight?: "selected" | "first" | "last" | "none",
+    highlight?: "selected" | "first" | "last" | "first-visible" | "none",
   ) => void;
   close: (reason: SelectCloseReason) => void;
   toggle: () => void;
@@ -113,6 +153,17 @@ export type SelectMachine<T> = {
   setValue: (value: SelectValue<T>) => void;
   /** Keyboard handling for the trigger (select-only mode). */
   onTriggerKeyDown: (event: KeyEventLike) => KeyResult;
+  /** Called by `Select.Input` while mounted; switches the machine to combobox mode. */
+  registerInput: () => () => void;
+  /** Text typed into the input. `composing` defers filtering until composition ends. */
+  onInput: (text: string, options?: { composing?: boolean }) => void;
+  onInputKeyDown: (event: KeyEventLike) => KeyResult;
+  onInputFocus: () => void;
+  onInputClick: () => void;
+  /** Blur: closes and, with `restoreOnBlur`, puts the selected label back. */
+  onInputBlur: () => void;
+  /** Remove the last selected value (multiple mode). */
+  removeLast: () => void;
   /** Keys of items that should render (the visible subset). */
   visibleKeys: () => string[];
   /** Label of one value: label cache, then `itemToString`, then its key. */
@@ -131,6 +182,7 @@ export type SelectMachine<T> = {
     groupLabel: (id: string) => Attrs;
     clear: (label: string) => Attrs;
     root: () => Attrs;
+    input: () => Attrs;
   };
   destroy: () => void;
 };
@@ -160,32 +212,67 @@ export function createSelectMachine<T>(
       | "closeOnSelect"
       | "allowsEmptyCollection"
       | "loop"
+      | "openOnFocus"
+      | "openOnInput"
+      | "selectionBehavior"
+      | "restoreOnBlur"
+      | "autoHighlight"
+      | "autoSelectOnTab"
+      | "triggerLabel"
     >
   > &
-    Pick<SelectProps<T>, "onValueChange" | "onOpenChange"> = {
+    Pick<
+      SelectProps<T>,
+      "onValueChange" | "onOpenChange" | "onInputChange" | "filter"
+    > = {
     disabled: options.disabled ?? false,
     required: options.required ?? false,
     closeOnSelect: options.closeOnSelect ?? !multiple,
     allowsEmptyCollection: options.allowsEmptyCollection ?? true,
     loop: options.loop ?? false,
+    openOnFocus: options.openOnFocus ?? false,
+    openOnInput: options.openOnInput ?? true,
+    selectionBehavior:
+      options.selectionBehavior ?? (multiple ? "clear-input" : "replace-input"),
+    restoreOnBlur: options.restoreOnBlur ?? true,
+    autoHighlight: options.autoHighlight ?? true,
+    autoSelectOnTab: options.autoSelectOnTab ?? false,
+    triggerLabel: options.triggerLabel ?? "Show options",
     onValueChange: options.onValueChange,
     onOpenChange: options.onOpenChange,
+    onInputChange: options.onInputChange,
+    filter: options.filter,
   };
 
   const defaultValue = options.defaultValue ?? selection.empty();
+  const initialValue =
+    options.value !== undefined ? options.value : defaultValue;
+  const fallbackLabel = (value: T): string =>
+    options.itemToString?.(value) ?? itemToKey(value);
+  const initialInput =
+    options.inputValue ??
+    options.defaultInputValue ??
+    (!multiple && initialValue !== null
+      ? fallbackLabel(initialValue as T)
+      : "");
   const store = createStore<SelectState<T>>({
     open: options.open ?? options.defaultOpen ?? false,
     highlightedKey: null,
     highlightSource: null,
-    value: options.value !== undefined ? options.value : defaultValue,
+    value: initialValue,
+    inputValue: initialInput,
+    mode: "select-only",
     version: 0,
     hasClear: false,
     hasLoading: false,
   });
 
   let reason: SelectOpenReason | SelectCloseReason = "imperative";
+  let inputReason: SelectInputChangeReason = "input";
+  /** Text the filter runs on; follows typing only, not the selected label. */
+  let filterQuery = "";
   /** Highlight to apply once items register (the popover mounts after opening). */
-  let pending: "selected" | "first" | "last" | null = null;
+  let pending: "selected" | "first" | "last" | "first-visible" | null = null;
   const sameKeys = (a: SelectValue<T>, b: SelectValue<T>) =>
     selection.keys(a).join("\u0000") === selection.keys(b).join("\u0000");
 
@@ -213,6 +300,46 @@ export function createSelectMachine<T>(
     },
   });
 
+  const inputCtl: Controllable<string> = createControllable<string>({
+    value: options.inputValue,
+    defaultValue: initialInput,
+    onChange(next) {
+      if (!inputCtl.isControlled()) {
+        store.set({ inputValue: next });
+      }
+      props.onInputChange?.(next, inputReason);
+    },
+  });
+
+  const setInput = (text: string, why: SelectInputChangeReason): void => {
+    inputReason = why;
+    inputCtl.set(text);
+  };
+
+  const applyFilter = (): void => {
+    const state = store.get();
+    const active = state.open && state.mode === "combobox";
+    collection.setFilter(
+      active ? filterQuery : "",
+      props.filter === undefined ? defaultFilter : props.filter,
+    );
+  };
+
+  /** Text the input should show for the current selection. */
+  const selectedText = (): string => {
+    if (multiple) {
+      return "";
+    }
+    const value = store.get().value;
+    return value === null ? "" : machine.labelOf(value as T);
+  };
+
+  const restoreInput = (): void => {
+    if (store.get().mode === "combobox" && props.restoreOnBlur) {
+      setInput(selectedText(), "close");
+    }
+  };
+
   function applyOpen(open: boolean): void {
     store.set({
       open,
@@ -222,7 +349,9 @@ export function createSelectMachine<T>(
     if (!open) {
       typeahead.reset();
       pending = null;
+      filterQuery = "";
     }
+    applyFilter();
   }
 
   const unsubscribeCollection = collection.subscribe(() => {
@@ -238,6 +367,21 @@ export function createSelectMachine<T>(
     }
     if (state.open && pending !== null && state.highlightedKey === null) {
       schedulePending();
+    }
+    // Items register after the first paint; replace a fallback label with the real one.
+    if (
+      state.mode === "combobox" &&
+      !multiple &&
+      filterQuery === "" &&
+      props.selectionBehavior === "replace-input" &&
+      options.itemToString === undefined &&
+      state.value !== null &&
+      state.inputValue === itemToKey(state.value as T)
+    ) {
+      const label = machine.labelOf(state.value as T);
+      if (label !== state.inputValue) {
+        setInput(label, "select");
+      }
     }
     if (state.highlightedKey !== null) {
       const item = collection.get(state.highlightedKey);
@@ -293,9 +437,12 @@ export function createSelectMachine<T>(
   };
 
   const resolveHighlight = (
-    mode: "selected" | "first" | "last" | null,
+    mode: "selected" | "first" | "last" | "first-visible" | null,
   ): string | null => {
     const nav = visibleNav();
+    if (mode === "first-visible") {
+      return first(nav);
+    }
     if (mode === "selected") {
       return firstSelectedVisibleKey();
     }
@@ -333,8 +480,24 @@ export function createSelectMachine<T>(
         props.onOpenChange = next.onOpenChange;
       }
       if (valueCtl.isControlled() && next.value !== undefined) {
+        const changed = !sameKeys(store.get().value, next.value);
         valueCtl.sync(next.value);
         store.set({ value: next.value });
+        if (
+          changed &&
+          store.get().mode === "combobox" &&
+          !multiple &&
+          props.selectionBehavior === "replace-input"
+        ) {
+          setInput(selectedText(), "select");
+        }
+      }
+      if (inputCtl.isControlled() && next.inputValue !== undefined) {
+        inputCtl.sync(next.inputValue);
+        store.set({ inputValue: next.inputValue });
+      }
+      if (next.filter !== undefined || "filter" in next) {
+        applyFilter();
       }
       if (openCtl.isControlled() && next.open !== undefined) {
         openCtl.sync(next.open);
@@ -369,6 +532,9 @@ export function createSelectMachine<T>(
         return;
       }
       setOpen(false, why);
+      if (why !== "select") {
+        restoreInput();
+      }
     },
     toggle() {
       if (store.get().open) {
@@ -400,15 +566,42 @@ export function createSelectMachine<T>(
         ? selection.toggle(current, item.value)
         : selection.select(current, item.value);
       valueCtl.set(next);
+      if (store.get().mode === "combobox") {
+        const behavior = props.selectionBehavior;
+        if (behavior === "replace-input" && !multiple) {
+          setInput(machine.labelOf(item.value), "select");
+        } else if (
+          behavior === "clear-input" ||
+          (multiple && behavior === "replace-input")
+        ) {
+          setInput("", "select");
+        }
+        filterQuery = "";
+        applyFilter();
+      }
       if (props.closeOnSelect && selectOptions?.close !== false) {
         machine.close("select");
       }
     },
     clear() {
-      if (props.disabled || selection.isEmpty(store.get().value)) {
+      if (props.disabled) {
         return;
       }
-      valueCtl.set(selection.empty());
+      if (store.get().mode === "combobox") {
+        setInput("", "clear");
+        filterQuery = "";
+        applyFilter();
+      }
+      if (!selection.isEmpty(store.get().value)) {
+        valueCtl.set(selection.empty());
+      }
+    },
+    removeLast() {
+      const value = store.get().value;
+      if (!Array.isArray(value) || value.length === 0 || props.disabled) {
+        return;
+      }
+      valueCtl.set(value.slice(0, -1));
     },
     setValue(next) {
       valueCtl.setSilently(next);
@@ -417,7 +610,11 @@ export function createSelectMachine<T>(
     onTriggerKeyDown(event) {
       const none: KeyResult = { preventDefault: false };
       const handled: KeyResult = { preventDefault: true };
-      if (props.disabled || event.isComposing) {
+      if (
+        props.disabled ||
+        event.isComposing ||
+        store.get().mode === "combobox"
+      ) {
         return none;
       }
       const state = store.get();
@@ -534,6 +731,125 @@ export function createSelectMachine<T>(
       }
       return none;
     },
+    registerInput() {
+      store.set({ mode: "combobox" });
+      applyFilter();
+      return () => {
+        store.set({ mode: "select-only" });
+        applyFilter();
+      };
+    },
+    onInput(text, inputOptions) {
+      if (props.disabled) {
+        return;
+      }
+      setInput(text, "input");
+      if (inputOptions?.composing) {
+        return;
+      }
+      filterQuery = text;
+      pending = props.autoHighlight && text !== "" ? "first-visible" : null;
+      if (!store.get().open) {
+        if (props.openOnInput) {
+          machine.open("keyboard", "none");
+          pending = props.autoHighlight && text !== "" ? "first-visible" : null;
+        }
+      } else {
+        applyFilter();
+        const current = store.get().highlightedKey;
+        if (current !== null && !collection.isVisible(current)) {
+          store.set({ highlightedKey: null, highlightSource: null });
+        }
+      }
+      if (pending !== null && store.get().open) {
+        schedulePending();
+      }
+    },
+    onInputKeyDown(event) {
+      const none: KeyResult = { preventDefault: false };
+      const handled: KeyResult = { preventDefault: true };
+      if (props.disabled || event.isComposing) {
+        return none;
+      }
+      const state = store.get();
+      const nav = visibleNav();
+      const key = event.key;
+      if (key === "Backspace" && multiple && state.inputValue === "") {
+        machine.removeLast();
+        return none;
+      }
+      if (!state.open) {
+        switch (key) {
+          case "ArrowDown":
+            machine.open("keyboard", event.altKey ? "none" : "first");
+            return handled;
+          case "ArrowUp":
+            if (event.altKey) {
+              return none;
+            }
+            machine.open("keyboard", "last");
+            return handled;
+          case "Escape":
+            if (state.inputValue !== "") {
+              setInput("", "clear");
+              filterQuery = "";
+              return handled;
+            }
+            return none;
+          default:
+            return none;
+        }
+      }
+      const from = state.highlightedKey;
+      switch (key) {
+        case "ArrowDown":
+          machine.highlight(next(nav, from, { wrap: props.loop }));
+          return handled;
+        case "ArrowUp":
+          if (event.altKey) {
+            return none;
+          }
+          machine.highlight(prev(nav, from, { wrap: props.loop }));
+          return handled;
+        case "PageDown":
+          machine.highlight(pageDown(nav, from));
+          return handled;
+        case "PageUp":
+          machine.highlight(pageUp(nav, from));
+          return handled;
+        case "Enter":
+          if (from !== null) {
+            machine.selectKey(from);
+            return handled;
+          }
+          return none;
+        case "Tab":
+          if (props.autoSelectOnTab && from !== null && !multiple) {
+            machine.selectKey(from, { close: false });
+          }
+          machine.close("tab");
+          return none;
+        default:
+          return none;
+      }
+    },
+    onInputFocus() {
+      if (props.openOnFocus && !store.get().open) {
+        machine.open("keyboard", "none");
+      }
+    },
+    onInputClick() {
+      if (!store.get().open) {
+        machine.open("trigger", "selected");
+      }
+    },
+    onInputBlur() {
+      if (store.get().open) {
+        machine.close("blur");
+      } else {
+        restoreInput();
+      }
+    },
     visibleKeys: () => collection.visible().map((item) => item.key),
     labelOf: (value) =>
       collection.labelOf(
@@ -561,6 +877,19 @@ export function createSelectMachine<T>(
       trigger: () => {
         const state = store.get();
         const listMounted = state.open;
+        if (state.mode === "combobox") {
+          return {
+            id: ids.trigger,
+            "aria-haspopup": "listbox",
+            "aria-expanded": state.open ? "true" : "false",
+            "aria-controls": listMounted ? ids.listbox : undefined,
+            "aria-label": props.triggerLabel,
+            tabindex: "-1",
+            "aria-disabled": props.disabled ? "true" : undefined,
+            "data-state": state.open ? "open" : "closed",
+            "data-disabled": bool(props.disabled),
+          };
+        }
         return {
           id: ids.trigger,
           role: "combobox",
@@ -577,6 +906,28 @@ export function createSelectMachine<T>(
           "data-state": state.open ? "open" : "closed",
           "data-disabled": bool(props.disabled),
           "data-placeholder": bool(!multiple && selection.isEmpty(state.value)),
+        };
+      },
+      input: () => {
+        const state = store.get();
+        return {
+          id: ids.input,
+          role: "combobox",
+          "aria-autocomplete": "list",
+          "aria-haspopup": "listbox",
+          "aria-expanded": state.open ? "true" : "false",
+          "aria-controls": state.open ? ids.listbox : undefined,
+          "aria-activedescendant":
+            state.open && state.highlightedKey !== null
+              ? ids.item(state.highlightedKey)
+              : undefined,
+          "aria-labelledby": ids.label,
+          "aria-required": props.required ? "true" : undefined,
+          "aria-disabled": props.disabled ? "true" : undefined,
+          autocomplete: "off",
+          spellcheck: "false",
+          "data-state": state.open ? "open" : "closed",
+          "data-disabled": bool(props.disabled),
         };
       },
       list: () => ({

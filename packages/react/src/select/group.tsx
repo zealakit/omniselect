@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import { GroupContext, useSelectContext } from "./context.js";
-import { reactAttrs } from "./internal.js";
+import { reactAttrs, useSnapshot } from "./internal.js";
 import { useContext } from "react";
 
 export type SelectGroupProps = HTMLAttributes<HTMLDivElement> & {
@@ -25,6 +25,10 @@ export const Group = forwardRef<HTMLDivElement, SelectGroupProps>(
       () => machine.collection.registerGroup(groupId, { disabled }),
       [machine, groupId, disabled],
     );
+    const visible =
+      useSnapshot(machine, (m) =>
+        String(m.collection.groupHasVisible(groupId)),
+      ) === "true";
     const value = useMemo(() => ({ groupId, setHasLabel }), [groupId]);
     return (
       <GroupContext.Provider value={value}>
@@ -33,6 +37,7 @@ export const Group = forwardRef<HTMLDivElement, SelectGroupProps>(
           data-disabled={disabled ? "" : undefined}
           {...rest}
           {...reactAttrs(machine.attrs.group(groupId, hasLabel))}
+          hidden={!visible}
           ref={ref}
         />
       </GroupContext.Provider>

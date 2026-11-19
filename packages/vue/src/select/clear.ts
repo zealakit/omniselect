@@ -30,7 +30,7 @@ export const Clear = defineComponent({
           hidden: !hasValue,
           onClick: () => {
             machine.clear();
-            context.focusTrigger();
+            context.focusField();
           },
         },
         slots.default?.(),

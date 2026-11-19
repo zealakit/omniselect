@@ -21,3 +21,5 @@ form.addEventListener("submit", (event) => {
 createSelect(document.getElementById("select") as HTMLElement, {
   defaultValue: "apple",
 });
+
+createSelect(document.getElementById("combobox") as HTMLElement);

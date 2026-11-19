@@ -21,7 +21,12 @@ setContext(GROUP_KEY, {
 });
 
 $effect(() => machine.collection.registerGroup(groupId, { disabled }));
+const { snapshot } = getSelectContext("Group");
 const attrs = $derived(machine.attrs.group(groupId, state.hasLabel));
+const visible = $derived.by(() => {
+  void $snapshot;
+  return machine.collection.groupHasVisible(groupId);
+});
 </script>
 
-<div data-part="group" data-disabled={disabled ? "" : undefined} {...rest} {...attrs}>{@render children?.()}</div>
+<div data-part="group" data-disabled={disabled ? "" : undefined} {...rest} {...attrs} hidden={!visible}>{@render children?.()}</div>

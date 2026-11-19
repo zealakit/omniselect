@@ -45,6 +45,26 @@
           </div>
         </div>
       </div>
+      <h2>Combobox</h2>
+      <div class="field" id="combobox">
+        <span data-part="label">Search fruit</span>
+        <div data-part="control">
+          <span class="select-control">
+            <input data-part="input" type="text" placeholder="Type to filter" />
+            <button data-part="trigger" type="button"><span data-part="indicator">▾</span></button>
+            <button data-part="clear" type="button">×</button>
+          </span>
+        </div>
+        <div data-part="popover">
+          <div data-part="list">
+            <div data-part="item" data-value="apple">apple</div>
+            <div data-part="item" data-value="apricot">apricot</div>
+            <div data-part="item" data-value="banana">banana</div>
+            <div data-part="item" data-value="cherry">cherry</div>
+            <div data-part="empty">No results</div>
+          </div>
+        </div>
+      </div>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>

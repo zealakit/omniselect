@@ -32,6 +32,10 @@ export type Collection<T> = {
   items: () => CollectionItem<T>[];
   /** Items passing the current filter, in order. */
   visible: () => CollectionItem<T>[];
+  /** Whether an item passes the current filter. */
+  isVisible: (key: string) => boolean;
+  /** Whether any item of a group passes the current filter. */
+  groupHasVisible: (groupId: string) => boolean;
   get: (key: string) => CollectionItem<T> | undefined;
   /** Set the live query. `false` = manual mode (nothing is filtered out). */
   setFilter: (query: string, filter?: FilterFn<T> | false) => void;
@@ -58,6 +62,8 @@ export function createCollection<T>(
     items: CollectionItem<T>[];
     visible: CollectionItem<T>[];
     byKey: Map<string, CollectionItem<T>>;
+    visibleKeys: Set<string>;
+    visibleGroups: Set<string>;
   } | null = null;
 
   const bump = (): void => {
@@ -93,6 +99,12 @@ export function createCollection<T>(
       items,
       visible,
       byKey: new Map(items.map((item) => [item.key, item])),
+      visibleKeys: new Set(visible.map((item) => item.key)),
+      visibleGroups: new Set(
+        visible.flatMap((item) =>
+          item.groupId === null ? [] : [item.groupId],
+        ),
+      ),
     };
     return cache;
   };
@@ -146,6 +158,8 @@ export function createCollection<T>(
     },
     items: () => resolve().items,
     visible: () => resolve().visible,
+    isVisible: (key) => resolve().visibleKeys.has(key),
+    groupHasVisible: (groupId) => resolve().visibleGroups.has(groupId),
     get: (key) => resolve().byKey.get(key),
     setFilter(nextQuery, nextFilter) {
       query = nextQuery;

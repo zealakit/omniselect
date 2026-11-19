@@ -194,6 +194,53 @@ const fruit = ref<string | null>("apple");
 | `--omniselect-anchor-width` | Popover | Chiều rộng của control, dùng cho `matchWidth`. |
 | `--omniselect-available-height` | Popover | Khoảng trống còn lại ở phía của popover. |
 
+### Combobox
+
+Thêm `Select.Input` để biến Select thành combobox có tìm kiếm (mẫu editable combobox với list autocomplete của WAI-ARIA). Input nhận `role="combobox"` và giữ focus; trigger trở thành một nút thường có nhãn từ `triggerLabel`. Các item được lọc khi người dùng gõ.
+
+```vue
+<Select.Root v-model="fruit">
+  <Select.Control>
+    <Select.Input placeholder="Search fruit" />
+    <Select.Trigger><Select.Indicator>▾</Select.Indicator></Select.Trigger>
+    <Select.Clear>×</Select.Clear>
+  </Select.Control>
+  <Select.Popover>
+    <Select.List>
+      <Select.Item value="apple">Apple</Select.Item>
+      <Select.Empty>No results</Select.Empty>
+    </Select.List>
+  </Select.Popover>
+</Select.Root>
+```
+
+### Combobox props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `inputValue`, `defaultInputValue` | `string` | `""` | Văn bản tìm kiếm. Được điều khiển khi có `inputValue`. |
+| `onInputChange` | `(text, reason) => void` | — | Lý do: `input`, `select`, `clear`, `close` hoặc `reset`. |
+| `filter` | `FilterFn \| false` | contains | Hàm `(item, query) => boolean` tùy biến, hoặc `false` để lọc bên ngoài (tìm kiếm bất đồng bộ). |
+| `openOnFocus`, `openOnInput` | `boolean` | `false`, `true` | Mở khi input nhận focus hoặc khi đang gõ. |
+| `selectionBehavior` | `"replace-input" \| "keep-input" \| "clear-input"` | `"replace-input"` | Input hiển thị gì sau khi chọn. |
+| `restoreOnBlur` | `boolean` | `true` | Trả nhãn đã chọn về input khi mất focus. |
+| `autoHighlight`, `autoSelectOnTab` | `boolean` | `true`, `false` | Highlight kết quả đầu khi gõ; chọn mục đang highlight khi nhấn Tab. |
+| `triggerLabel` | `string` | `"Show options"` | Tên truy cập của trigger ở chế độ combobox. |
+
+### Combobox keyboard
+
+| Key | Closed | Open |
+| --- | --- | --- |
+| Gõ phím | Sửa văn bản và mở danh sách | Lọc các item |
+| ArrowDown / ArrowUp | Mở tại item đầu / cuối | Di chuyển highlight |
+| Alt+ArrowDown | Mở mà không highlight | — |
+| Enter | Để form xử lý | Chọn item đang highlight |
+| Escape | Xóa văn bản | Đóng và khôi phục nhãn đã chọn |
+| Tab | — | Đóng; chỉ chọn khi có `autoSelectOnTab` |
+| Space | Gõ dấu cách | Gõ dấu cách |
+
+Việc lọc không phân biệt dấu và hoa thường. Các item bị lọc vẫn được đăng ký nhưng không render gì, và nhóm không có kết quả sẽ tự ẩn. Khi đang gõ bằng IME, phím và việc lọc chờ đến khi kết thúc composition. Server render markup select-only, và effect đầu tiên ở client chuyển sang ngữ nghĩa combobox.
+
 ### Notes
 
 - Các item đăng ký khi popover được mount. Trước khi mở, giá trị đã chọn chưa có nhãn: hãy truyền `itemToString`, hoặc đặt `forceMount` cho `Popover` để giữ các item được đăng ký (cách này cũng cho phép type-ahead hoạt động khi đang đóng).
@@ -203,7 +250,7 @@ const fruit = ref<string | null>("apple");
 
 ## Status
 
-`NativeSelect` và `Select` đã sẵn sàng. Tìm kiếm combobox, chọn nhiều và tải bất đồng bộ sẽ có ở các bản release sau, nên package cũng chỉ export các type của Overlay bên dưới.
+`NativeSelect`, `Select` và tìm kiếm combobox (`Select.Input`) đã sẵn sàng. Chọn nhiều và tải bất đồng bộ sẽ có ở các bản release sau, nên package cũng chỉ export các type của Overlay bên dưới.
 
 | Export | From |
 | --- | --- |

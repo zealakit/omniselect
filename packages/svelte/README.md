@@ -188,6 +188,53 @@ A custom select with a floating popover, built on Overlay. It uses the WAI-ARIA 
 | `--omniselect-anchor-width` | Popover | Width of the control, for `matchWidth`. |
 | `--omniselect-available-height` | Popover | Room left on the popover's side. |
 
+### Combobox
+
+Add `Select.Input` to turn the Select into a searchable combobox (WAI-ARIA editable combobox with list autocomplete). The input takes `role="combobox"` and keeps focus; the trigger becomes a plain button labelled by `triggerLabel`. Items are filtered as the user types.
+
+```svelte
+<Select.Root bind:value={fruit} bind:inputValue={query}>
+  <Select.Control>
+    <Select.Input placeholder="Search fruit" />
+    <Select.Trigger><Select.Indicator>▾</Select.Indicator></Select.Trigger>
+    <Select.Clear>×</Select.Clear>
+  </Select.Control>
+  <Select.Popover>
+    <Select.List>
+      <Select.Item value="apple">Apple</Select.Item>
+      <Select.Empty>No results</Select.Empty>
+    </Select.List>
+  </Select.Popover>
+</Select.Root>
+```
+
+### Combobox props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `inputValue`, `defaultInputValue` | `string` | `""` | Search text. Controlled when `inputValue` is defined. |
+| `onInputChange` | `(text, reason) => void` | — | Reason: `input`, `select`, `clear`, `close`, or `reset`. |
+| `filter` | `FilterFn \| false` | contains | Custom `(item, query) => boolean`, or `false` to filter outside (async search). |
+| `openOnFocus`, `openOnInput` | `boolean` | `false`, `true` | Open when the input gains focus or while typing. |
+| `selectionBehavior` | `"replace-input" \| "keep-input" \| "clear-input"` | `"replace-input"` | What the input shows after a pick. |
+| `restoreOnBlur` | `boolean` | `true` | Put the selected label back when the input loses focus. |
+| `autoHighlight`, `autoSelectOnTab` | `boolean` | `true`, `false` | Highlight the first match while typing; select the highlight on Tab. |
+| `triggerLabel` | `string` | `"Show options"` | Accessible name of the trigger in combobox mode. |
+
+### Combobox keyboard
+
+| Key | Closed | Open |
+| --- | --- | --- |
+| Typing | Edits the text and opens the list | Filters the items |
+| ArrowDown / ArrowUp | Opens on the first / last item | Moves the highlight |
+| Alt+ArrowDown | Opens without a highlight | — |
+| Enter | Left to the form | Selects the highlighted item |
+| Escape | Clears the text | Closes and restores the selected label |
+| Tab | — | Closes; selects only with `autoSelectOnTab` |
+| Space | Types a space | Types a space |
+
+Filtering is diacritic- and case-insensitive. Filtered-out items stay registered but render nothing, and a group with no match hides itself. During IME composition, keys and filtering wait for the composition to end. The server renders the select-only markup, and the first client effect switches to combobox semantics.
+
 ### Notes
 
 - Items register while the popover is mounted. Until it opens, a selected value has no label: pass `itemToString`, or set `forceMount` on `Popover` to keep the items registered (this also lets type-ahead work while closed).
@@ -197,7 +244,7 @@ A custom select with a floating popover, built on Overlay. It uses the WAI-ARIA 
 
 ## Status
 
-`NativeSelect` and `Select` are available. Combobox search, multiple selection, and async loading land in later releases, so the package also exports only the Overlay types below.
+`NativeSelect`, `Select`, and combobox search (`Select.Input`) are available. Multiple selection and async loading land in later releases, so the package also exports only the Overlay types below.
 
 | Export | From |
 | --- | --- |

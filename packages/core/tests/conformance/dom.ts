@@ -90,7 +90,7 @@ export function querySelectPart(
 ): Element | null {
   const doc = root.ownerDocument ?? document;
   const first = (selector: string) => doc.querySelector(selector);
-  if (ref === "trigger") return first("[role=combobox]:not(input)");
+  if (ref === "trigger") return first("[data-part=trigger]");
   if (ref === "input") return first("input[role=combobox]");
   if (ref === "list") return first("[role=listbox]");
   if (ref === "outside") return first("[data-part=outside]");
@@ -132,6 +132,19 @@ const keyboardInit = (
   cancelable: true,
 });
 
+/** Set `value` the way a user edit does, so React notices the change. */
+function setNativeValue(input: HTMLInputElement, text: string): void {
+  const setter = Object.getOwnPropertyDescriptor(
+    Object.getPrototypeOf(input),
+    "value",
+  )?.set;
+  if (setter) {
+    setter.call(input, text);
+  } else {
+    input.value = text;
+  }
+}
+
 function pointer(target: Element, type: string): void {
   const event = new window.Event(type, { bubbles: true, cancelable: true });
   Object.defineProperty(event, "button", { value: 0 });
@@ -156,6 +169,35 @@ export function performSelectDomStep(
           keyboardInit(step.key as string, step.mods as never),
         ),
       );
+      return true;
+    }
+    case "fill": {
+      const target = find(
+        (step.target as string | undefined) ?? "input",
+      ) as HTMLInputElement | null;
+      if (target) {
+        setNativeValue(target, step.text as string);
+        target.dispatchEvent(new window.Event("input", { bubbles: true }));
+      }
+      return true;
+    }
+    case "compose": {
+      // IME: compositionstart, input while composing, compositionend.
+      const target = find(
+        (step.target as string | undefined) ?? "input",
+      ) as HTMLInputElement | null;
+      if (target) {
+        target.dispatchEvent(
+          new window.Event("compositionstart", { bubbles: true }),
+        );
+        setNativeValue(target, step.text as string);
+        const event = new window.Event("input", { bubbles: true });
+        Object.defineProperty(event, "isComposing", { value: true });
+        target.dispatchEvent(event);
+        target.dispatchEvent(
+          new window.Event("compositionend", { bubbles: true }),
+        );
+      }
       return true;
     }
     case "type": {

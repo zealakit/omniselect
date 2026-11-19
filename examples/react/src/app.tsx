@@ -83,6 +83,31 @@ export function App() {
         </Select.Root>
       </div>
       <pre>{submitted}</pre>
+      <h2>Combobox</h2>
+      <div className="field">
+        <Select.Root>
+          <Select.Label>Search fruit</Select.Label>
+          <Select.Control>
+            <span className="select-control">
+              <Select.Input placeholder="Type to filter" />
+              <Select.Trigger>
+                <Select.Indicator>▾</Select.Indicator>
+              </Select.Trigger>
+              <Select.Clear>×</Select.Clear>
+            </span>
+          </Select.Control>
+          <Select.Popover>
+            <Select.List>
+              {["apple", "apricot", "banana", "cherry", "date"].map((name) => (
+                <Select.Item key={name} value={name}>
+                  {name}
+                </Select.Item>
+              ))}
+              <Select.Empty>No results</Select.Empty>
+            </Select.List>
+          </Select.Popover>
+        </Select.Root>
+      </div>
     </main>
   );
 }

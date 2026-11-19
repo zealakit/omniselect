@@ -4,6 +4,7 @@ export { default as Empty } from "./empty.svelte";
 export { default as Group } from "./group.svelte";
 export { default as GroupLabel } from "./group-label.svelte";
 export { default as Indicator } from "./indicator.svelte";
+export { default as Input } from "./input.svelte";
 export { default as Item } from "./item.svelte";
 export { default as ItemIndicator } from "./item-indicator.svelte";
 export { default as Label } from "./label.svelte";

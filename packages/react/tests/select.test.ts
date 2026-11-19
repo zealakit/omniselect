@@ -11,6 +11,7 @@ import {
   querySelectPart,
   readSelectVisibleItems,
   runConformance,
+  comboboxScenarios,
   selectScenarios,
   withCallbacks,
 } from "../../core/tests/conformance/index.ts";
@@ -19,6 +20,7 @@ import { Select } from "../dist/select/index.js";
 const components = {
   label: Select.Label,
   control: Select.Control,
+  input: Select.Input,
   trigger: Select.Trigger,
   value: Select.Value,
   clear: Select.Clear,
@@ -94,3 +96,4 @@ const driver: Driver = {
 
 after(() => cleanup());
 runConformance("react", driver, selectScenarios);
+runConformance("react", driver, comboboxScenarios);

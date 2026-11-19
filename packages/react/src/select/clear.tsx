@@ -17,7 +17,7 @@ export type SelectClearProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 /** Button that resets the selection. Place it beside the trigger, never inside it. */
 export const Clear = forwardRef<HTMLButtonElement, SelectClearProps>(
   function SelectClear({ label = "Clear selection", onClick, ...rest }, ref) {
-    const { machine, focusTrigger } = useSelectContext("Clear");
+    const { machine, focusField } = useSelectContext("Clear");
     const elementRef = useRef<HTMLButtonElement | null>(null);
     const mergedRef = useMergedRef(ref, elementRef);
     useEffect(() => {
@@ -40,7 +40,7 @@ export const Clear = forwardRef<HTMLButtonElement, SelectClearProps>(
           onClick?.(event);
           if (!event.defaultPrevented) {
             machine.clear();
-            focusTrigger();
+            focusField();
           }
         }}
       />

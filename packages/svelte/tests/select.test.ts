@@ -5,6 +5,7 @@ import {
   querySelectPart,
   readSelectVisibleItems,
   runConformance,
+  comboboxScenarios,
   selectScenarios,
   withCallbacks,
 } from "../../core/tests/conformance/index.ts";
@@ -50,3 +51,4 @@ const driver: Driver = {
 };
 
 runConformance("svelte", driver, selectScenarios);
+runConformance("svelte", driver, comboboxScenarios);

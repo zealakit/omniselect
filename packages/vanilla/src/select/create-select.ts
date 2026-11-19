@@ -1,9 +1,12 @@
 import {
   type Attrs,
   createSelectMachine,
+  type FilterFn,
   getPopoverVars,
   nextId,
   type SelectCloseReason,
+  type SelectInputChangeReason,
+  type SelectionBehavior,
   type SelectOpenReason,
 } from "@zealakit/omniselect-core";
 import {
@@ -33,6 +36,19 @@ export type SelectOptions = {
   portal?: Element | null;
   /** Accessible name of the Clear button. Default "Clear selection". */
   clearLabel?: string;
+  /** Used when a `[data-part="input"]` is present. */
+  defaultInputValue?: string;
+  onInputChange?: (value: string, reason: SelectInputChangeReason) => void;
+  /** Custom filter, or `false` to filter outside (async search). */
+  filter?: FilterFn<string> | false;
+  openOnFocus?: boolean;
+  openOnInput?: boolean;
+  selectionBehavior?: SelectionBehavior;
+  restoreOnBlur?: boolean;
+  autoHighlight?: boolean;
+  autoSelectOnTab?: boolean;
+  /** Accessible name of the trigger when an input is present. */
+  triggerLabel?: string;
 };
 
 export type SelectHandle = {
@@ -102,6 +118,7 @@ export function createSelect(
   }
   const control = part("control");
   const valueEl = part("value");
+  const inputEl = part("input") as HTMLInputElement | null;
   const clearEl = part("clear");
   const indicator = part("indicator");
   const label = part("label");
@@ -120,13 +137,23 @@ export function createSelect(
     closeOnSelect: options.closeOnSelect,
     allowsEmptyCollection: options.allowsEmptyCollection,
     loop: options.loop,
+    defaultInputValue: options.defaultInputValue,
+    onInputChange: options.onInputChange,
+    filter: options.filter,
+    openOnFocus: options.openOnFocus,
+    openOnInput: options.openOnInput,
+    selectionBehavior: options.selectionBehavior,
+    restoreOnBlur: options.restoreOnBlur,
+    autoHighlight: options.autoHighlight,
+    autoSelectOnTab: options.autoSelectOnTab,
+    triggerLabel: options.triggerLabel,
     onOpenChange(open, reason) {
       options.onOpenChange?.(open, reason);
       if (
         !open &&
         (reason === "select" || reason === "escape" || reason === "tab")
       ) {
-        trigger.focus();
+        (inputEl ?? trigger).focus();
       }
     },
   });
@@ -134,6 +161,7 @@ export function createSelect(
     label.id = machine.ids.label;
   }
 
+  let composing = false;
   let overlay: Overlay | null = null;
   const unregister: (() => void)[] = [];
 
@@ -142,7 +170,7 @@ export function createSelect(
       off();
     }
     for (const group of Array.from(
-      root.querySelectorAll<HTMLElement>('[data-part="group"]'),
+      popover.querySelectorAll<HTMLElement>('[data-part="group"]'),
     )) {
       const id = group.id || nextId("group");
       group.dataset.groupId = id;
@@ -183,6 +211,12 @@ export function createSelect(
       trigger.disabled = trigger.getAttribute("aria-disabled") === "true";
     }
     applyAttrs(control, machine.attrs.root());
+    if (inputEl) {
+      applyAttrs(inputEl, machine.attrs.input());
+      if (inputEl.value !== state.inputValue && !composing) {
+        inputEl.value = state.inputValue;
+      }
+    }
     applyAttrs(list, machine.attrs.list());
     applyAttrs(
       clearEl,
@@ -209,6 +243,7 @@ export function createSelect(
       if (!machine.collection.get(key)) {
         continue;
       }
+      el.hidden = !machine.collection.isVisible(key);
       applyAttrs(el, machine.attrs.item(key));
       const selected = machine.isSelected(key);
       for (const mark of Array.from(
@@ -220,13 +255,14 @@ export function createSelect(
       }
     }
     for (const group of Array.from(
-      root.querySelectorAll<HTMLElement>('[data-part="group"]'),
+      popover.querySelectorAll<HTMLElement>('[data-part="group"]'),
     )) {
       const id = group.dataset.groupId ?? "";
       const groupLabel = group.querySelector<HTMLElement>(
         '[data-part="group-label"]',
       );
       applyAttrs(group, machine.attrs.group(id, groupLabel !== null));
+      group.hidden = !machine.collection.groupHasVisible(id);
       applyAttrs(groupLabel, machine.attrs.groupLabel(id));
     }
     const highlighted = state.highlightedKey;
@@ -292,7 +328,45 @@ export function createSelect(
   const unsubscribe = machine.store.subscribe(render);
   const offCollection = machine.collection.subscribe(render);
 
-  const onTriggerClick = () => machine.toggle();
+  const onTriggerClick = () => {
+    machine.toggle();
+    if (inputEl) {
+      inputEl.focus();
+    }
+  };
+  const onInputEvent = () => {
+    if (inputEl) {
+      machine.onInput(inputEl.value, { composing });
+      if (!composing && inputEl.value !== machine.store.get().inputValue) {
+        inputEl.value = machine.store.get().inputValue;
+      }
+    }
+  };
+  const onCompositionStart = () => {
+    composing = true;
+  };
+  const onCompositionEnd = () => {
+    composing = false;
+    if (inputEl) {
+      machine.onInput(inputEl.value);
+    }
+  };
+  const onInputKeyDown = (event: KeyboardEvent) => {
+    const result = machine.onInputKeyDown({
+      key: event.key,
+      altKey: event.altKey,
+      ctrlKey: event.ctrlKey,
+      metaKey: event.metaKey,
+      shiftKey: event.shiftKey,
+      isComposing: event.isComposing || composing,
+    });
+    if (result.preventDefault) {
+      event.preventDefault();
+    }
+  };
+  const onInputFocus = () => machine.onInputFocus();
+  const onInputClick = () => machine.onInputClick();
+  const onInputBlur = () => machine.onInputBlur();
   const onKeyDown = (event: KeyboardEvent) => {
     const result = machine.onTriggerKeyDown(event);
     if (result.preventDefault) {
@@ -304,6 +378,8 @@ export function createSelect(
       event.preventDefault();
     }
   };
+  // Keep focus on the trigger/input (also when grabbing the scrollbar).
+  const onPopoverMouseDown = (event: Event) => event.preventDefault();
   const itemOf = (event: Event): HTMLElement | null =>
     (event.target as Element | null)?.closest?.(
       '[data-part="item"]',
@@ -327,9 +403,18 @@ export function createSelect(
   };
   const onClear = () => {
     machine.clear();
-    trigger.focus();
+    (inputEl ?? trigger).focus();
   };
+  popover.addEventListener("mousedown", onPopoverMouseDown);
 
+  inputEl?.addEventListener("input", onInputEvent);
+  inputEl?.addEventListener("compositionstart", onCompositionStart);
+  inputEl?.addEventListener("compositionend", onCompositionEnd);
+  inputEl?.addEventListener("keydown", onInputKeyDown);
+  inputEl?.addEventListener("focus", onInputFocus);
+  inputEl?.addEventListener("click", onInputClick);
+  inputEl?.addEventListener("blur", onInputBlur);
+  const offInput = inputEl ? machine.registerInput() : () => {};
   trigger.addEventListener("click", onTriggerClick);
   trigger.addEventListener("keydown", onKeyDown);
   trigger.addEventListener("keyup", onKeyUp);
@@ -375,6 +460,15 @@ export function createSelect(
       popover.removeEventListener("pointermove", onPointerMove);
       popover.removeEventListener("click", onItemClick);
       clearEl?.removeEventListener("click", onClear);
+      popover.removeEventListener("mousedown", onPopoverMouseDown);
+      inputEl?.removeEventListener("input", onInputEvent);
+      inputEl?.removeEventListener("compositionstart", onCompositionStart);
+      inputEl?.removeEventListener("compositionend", onCompositionEnd);
+      inputEl?.removeEventListener("keydown", onInputKeyDown);
+      inputEl?.removeEventListener("focus", onInputFocus);
+      inputEl?.removeEventListener("click", onInputClick);
+      inputEl?.removeEventListener("blur", onInputBlur);
+      offInput();
       overlay?.destroy();
       machine.destroy();
     },

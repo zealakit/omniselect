@@ -6,6 +6,7 @@ export type { SelectControlProps } from "./control.js";
 export type { SelectEmptyProps } from "./empty.js";
 export type { SelectGroupLabelProps, SelectGroupProps } from "./group.js";
 export type { SelectIndicatorProps } from "./indicator.js";
+export type { SelectInputProps } from "./input.js";
 export type { SelectItemIndicatorProps, SelectItemProps } from "./item.js";
 export type { SelectLabelProps } from "./label.js";
 export type { SelectListProps } from "./list.js";

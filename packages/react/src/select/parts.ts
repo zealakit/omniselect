@@ -3,6 +3,7 @@ export { Control } from "./control.js";
 export { Empty } from "./empty.js";
 export { Group, GroupLabel } from "./group.js";
 export { Indicator } from "./indicator.js";
+export { Input } from "./input.js";
 export { Item, ItemIndicator } from "./item.js";
 export { Label } from "./label.js";
 export { List } from "./list.js";

@@ -147,9 +147,15 @@ export const Popover = forwardRef<HTMLDivElement, SelectPopoverProps>(
           : undefined,
       };
     const content = (
+      // biome-ignore lint/a11y/noStaticElementInteractions: the handler only keeps focus on the trigger/input
       <div
         data-part="popover"
         {...rest}
+        onMouseDown={(event) => {
+          rest.onMouseDown?.(event);
+          // Keep focus on the trigger/input (also when grabbing the scrollbar).
+          event.preventDefault();
+        }}
         ref={mergedRef}
         hidden={!open && !mounted}
         data-state={open ? "open" : "closed"}

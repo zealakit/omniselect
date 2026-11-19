@@ -28,6 +28,7 @@ export function setRootProps(next: Record<string, unknown>) {
   {:else if node.part === "outside"}<button data-part="outside" type="button">{node.text}</button>
   {:else if node.part === "label"}<Select.Label {...node.props}>{@render kids(node)}</Select.Label>
   {:else if node.part === "control"}<Select.Control {...node.props}>{@render kids(node)}</Select.Control>
+  {:else if node.part === "input"}<Select.Input {...node.props} />
   {:else if node.part === "trigger"}<Select.Trigger {...node.props}>{@render kids(node)}</Select.Trigger>
   {:else if node.part === "value"}<Select.Value {...node.props} />
   {:else if node.part === "clear"}<Select.Clear {...node.props}>{@render kids(node)}</Select.Clear>

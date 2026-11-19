@@ -25,6 +25,22 @@ export type SelectItemProps<T> = Omit<
   ref?: Ref<HTMLDivElement>;
 };
 
+/** Plain text of a React children tree (strings and numbers only). */
+function textFromChildren(children: unknown): string {
+  if (typeof children === "string" || typeof children === "number") {
+    return String(children).trim();
+  }
+  if (Array.isArray(children)) {
+    return children.map(textFromChildren).join(" ").replace(/\s+/g, " ").trim();
+  }
+  if (children && typeof children === "object" && "props" in children) {
+    return textFromChildren(
+      (children as { props: { children?: unknown } }).props.children,
+    );
+  }
+  return "";
+}
+
 function ItemImpl<T>(
   {
     value,
@@ -45,6 +61,7 @@ function ItemImpl<T>(
   valueRef.current = value;
   const key = machine.itemToKey(value);
   const groupId = group?.groupId ?? null;
+  const fallbackText = textFromChildren(rest.children);
 
   useEffect(() => checkStructure("Item", elementRef.current), []);
 
@@ -53,7 +70,8 @@ function ItemImpl<T>(
       machine.collection.register({
         key,
         value: valueRef.current,
-        textValue: textValue ?? elementRef.current?.textContent?.trim() ?? "",
+        textValue:
+          textValue ?? elementRef.current?.textContent?.trim() ?? fallbackText,
         disabled,
         groupId,
         node: elementRef.current,
@@ -63,18 +81,27 @@ function ItemImpl<T>(
 
   const snapshot = useSnapshot(machine, (m) => {
     const s = m.store.get();
-    return `${m.isSelected(key)}|${s.highlightedKey === key}|${m.collection.get(key)?.disabled}|${s.highlightSource}`;
+    return `${m.isSelected(key)}|${s.highlightedKey === key}|${m.collection.get(key)?.disabled}|${s.highlightSource}|${m.collection.isVisible(key)}`;
   });
+  const visible = snapshot.endsWith("|true");
   const highlightedByKeyboard =
-    snapshot.includes("|true|") && snapshot.endsWith("keyboard");
+    snapshot.includes("|true|") && snapshot.includes("|keyboard|");
   useEffect(() => {
     if (highlightedByKeyboard) {
       elementRef.current?.scrollIntoView?.({ block: "nearest" });
     }
   }, [highlightedByKeyboard]);
 
+  // The element mounts and unmounts as the filter changes; keep the DOM-order node current.
+  useIsomorphicLayoutEffect(() => {
+    machine.collection.update(key, { node: elementRef.current });
+  }, [machine, key, visible]);
+
   const attrs = machine.attrs.item(key);
   const itemContext = useMemo(() => ({ key }), [key]);
+  if (!visible) {
+    return null;
+  }
   return (
     <ItemContext.Provider value={itemContext}>
       {/* biome-ignore lint/a11y/noStaticElementInteractions: role=option comes from machine attrs; keyboard handling lives on the trigger (aria-activedescendant) */}

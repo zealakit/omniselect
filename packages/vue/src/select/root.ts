@@ -38,6 +38,24 @@ export const Root = defineComponent({
     closeOnSelect: { type: Boolean, default: undefined },
     allowsEmptyCollection: { type: Boolean, default: undefined },
     loop: { type: Boolean, default: undefined },
+    inputValue: { type: String, default: undefined },
+    defaultInputValue: { type: String, default: undefined },
+    filter: {
+      type: [Function, Boolean] as PropType<
+        ((item: any, query: string) => boolean) | false
+      >,
+      default: undefined,
+    },
+    openOnFocus: { type: Boolean, default: undefined },
+    openOnInput: { type: Boolean, default: undefined },
+    selectionBehavior: {
+      type: String as PropType<"replace-input" | "keep-input" | "clear-input">,
+      default: undefined,
+    },
+    restoreOnBlur: { type: Boolean, default: undefined },
+    autoHighlight: { type: Boolean, default: undefined },
+    autoSelectOnTab: { type: Boolean, default: undefined },
+    triggerLabel: { type: String, default: undefined },
     placement: { type: String as PropType<Placement>, default: "bottom-start" },
     offset: { type: Number, default: 4 },
     matchWidth: { type: Boolean, default: true },
@@ -53,10 +71,13 @@ export const Root = defineComponent({
     valueChange: (_value: unknown) => true,
     "update:open": (_open: boolean) => true,
     openChange: (_open: boolean, _reason: string) => true,
+    "update:inputValue": (_value: string) => true,
+    inputChange: (_value: string, _reason: string) => true,
   },
   setup(props, { slots, emit }) {
     const triggerEl = shallowRef<HTMLElement | null>(null);
     const controlEl = shallowRef<HTMLElement | null>(null);
+    const inputEl = shallowRef<HTMLInputElement | null>(null);
     const onValueChange = (value: unknown) => {
       emit("update:modelValue", value);
       emit("valueChange", value);
@@ -75,6 +96,20 @@ export const Root = defineComponent({
       closeOnSelect: props.closeOnSelect,
       allowsEmptyCollection: props.allowsEmptyCollection,
       loop: props.loop,
+      inputValue: props.inputValue,
+      defaultInputValue: props.defaultInputValue,
+      onInputChange(value, reason) {
+        emit("update:inputValue", value);
+        emit("inputChange", value, reason);
+      },
+      filter: props.filter,
+      openOnFocus: props.openOnFocus,
+      openOnInput: props.openOnInput,
+      selectionBehavior: props.selectionBehavior,
+      restoreOnBlur: props.restoreOnBlur,
+      autoHighlight: props.autoHighlight,
+      autoSelectOnTab: props.autoSelectOnTab,
+      triggerLabel: props.triggerLabel,
       onOpenChange(open, reason) {
         emit("update:open", open);
         emit("openChange", open, reason);
@@ -82,7 +117,7 @@ export const Root = defineComponent({
           !open &&
           (reason === "select" || reason === "escape" || reason === "tab")
         ) {
-          triggerEl.value?.focus();
+          (inputEl.value ?? triggerEl.value)?.focus();
         }
       },
     });
@@ -103,6 +138,15 @@ export const Root = defineComponent({
         props.closeOnSelect,
         props.allowsEmptyCollection,
         props.loop,
+        props.inputValue,
+        props.filter,
+        props.openOnFocus,
+        props.openOnInput,
+        props.selectionBehavior,
+        props.restoreOnBlur,
+        props.autoHighlight,
+        props.autoSelectOnTab,
+        props.triggerLabel,
       ],
       () =>
         machine.sync({
@@ -114,6 +158,15 @@ export const Root = defineComponent({
           closeOnSelect: props.closeOnSelect,
           allowsEmptyCollection: props.allowsEmptyCollection,
           loop: props.loop,
+          inputValue: props.inputValue,
+          filter: props.filter,
+          openOnFocus: props.openOnFocus,
+          openOnInput: props.openOnInput,
+          selectionBehavior: props.selectionBehavior,
+          restoreOnBlur: props.restoreOnBlur,
+          autoHighlight: props.autoHighlight,
+          autoSelectOnTab: props.autoSelectOnTab,
+          triggerLabel: props.triggerLabel,
         }),
       { flush: "sync" },
     );
@@ -123,7 +176,9 @@ export const Root = defineComponent({
       version,
       triggerEl,
       controlEl,
+      inputEl,
       focusTrigger: () => triggerEl.value?.focus(),
+      focusField: () => (inputEl.value ?? triggerEl.value)?.focus(),
       props: new Proxy({} as SelectContext["props"], {
         get: (_target, key: string) => (props as Record<string, unknown>)[key],
       }),

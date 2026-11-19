@@ -32,16 +32,19 @@ export const Group = defineComponent({
     onMounted(register);
     watch(() => props.disabled, register);
     onBeforeUnmount(() => off?.());
-    return () =>
-      h(
+    return () => {
+      context.version.value;
+      return h(
         "div",
         {
           "data-part": "group",
           "data-disabled": props.disabled ? "" : undefined,
+          hidden: !machine.collection.groupHasVisible(groupId),
           ...attrsOf(machine.attrs.group(groupId, hasLabel.value)),
         },
         slots.default?.(),
       );
+    };
   },
 });
 

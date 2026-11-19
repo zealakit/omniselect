@@ -9,7 +9,10 @@ export type SelectContext = {
   version: Ref<number>;
   triggerEl: ShallowRef<HTMLElement | null>;
   controlEl: ShallowRef<HTMLElement | null>;
+  inputEl: ShallowRef<HTMLInputElement | null>;
   focusTrigger: () => void;
+  /** Focus the input in combobox mode, the trigger otherwise. */
+  focusField: () => void;
   props: {
     readonly placement: Placement;
     readonly offset: number;

@@ -11,6 +11,9 @@ export type SelectContextValue = {
   setControlEl: (element: HTMLElement | null) => void;
   /** Return focus to the trigger (after select, Escape, Tab, Clear). */
   focusTrigger: () => void;
+  /** Focus the input in combobox mode, the trigger otherwise. */
+  focusField: () => void;
+  inputRef: { current: HTMLInputElement | null };
   placement: Placement;
   offset: number;
   matchWidth: boolean;

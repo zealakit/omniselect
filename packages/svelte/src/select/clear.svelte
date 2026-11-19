@@ -39,7 +39,7 @@ $effect(() => {
     (onclick as ((e: MouseEvent) => void) | undefined)?.(event as MouseEvent);
     if (!event.defaultPrevented) {
       machine.clear();
-      context.focusTrigger();
+      context.focusField();
     }
   }}
 >

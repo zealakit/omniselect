@@ -14,12 +14,18 @@ export function useSnapshot(
   return useSyncExternalStore(machine.store.subscribe, read, read);
 }
 
-/** Turn a machine attribute map into React props (drops `undefined`, fixes `tabindex`). */
+const renamed: Record<string, string> = {
+  tabindex: "tabIndex",
+  autocomplete: "autoComplete",
+  spellcheck: "spellCheck",
+};
+
+/** Turn a machine attribute map into React props (drops `undefined`, fixes casing). */
 export function reactAttrs(attrs: Attrs): Record<string, string> {
   const out: Record<string, string> = {};
   for (const [name, value] of Object.entries(attrs)) {
     if (value !== undefined) {
-      out[name === "tabindex" ? "tabIndex" : name] = value;
+      out[renamed[name] ?? name] = value;
     }
   }
   return out;

@@ -19,7 +19,12 @@ export const Trigger = defineComponent({
           ...attrsOf(attrs),
           disabled: attrs["aria-disabled"] === "true",
           ref: context.triggerEl,
-          onClick: () => machine.toggle(),
+          onClick: () => {
+            machine.toggle();
+            if (machine.store.get().mode === "combobox") {
+              context.focusField();
+            }
+          },
           onKeydown: (event: KeyboardEvent) => {
             const result = machine.onTriggerKeyDown({
               key: event.key,

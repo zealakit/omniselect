@@ -66,5 +66,24 @@ function onSubmit(event: Event) {
         </Select.Popover>
       </Select.Root>
     </div>
+    <h2>Combobox</h2>
+    <div class="field">
+      <Select.Root>
+        <Select.Label>Search fruit</Select.Label>
+        <Select.Control>
+          <span class="select-control">
+            <Select.Input placeholder="Type to filter" />
+            <Select.Trigger><Select.Indicator>▾</Select.Indicator></Select.Trigger>
+            <Select.Clear>×</Select.Clear>
+          </span>
+        </Select.Control>
+        <Select.Popover>
+          <Select.List>
+            <Select.Item v-for="name in ['apple', 'apricot', 'banana', 'cherry', 'date']" :key="name" :value="name">{{ name }}</Select.Item>
+            <Select.Empty>No results</Select.Empty>
+          </Select.List>
+        </Select.Popover>
+      </Select.Root>
+    </div>
   </main>
 </template>

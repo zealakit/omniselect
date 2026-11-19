@@ -66,4 +66,25 @@ function onSubmit(event: SubmitEvent) {
       </Select.Popover>
     </Select.Root>
   </div>
+  <h2>Combobox</h2>
+  <div class="field">
+    <Select.Root>
+      <Select.Label>Search fruit</Select.Label>
+      <Select.Control>
+        <span class="select-control">
+          <Select.Input placeholder="Type to filter" />
+          <Select.Trigger><Select.Indicator>▾</Select.Indicator></Select.Trigger>
+          <Select.Clear>×</Select.Clear>
+        </span>
+      </Select.Control>
+      <Select.Popover>
+        <Select.List>
+          {#each ["apple", "apricot", "banana", "cherry", "date"] as name (name)}
+            <Select.Item value={name}>{name}</Select.Item>
+          {/each}
+          <Select.Empty>No results</Select.Empty>
+        </Select.List>
+      </Select.Popover>
+    </Select.Root>
+  </div>
 </main>

@@ -8,11 +8,11 @@ export type SelectTriggerProps = ButtonHTMLAttributes<HTMLButtonElement>;
 /** The focusable button. Toggles the popover and owns keyboard handling. */
 export const Trigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
   function SelectTrigger({ onClick, onKeyDown, onKeyUp, ...rest }, ref) {
-    const { machine, setTriggerEl } = useSelectContext("Trigger");
+    const { machine, setTriggerEl, focusField } = useSelectContext("Trigger");
     const mergedRef = useMergedRef(ref, setTriggerEl);
     useSnapshot(machine, (m) => {
       const s = m.store.get();
-      return `${s.open}|${s.highlightedKey}|${m.selection.keys(s.value).join(",")}`;
+      return `${s.open}|${s.highlightedKey}|${s.mode}|${m.selection.keys(s.value).join(",")}`;
     });
     const attrs = machine.attrs.trigger();
     return (
@@ -27,6 +27,9 @@ export const Trigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
           onClick?.(event);
           if (!event.defaultPrevented) {
             machine.toggle();
+            if (machine.store.get().mode === "combobox") {
+              focusField();
+            }
           }
         }}
         onKeyDown={(event) => {

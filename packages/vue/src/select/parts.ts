@@ -1,5 +1,6 @@
 export { Clear } from "./clear.js";
 export { Group, GroupLabel } from "./group.js";
+export { Input } from "./input.js";
 export { Item, ItemIndicator } from "./item.js";
 export { Popover } from "./popover.js";
 export { Root } from "./root.js";
