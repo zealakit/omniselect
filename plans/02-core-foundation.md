@@ -1,6 +1,6 @@
 # Plan: core foundation — state, collection, selection, navigation
 
-Status: **proposal — not implemented**. Release target: **none** (`@zealakit/omniselect-core` is
+Status: **implemented**. Release target: **none** (`@zealakit/omniselect-core` is
 private; it ships vendored inside the 0.1.0 adapters).
 
 Order: **2 of 8**. Requires `00-init-src.md` (empty, buildable core package) and the decisions
@@ -25,7 +25,7 @@ stub driver.
 ## 1. `store`
 
 - `createStore<S>(initial)` → `{ get, set(partial | updater), subscribe(listener) → unsubscribe }`.
-- Notifications are **batched per microtask**, plus a `batch(fn)` for synchronous grouping.
+- Notifications are **synchronous** after the outermost `set` or `batch(fn)` (decided during implementation: deterministic for tests and `useSyncExternalStore`).
   Adapters that need synchronous reads (React `useSyncExternalStore`) call `get()`, which is
   always current.
 - Shallow-equal check on `set` skips no-op notifications.
