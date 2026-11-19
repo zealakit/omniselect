@@ -8,8 +8,22 @@
   <body>
     <main class="page">
       <p class="eyebrow">@zealakit/omniselect-vanilla</p>
-      <h1>Omniselect examples</h1>
-      <p>Placeholder page. The Select and Combobox demos arrive with the component plans.</p>
+      <h1>NativeSelect</h1>
+      <form id="form">
+        <div class="field" id="fruit">
+          <label for="fruit-select">Fruit</label>
+          <select id="fruit-select" name="fruit" required>
+            <option value="" disabled selected>Choose a fruit…</option>
+            <option value="apple">Apple</option>
+            <option value="banana">Banana</option>
+            <option value="cherry">Cherry</option>
+          </select>
+          <span data-part="indicator">▾</span>
+          <button type="submit">Submit</button>
+        </div>
+      </form>
+      <p>Value: <span id="value">none</span></p>
+      <pre id="submitted"></pre>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>

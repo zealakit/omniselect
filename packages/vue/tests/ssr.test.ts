@@ -35,3 +35,39 @@ test("vue adapter and its Overlay dependency import without browser globals", ()
   assert.ok(result.overlayExports > 0);
   assert.equal(result.omniselectLoaded, "object");
 });
+
+test("NativeSelect renders the default option as selected on the server", () => {
+  const script = `
+    const { createSSRApp, h } = await import("vue");
+    const { renderToString } = await import("vue/server-renderer");
+    const { NativeSelect } = await import("./dist/native/index.js");
+    const App = {
+      render: () =>
+        h(NativeSelect.Root, { defaultValue: "b", name: "x" }, {
+          default: () => [
+            h(NativeSelect.Label, null, { default: () => "L" }),
+            h(NativeSelect.Control, null, {
+              default: () => [
+                h(NativeSelect.Option, { value: "a" }, { default: () => "A" }),
+                h(NativeSelect.Option, { value: "b" }, { default: () => "B" }),
+              ],
+            }),
+          ],
+        }),
+    };
+    const html = await renderToString(createSSRApp(App));
+    console.log(JSON.stringify({ document: typeof document, html }));
+  `;
+  const output = execFileSync(
+    process.execPath,
+    ["--input-type=module", "--eval", script],
+    { cwd: packageRoot, encoding: "utf8" },
+  );
+  const result = JSON.parse(output.trim()) as {
+    document: string;
+    html: string;
+  };
+  assert.equal(result.document, "undefined");
+  assert.match(result.html, /<option value="b" selected[^>]*>B<\/option>/);
+  assert.match(result.html, /<label for=/);
+});

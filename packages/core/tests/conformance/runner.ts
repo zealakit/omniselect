@@ -73,7 +73,9 @@ export function runConformance(
   scenarios: readonly Scenario[],
 ): void {
   for (const scenario of scenarios) {
-    test(`[${adapter}] ${scenario.name}`, async () => {
+    const skip =
+      scenario.skip?.[adapter as keyof NonNullable<Scenario["skip"]>];
+    test(`[${adapter}] ${scenario.name}`, { skip }, async () => {
       const mounted = await driver.mount(scenario);
       try {
         let index = 0;

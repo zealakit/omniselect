@@ -1,6 +1,6 @@
 # Plan: `NativeSelect` — semantic `<select>` primitive
 
-Status: **proposal — not implemented**. Release target: **0.1.0** (first publishable version).
+Status: **implemented**. Release target: **0.1.0** (first publishable version).
 
 Order: **3 of 8**. Requires `02-core-foundation.md` (store, controllable, collection, selection,
 ids, conformance contract).

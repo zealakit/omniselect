@@ -15,3 +15,11 @@ globals.Node = window.Node;
 globals.CustomEvent = window.CustomEvent;
 globals.KeyboardEvent = window.KeyboardEvent;
 globals.getComputedStyle = window.getComputedStyle.bind(window);
+
+globals.HTMLSelectElement = window.HTMLSelectElement;
+globals.HTMLOptionElement = window.HTMLOptionElement;
+globals.HTMLFormElement = window.HTMLFormElement;
+globals.FormData = window.FormData;
+globals.Event = window.Event;
+globals.MouseEvent = window.MouseEvent;
+globals.FocusEvent = window.FocusEvent;

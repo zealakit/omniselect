@@ -37,6 +37,8 @@ export type Step =
   | { type: "click"; target: PartRef }
   | { type: "focus"; target: PartRef }
   | { type: "blur"; target?: PartRef }
+  | { type: "select"; target: PartRef; values: string[] }
+  | { type: "invalid"; target: PartRef }
   | { type: "setProps"; props: Record<string, unknown> }
   | { type: "intersect"; target: PartRef }
   | { type: "resolveLoad" }
@@ -60,6 +62,10 @@ export type Scenario = {
   callbacks?: string[];
   /** Wrap the tree in a <form> so FormData and reset steps work. */
   form?: boolean;
+  /** Build `itemToKey` as `String(value[keyBy])` (`null` stays `""`). */
+  keyBy?: string;
+  /** Adapters that cannot express this scenario (documented, not silent). */
+  skip?: Partial<Record<"vanilla" | "react" | "vue" | "svelte", string>>;
   tree: PartNode[];
   steps: Step[];
 };

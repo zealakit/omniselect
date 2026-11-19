@@ -22,6 +22,13 @@ export {
   prev,
 } from "./navigation.js";
 export {
+  createNativeSelect,
+  type NativeSelectController,
+  type NativeSelectOptions,
+  type NativeState,
+  type NativeValue,
+} from "./native.js";
+export {
   createSelection,
   type ItemToKey,
   type ItemToString,

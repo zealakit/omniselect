@@ -29,10 +29,28 @@ keep its Overlay adapter on the same major version.
 ## Import
 
 ```ts
-import type { Placement, DismissReason } from "@zealakit/omniselect-vue";
+import { NativeSelect } from "@zealakit/omniselect-vue/native";
 ```
+
+Import from the `/native` entry so Overlay stays out of the bundle.
+
+## NativeSelect
+
+```vue
+<NativeSelect.Root v-model="fruit" name="fruit">
+  <NativeSelect.Label>Fruit</NativeSelect.Label>
+  <NativeSelect.Control>
+    <NativeSelect.Option value="apple">Apple</NativeSelect.Option>
+    <NativeSelect.Option value="banana">Banana</NativeSelect.Option>
+  </NativeSelect.Control>
+</NativeSelect.Root>
+```
+
+- Use `v-model` (or `modelValue`) for controlled state and `defaultValue` for uncontrolled. `multiple` switches the value to an array. `@valueChange` fires on every change.
+- Object values need `itemToKey` (`(value) => string`); the key becomes `<option value>` and the submitted form value.
+- A `null` option value is the placeholder (key `""`); the control gets `data-placeholder` while it is selected.
+- Style with `data-disabled`, `data-required`, `data-invalid`, and `data-placeholder`. No CSS ships.
 
 ## Status
 
-This release scaffolds the package. Only Overlay type re-exports exist today; do not generate
-Select or Combobox component code against it until a release documents them.
+`NativeSelect` is available. `Select` and `Combobox` land in later releases; do not generate code for them until a release documents them.

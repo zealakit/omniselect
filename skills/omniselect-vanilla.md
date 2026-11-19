@@ -29,10 +29,24 @@ keep its Overlay adapter on the same major version.
 ## Import
 
 ```ts
-import type { Placement, DismissReason } from "@zealakit/omniselect-vanilla";
+import { createNativeSelect } from "@zealakit/omniselect-vanilla/native";
 ```
+
+Import from the `/native` entry so Overlay stays out of the bundle.
+
+## NativeSelect
+
+```ts
+const handle = createNativeSelect(rootElement, {
+  onValueChange: (value) => console.log(value),
+});
+```
+
+- Values are strings (an array of strings when the `<select>` is `multiple`). Put `selected` on a disabled placeholder option. Call `handle.destroy()` on teardown.
+- Object values need `itemToKey` (`(value) => string`); the key becomes `<option value>` and the submitted form value.
+- A `null` option value is the placeholder (key `""`); the control gets `data-placeholder` while it is selected.
+- Style with `data-disabled`, `data-required`, `data-invalid`, and `data-placeholder`. No CSS ships.
 
 ## Status
 
-This release scaffolds the package. Only Overlay type re-exports exist today; do not generate
-Select or Combobox component code against it until a release documents them.
+`NativeSelect` is available. `Select` and `Combobox` land in later releases; do not generate code for them until a release documents them.

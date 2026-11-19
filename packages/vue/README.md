@@ -24,9 +24,71 @@ npm install @zealakit/omniselect-vue
 Peer dependency: `vue` `^3.5.0`. The app already provides it.
 `@zealakit/overlay-vue` is installed automatically as a dependency. The internal `@zealakit/omniselect-core` is bundled inside this package and is not published to npm; there is nothing else to install. ESM only.
 
+## NativeSelect
+
+A semantic `<select>` with a linked label, object values, and native form behavior. Import it from the `/native` entry to keep Overlay out of your bundle.
+
+### Quick start
+
+```vue
+<script setup lang="ts">
+import { ref } from "vue";
+import { NativeSelect } from "@zealakit/omniselect-vue/native";
+
+const fruit = ref("apple");
+</script>
+
+<template>
+  <NativeSelect.Root v-model="fruit" name="fruit">
+    <NativeSelect.Label>Fruit</NativeSelect.Label>
+    <NativeSelect.Control>
+      <NativeSelect.Option value="apple">Apple</NativeSelect.Option>
+      <NativeSelect.Option value="banana">Banana</NativeSelect.Option>
+    </NativeSelect.Control>
+    <NativeSelect.Indicator>▾</NativeSelect.Indicator>
+  </NativeSelect.Root>
+</template>
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `modelValue` (`v-model`) | `T \| null` (`T[]` with `multiple`) | — | Controlled value. |
+| `defaultValue` | same | `null` (`[]`) | Initial value when uncontrolled. |
+| `@valueChange` | `(value) => void` | — | Called on every user change and on form reset. |
+| `multiple` | `boolean` | `false` | Selects an array instead of one value. |
+| `itemToKey` | `(value) => string` | `String` | Maps a value to `<option value>` and to the submitted form value. |
+| `name`, `form`, `required`, `disabled`, `autocomplete` | native | — | Forwarded to the `<select>`. |
+| default slot | `VNode[]` | — | The parts. The Root renders no element. |
+
+### Parts
+
+| Part | Element | Notes |
+| --- | --- | --- |
+| `Root` | none | Owns value, form props, and the option collection. |
+| `Label` | `label` | Linked to the control. |
+| `Control` | `select` | The only focusable element. Other props are forwarded. |
+| `Option` | `option` | `value`, `disabled`, `textValue`. |
+| `OptionGroup` | `optgroup` | `label`, `disabled`; disabling it disables its options. |
+| `Indicator` | `span` | Decorative slot, `aria-hidden`. |
+
+### Placeholder
+
+Render an option whose value is `null` for the empty state. Its key is `""`, and the control gets `data-placeholder` while it is selected.
+
+## Styling hooks
+
+| Attribute | Where | Purpose |
+| --- | --- | --- |
+| `data-disabled` | Control, Label, Indicator, Option, OptionGroup | Disabled state. |
+| `data-required` | Control, Label | The field is required. |
+| `data-invalid` | Control | Set after the browser `invalid` event, cleared on change. |
+| `data-placeholder` | Control | A single value is empty. |
+
 ## Status
 
-This release scaffolds the package. The component API lands in a later release, so the package exports only the Overlay types below.
+`NativeSelect` is available. `Select` and `Combobox` land in later releases, so the package also exports only the Overlay types below.
 
 | Export | From |
 | --- | --- |

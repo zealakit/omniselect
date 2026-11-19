@@ -24,9 +24,71 @@ npm install @zealakit/omniselect-vue
 Peer 依赖：`vue` `^3.5.0`。应用已提供它。
 `@zealakit/overlay-vue` 会作为依赖自动安装。内部的 `@zealakit/omniselect-core` 已打包在此包内，不会发布到 npm；无需再安装其他内容。仅支持 ESM。
 
+## NativeSelect
+
+带有关联标签、对象值和原生表单行为的语义化 `<select>`。从 `/native` 入口导入，可避免把 Overlay 打进你的包。
+
+### Quick start
+
+```vue
+<script setup lang="ts">
+import { ref } from "vue";
+import { NativeSelect } from "@zealakit/omniselect-vue/native";
+
+const fruit = ref("apple");
+</script>
+
+<template>
+  <NativeSelect.Root v-model="fruit" name="fruit">
+    <NativeSelect.Label>Fruit</NativeSelect.Label>
+    <NativeSelect.Control>
+      <NativeSelect.Option value="apple">Apple</NativeSelect.Option>
+      <NativeSelect.Option value="banana">Banana</NativeSelect.Option>
+    </NativeSelect.Control>
+    <NativeSelect.Indicator>▾</NativeSelect.Indicator>
+  </NativeSelect.Root>
+</template>
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `modelValue` (`v-model`) | `T \| null` (`T[]` with `multiple`) | — | 受控值。 |
+| `defaultValue` | same | `null` (`[]`) | 非受控时的初始值。 |
+| `@valueChange` | `(value) => void` | — | 每次用户更改以及表单重置时调用。 |
+| `multiple` | `boolean` | `false` | 选择数组而不是单个值。 |
+| `itemToKey` | `(value) => string` | `String` | 将值映射为 `<option value>` 以及提交的表单值。 |
+| `name`, `form`, `required`, `disabled`, `autocomplete` | native | — | 转发给 `<select>`。 |
+| default slot | `VNode[]` | — | 各个 part。Root 不渲染任何元素。 |
+
+### Parts
+
+| Part | Element | Notes |
+| --- | --- | --- |
+| `Root` | 无 | 持有值、表单属性和选项集合。 |
+| `Label` | `label` | 与 control 关联。 |
+| `Control` | `select` | 唯一可聚焦的元素，其他 props 会被转发。 |
+| `Option` | `option` | `value`、`disabled`、`textValue`。 |
+| `OptionGroup` | `optgroup` | `label`、`disabled`；禁用分组会禁用其中的选项。 |
+| `Indicator` | `span` | 装饰性插槽，带 `aria-hidden`。 |
+
+### Placeholder
+
+用 value 为 `null` 的 option 表示空状态。它的 key 是 `""`，选中时 control 会带有 `data-placeholder`。
+
+## Styling hooks
+
+| Attribute | Where | Purpose |
+| --- | --- | --- |
+| `data-disabled` | Control, Label, Indicator, Option, OptionGroup | 禁用状态。 |
+| `data-required` | Control, Label | 字段为必填。 |
+| `data-invalid` | Control | 浏览器触发 `invalid` 事件后设置，值改变时清除。 |
+| `data-placeholder` | Control | 单选值为空。 |
+
 ## Status
 
-此版本仅搭建包的骨架。组件 API 将在后续版本提供，因此该包目前只导出下面的 Overlay 类型。
+`NativeSelect` 已可用。`Select` 和 `Combobox` 将在后续版本提供，因此该包同样只导出下面的 Overlay 类型。
 
 | Export | From |
 | --- | --- |

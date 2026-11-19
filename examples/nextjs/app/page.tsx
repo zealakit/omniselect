@@ -1,17 +1,13 @@
-import type { Placement } from "@zealakit/omniselect-react";
+import { NativeDemo } from "./native-demo";
 
-const placement: Placement = "bottom-start";
-
-// Server Component shell. Interactive demos land with the component plans.
+// Server Component shell: the server renders the default option, the Client
+// Component hydrates it.
 export default function Page() {
   return (
-    <main className="page" data-placement={placement}>
+    <main className="page">
       <p className="eyebrow">@zealakit/omniselect-react</p>
-      <h1>Omniselect examples</h1>
-      <p>
-        Placeholder page. The Select and Combobox demos arrive with the
-        component plans.
-      </p>
+      <h1>NativeSelect</h1>
+      <NativeDemo />
     </main>
   );
 }

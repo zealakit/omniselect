@@ -1,6 +1,6 @@
 {
   "name": "@zealakit/omniselect-react",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Accessible, headless Select and Combobox primitives for React.",
   "keywords": [
     "select",
@@ -40,6 +40,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./native": {
+      "types": "./dist/native/index.d.ts",
+      "import": "./dist/native/index.js",
+      "default": "./dist/native/index.js"
     },
     "./package.json": "./package.json"
   },

@@ -1,6 +1,6 @@
 {
   "name": "@zealakit/omniselect-core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Internal framework-independent Select/Combobox logic: selection, collection, keyboard navigation, filtering. Private: bundled into each adapter package, never published to npm.",
   "keywords": [
