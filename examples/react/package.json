@@ -2,7 +2,7 @@
   "name": "@zealakit/omniselect-react-example",
   "version": "1.0.0-beta.1",
   "private": true,
-  "description": "Minimal Vite integration smoke test for @zealakit/omniselect-react.",
+  "description": "Omniselect integration demos and smoke test.",
   "type": "module",
   "scripts": {
     "dev": "vite",

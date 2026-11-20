@@ -2,7 +2,7 @@
   "name": "@zealakit/omniselect-nextjs-example",
   "version": "1.0.0-beta.1",
   "private": true,
-  "description": "Next.js App Router SSR/hydration smoke test for @zealakit/omniselect-react.",
+  "description": "Omniselect integration demos and smoke test.",
   "type": "module",
   "scripts": {
     "dev": "next dev --port 3010",
