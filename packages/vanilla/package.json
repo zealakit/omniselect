@@ -1,7 +1,7 @@
 {
   "name": "@zealakit/omniselect-vanilla",
   "version": "1.0.0-beta.1",
-  "description": "Headless, accessible components for building selection UIs.",
+  "description": "Headless, accessible VanillaJS components for building selection UIs.",
   "keywords": [
     "select",
     "combobox",

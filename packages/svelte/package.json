@@ -1,7 +1,7 @@
 {
   "name": "@zealakit/omniselect-svelte",
   "version": "1.0.0-beta.1",
-  "description": "Headless, accessible components for building selection UIs.",
+  "description": "Headless, accessible Svelte components for building selection UIs.",
   "keywords": [
     "select",
     "combobox",
