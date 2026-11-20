@@ -29,3 +29,9 @@ createSelect(document.getElementById("multi") as HTMLElement, {
   defaultValue: ["apple"],
 });
 import "./form-demo";
+
+createSelect(document.getElementById("ps-single") as HTMLElement);
+createSelect(document.getElementById("ps-multi") as HTMLElement, {
+  multiple: true,
+  defaultValue: ["apple"],
+});

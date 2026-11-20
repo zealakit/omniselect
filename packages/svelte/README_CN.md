@@ -237,6 +237,28 @@ Peer 依赖：`svelte` `^5.0.0`。应用已提供它。
 
 过滤不区分重音和大小写。被过滤掉的选项仍保持注册但不渲染内容，没有匹配项的分组会自行隐藏。使用 IME 输入时，按键处理和过滤会等到输入法组合结束。服务端渲染 select-only 标记，客户端的第一个 effect 会切换为 combobox 语义。
 
+### Popover search
+
+把 `Select.Input` 放在 `Select.Popover` 内、列表上方，即可得到内嵌在下拉层中的搜索框。触发器仍是普通的 select 控件（占位文本、值或 chip）。打开弹层会自动聚焦输入框，输入时方向键和 Enter 都可用，搜索框始终从空开始并在每次关闭时清空，选择也不会让它移位。输入框拥有 `role="combobox"`，触发器保留自己的标签和值，搜索框中按 Backspace 不会删除 chip，关闭时焦点回到触发器。在内联 combobox 中，按下控件上的任意位置（按钮和输入框除外）会聚焦输入框并打开列表。请把控件样式做成一个圆角容器，用 `--omniselect-anchor-width` 设置弹层宽度，并让搜索框 `position: sticky`；示例中展示了这一切。
+
+```svelte
+<Select.Root>
+  <Select.Control>
+    <Select.Trigger>
+      <Select.Value placeholder="Pick a fruit" />
+      <Select.Indicator>▾</Select.Indicator>
+    </Select.Trigger>
+  </Select.Control>
+  <Select.Popover>
+    <div class="search"><Select.Input placeholder="Search…" /></div>
+    <Select.List>
+      <Select.Item value="apple">Apple</Select.Item>
+      <Select.Empty>No results</Select.Empty>
+    </Select.List>
+  </Select.Popover>
+</Select.Root>
+```
+
 ### Multiple selection
 
 设置 `multiple` 即可选择一个值数组。选择后列表保持打开，`Value` 会把标签连接起来，并且还提供已选项以便你渲染 chip。这是 APG 的 multiselectable listbox 模式：列表上有 `aria-multiselectable`，每个选项上有 `aria-selected`。

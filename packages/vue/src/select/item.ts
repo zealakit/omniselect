@@ -1,5 +1,5 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: values are user-defined
-import { checkStructure } from "@zealakit/omniselect-core";
+import { checkStructure, getItemText } from "@zealakit/omniselect-core";
 import {
   Comment,
   computed,
@@ -64,7 +64,7 @@ export const Item = defineComponent({
         key: key(),
         value: props.value,
         textValue:
-          props.textValue ?? element.value?.textContent?.trim() ?? fallbackText,
+          props.textValue ?? (getItemText(element.value) || fallbackText),
         disabled: props.disabled,
         groupId: group?.groupId ?? null,
         node: element.value,

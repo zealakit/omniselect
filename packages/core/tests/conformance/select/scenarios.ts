@@ -595,6 +595,9 @@ export const selectScenarios: Scenario[] = [
           absent: ["itemIndicator:apple"],
         },
       },
+      // The checkmark is decoration: it must not leak into the label.
+      { type: "click", target: "item:apple" },
+      { type: "expect", expect: { text: { value: "Apple" } } },
     ],
   },
   {

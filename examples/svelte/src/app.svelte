@@ -57,6 +57,17 @@ function onInputChange(text: string, reason: string) {
   clearTimeout(timer);
   timer = setTimeout(() => load(text, 0), 250);
 }
+const searchFruits = [
+  "apple",
+  "apricot",
+  "banana",
+  "blueberry",
+  "cherry",
+  "date",
+  "elderberry",
+  "fig",
+  "grape",
+];
 let fruitName = $state<string | null>("apple");
 const names = ["apple", "banana", "cherry", "date"];
 
@@ -174,6 +185,59 @@ function onSubmit(event: SubmitEvent) {
           {/each}
           <Select.Empty>No results</Select.Empty>
           <Select.LoadMore isLoading={loading} hasMore={more} onLoadMore={() => load(query, page + 1)}>Loading…</Select.LoadMore>
+        </Select.List>
+      </Select.Popover>
+    </Select.Root>
+  </div>
+  <h2>Popover search</h2>
+  <div class="field">
+    <Select.Root itemToString={(value: string) => value}>
+      <Select.Label>Fruit (search in the popover)</Select.Label>
+      <Select.Control>
+        <Select.Trigger>
+          <Select.Value placeholder="Pick a fruit" />
+          <Select.Indicator>▾</Select.Indicator>
+        </Select.Trigger>
+      </Select.Control>
+      <Select.Popover>
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+          <Select.Input placeholder="Search fruit…" />
+        </div>
+        <Select.List>
+          {#each searchFruits as name (name)}
+            <Select.Item value={name}>{name}<Select.ItemIndicator>✓</Select.ItemIndicator></Select.Item>
+          {/each}
+          <Select.Empty>No results</Select.Empty>
+        </Select.List>
+      </Select.Popover>
+    </Select.Root>
+  </div>
+  <div class="field">
+    <Select.Root multiple defaultValue={["apple"]} itemToString={(value: string) => value}>
+      <Select.Label>Fruits (search in the popover, multiple)</Select.Label>
+      <Select.Control>
+        <Select.Trigger>
+          <Select.Value placeholder="Pick fruits">
+            {#snippet children({ items, remove })}
+              {#each items as item (item.key)}
+                <button type="button" class="chip" onclick={(event) => { event.stopPropagation(); remove(item.value); }}>{item.label} ×</button>
+              {/each}
+            {/snippet}
+          </Select.Value>
+          <Select.Indicator>▾</Select.Indicator>
+        </Select.Trigger>
+      </Select.Control>
+      <Select.Popover>
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+          <Select.Input placeholder="Search fruit…" />
+        </div>
+        <Select.List>
+          {#each searchFruits as name (name)}
+            <Select.Item value={name}>{name}<Select.ItemIndicator>✓</Select.ItemIndicator></Select.Item>
+          {/each}
+          <Select.Empty>No results</Select.Empty>
         </Select.List>
       </Select.Popover>
     </Select.Root>

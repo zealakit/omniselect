@@ -58,6 +58,17 @@ function onInputChange(text: string, reason: string) {
   clearTimeout(timer);
   timer = setTimeout(() => load(text, 0), 250);
 }
+const searchFruits = [
+  "apple",
+  "apricot",
+  "banana",
+  "blueberry",
+  "cherry",
+  "date",
+  "elderberry",
+  "fig",
+  "grape",
+];
 const fruitName = ref<string | null>("apple");
 const names = ["apple", "banana", "cherry", "date"];
 const itemToKey = (value: Fruit) => String(value.id);
@@ -164,6 +175,51 @@ function onSubmit(event: Event) {
             <Select.Item v-for="name in items" :key="name" :value="name">{{ name }}</Select.Item>
             <Select.Empty>No results</Select.Empty>
             <Select.LoadMore :is-loading="loading" :has-more="more" @load-more="load(query, page + 1)">Loading…</Select.LoadMore>
+          </Select.List>
+        </Select.Popover>
+      </Select.Root>
+    </div>
+    <h2>Popover search</h2>
+    <div class="field">
+      <Select.Root :item-to-string="(value: string) => value">
+        <Select.Label>Fruit (search in the popover)</Select.Label>
+        <Select.Control>
+          <Select.Trigger>
+            <Select.Value placeholder="Pick a fruit" />
+            <Select.Indicator>▾</Select.Indicator>
+          </Select.Trigger>
+        </Select.Control>
+        <Select.Popover>
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+            <Select.Input placeholder="Search fruit…" />
+          </div>
+          <Select.List>
+            <Select.Item v-for="name in searchFruits" :key="name" :value="name">{{ name }}<Select.ItemIndicator>✓</Select.ItemIndicator></Select.Item>
+            <Select.Empty>No results</Select.Empty>
+          </Select.List>
+        </Select.Popover>
+      </Select.Root>
+    </div>
+    <div class="field">
+      <Select.Root multiple :default-value="['apple']" :item-to-string="(value: string) => value">
+        <Select.Label>Fruits (search in the popover, multiple)</Select.Label>
+        <Select.Control>
+          <Select.Trigger>
+            <Select.Value placeholder="Pick fruits" v-slot="{ items, remove }">
+              <button v-for="item in items" :key="item.key" type="button" class="chip" @click.stop="remove(item.value)">{{ item.label }} ×</button>
+            </Select.Value>
+            <Select.Indicator>▾</Select.Indicator>
+          </Select.Trigger>
+        </Select.Control>
+        <Select.Popover>
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+            <Select.Input placeholder="Search fruit…" />
+          </div>
+          <Select.List>
+            <Select.Item v-for="name in searchFruits" :key="name" :value="name">{{ name }}<Select.ItemIndicator>✓</Select.ItemIndicator></Select.Item>
+            <Select.Empty>No results</Select.Empty>
           </Select.List>
         </Select.Popover>
       </Select.Root>

@@ -1,6 +1,6 @@
 {
   "name": "@zealakit/omniselect-svelte",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Accessible, headless Select and Combobox primitives for Svelte.",
   "keywords": [
     "select",

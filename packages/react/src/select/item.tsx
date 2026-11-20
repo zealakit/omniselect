@@ -1,4 +1,4 @@
-import { checkStructure } from "@zealakit/omniselect-core";
+import { checkStructure, getItemText } from "@zealakit/omniselect-core";
 import {
   forwardRef,
   type HTMLAttributes,
@@ -34,6 +34,10 @@ function textFromChildren(children: unknown): string {
     return children.map(textFromChildren).join(" ").replace(/\s+/g, " ").trim();
   }
   if (children && typeof children === "object" && "props" in children) {
+    // Decorative parts (the checkmark) are not part of the label.
+    if ((children as { type?: unknown }).type === ItemIndicator) {
+      return "";
+    }
     return textFromChildren(
       (children as { props: { children?: unknown } }).props.children,
     );
@@ -71,7 +75,7 @@ function ItemImpl<T>(
         key,
         value: valueRef.current,
         textValue:
-          textValue ?? elementRef.current?.textContent?.trim() ?? fallbackText,
+          textValue ?? (getItemText(elementRef.current) || fallbackText),
         disabled,
         groupId,
         node: elementRef.current,

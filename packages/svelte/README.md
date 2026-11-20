@@ -237,6 +237,28 @@ Add `Select.Input` to turn the Select into a searchable combobox (WAI-ARIA edita
 
 Filtering is diacritic- and case-insensitive. Filtered-out items stay registered but render nothing, and a group with no match hides itself. During IME composition, keys and filtering wait for the composition to end. The server renders the select-only markup, and the first client effect switches to combobox semantics.
 
+### Popover search
+
+Put `Select.Input` inside `Select.Popover`, above the list, for a search box embedded in the dropdown. The trigger stays a plain select control (placeholder, value, or chips). Opening the popover focuses the input, arrows and Enter work while typing, the box starts empty and clears on every close, and picks never shift it. The input owns `role="combobox"` while the trigger keeps its label and value, Backspace in the box does not remove chips, and focus returns to the trigger on close. In the inline combobox, a press anywhere on the control (not on a button or the input) focuses the input and opens the list. Style the control as one rounded container, use `--omniselect-anchor-width` for the popover width, and make the search box `position: sticky`; the examples show all of this.
+
+```svelte
+<Select.Root>
+  <Select.Control>
+    <Select.Trigger>
+      <Select.Value placeholder="Pick a fruit" />
+      <Select.Indicator>▾</Select.Indicator>
+    </Select.Trigger>
+  </Select.Control>
+  <Select.Popover>
+    <div class="search"><Select.Input placeholder="Search…" /></div>
+    <Select.List>
+      <Select.Item value="apple">Apple</Select.Item>
+      <Select.Empty>No results</Select.Empty>
+    </Select.List>
+  </Select.Popover>
+</Select.Root>
+```
+
 ### Multiple selection
 
 Set `multiple` to select an array of values. The list stays open after a pick, `Value` joins the labels, and `Value` also exposes the selected items so you can render chips. The pattern is APG's multiselectable listbox: `aria-multiselectable` on the list and `aria-selected` on each item.

@@ -79,3 +79,4 @@ export {
   type LoadMoreGuardOptions,
   type LoadMoreState,
 } from "./pagination.js";
+export { getItemText } from "./item-text.js";

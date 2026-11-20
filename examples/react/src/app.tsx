@@ -2,6 +2,7 @@ import { NativeSelect } from "@zealakit/omniselect-react/native";
 import { Select } from "@zealakit/omniselect-react/select";
 import { AsyncSelect } from "./async-select";
 import { FormDemo } from "./form-demo";
+import { PopoverSearch } from "./popover-search";
 import { type FormEvent, useState } from "react";
 
 type Fruit = { id: number; name: string };
@@ -155,6 +156,13 @@ export function App() {
       <h2>Async search with LoadMore</h2>
       <div className="field">
         <AsyncSelect />
+      </div>
+      <h2>Popover search</h2>
+      <div className="field">
+        <PopoverSearch />
+      </div>
+      <div className="field">
+        <PopoverSearch multiple />
       </div>
       <h2>Forms: react-hook-form + zod</h2>
       <FormDemo />

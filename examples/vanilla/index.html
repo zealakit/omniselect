@@ -79,6 +79,55 @@
           </div>
         </div>
       </div>
+      <h2>Popover search</h2>
+      <div class="field" id="ps-single">
+        <span data-part="label">Fruit (search in the popover)</span>
+        <div data-part="control">
+          <button data-part="trigger" type="button"><span data-part="value">Pick a fruit</span><span data-part="indicator">▾</span></button>
+        </div>
+        <div data-part="popover">
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+            <input data-part="input" type="text" placeholder="Search fruit…" />
+          </div>
+          <div data-part="list">
+            <div data-part="item" data-value="apple">apple <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="apricot">apricot <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="banana">banana <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="blueberry">blueberry <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="cherry">cherry <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="date">date <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="elderberry">elderberry <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="fig">fig <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="grape">grape <span data-part="item-indicator">✓</span></div>
+            <div data-part="empty">No results</div>
+          </div>
+        </div>
+      </div>
+      <div class="field" id="ps-multi">
+        <span data-part="label">Fruits (search in the popover, multiple)</span>
+        <div data-part="control">
+          <button data-part="trigger" type="button"><span data-part="value">Pick fruits</span><span data-part="indicator">▾</span></button>
+        </div>
+        <div data-part="popover">
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+            <input data-part="input" type="text" placeholder="Search fruit…" />
+          </div>
+          <div data-part="list">
+            <div data-part="item" data-value="apple">apple <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="apricot">apricot <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="banana">banana <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="blueberry">blueberry <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="cherry">cherry <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="date">date <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="elderberry">elderberry <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="fig">fig <span data-part="item-indicator">✓</span></div>
+            <div data-part="item" data-value="grape">grape <span data-part="item-indicator">✓</span></div>
+            <div data-part="empty">No results</div>
+          </div>
+        </div>
+      </div>
       <h2>Forms: FormData + zod</h2>
       <form id="demo-form" novalidate>
         <div class="field" data-field="country">

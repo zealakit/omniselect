@@ -116,3 +116,11 @@ test("ids encode keys safely and counter is page-global", () => {
   assert.notEqual(a, b);
   assert.match(a, /^omniselect-\d+$/);
 });
+
+test("getItemText ignores aria-hidden decoration", async () => {
+  const { getItemText } = await import("../dist/index.js");
+  const el = document.createElement("div");
+  el.innerHTML = 'Apple  <span aria-hidden="true">✓</span> pie';
+  assert.equal(getItemText(el), "Apple pie");
+  assert.equal(getItemText(null), "");
+});

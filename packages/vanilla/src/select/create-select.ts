@@ -4,6 +4,7 @@ import {
   createSelectMachine,
   type FilterFn,
   findScrollParent,
+  getItemText,
   getPopoverVars,
   nextId,
   type SelectCloseReason,
@@ -221,7 +222,7 @@ export function createSelect(
         machine.collection.register({
           key,
           value: key,
-          textValue: el.dataset.textValue ?? el.textContent?.trim() ?? "",
+          textValue: el.dataset.textValue ?? getItemText(el),
           disabled:
             el.hasAttribute("data-disabled") ||
             el.getAttribute("aria-disabled") === "true",

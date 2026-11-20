@@ -1,4 +1,5 @@
 body {
+  color-scheme: dark;
   margin: 0;
   font-family: system-ui, sans-serif;
   background: #0f172a;
@@ -48,10 +49,6 @@ h1 {
   color: #94a3b8;
 }
 
-.field [data-part="indicator"] {
-  color: #94a3b8;
-}
-
 pre {
   padding: 0.75rem;
   border-radius: 0.5rem;
@@ -59,28 +56,95 @@ pre {
 }
 
 .select-control {
-  display: flex;
-  gap: 0.25rem;
-  align-items: center;
+  display: contents;
 }
 
+/* One rounded container holds the trigger / input / clear / indicator. */
+[data-part="control"] {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2.5rem;
+  padding: 0 0.5rem;
+  border: 1px solid #475569;
+  border-radius: 0.625rem;
+  background: #0b1220;
+  transition:
+    border-color 120ms,
+    box-shadow 120ms;
+}
+
+[data-part="control"]:focus-within,
+[data-part="control"][data-state="open"] {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35);
+}
+
+[data-part="control"][data-invalid] {
+  border-color: #f87171;
+}
+
+[data-part="control"][data-invalid]:focus-within {
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.3);
+}
+
+[data-part="control"][data-disabled] {
+  opacity: 0.55;
+}
+
+/* Inline combobox: the text input sits invisibly inside the container. */
+[data-part="control"] [data-part="input"] {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+[data-part="control"] [data-part="input"]::placeholder {
+  color: #94a3b8;
+}
+
+/* The trigger fills the container (select) or shrinks to the chevron (combobox). */
 [data-part="trigger"] {
   display: flex;
   flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #475569;
-  border-radius: 0.5rem;
-  background: #0b1220;
+  gap: 0.25rem;
+  min-height: 2.25rem;
+  padding: 0.25rem 0;
+  border: 0;
+  background: transparent;
   color: inherit;
   font: inherit;
+  text-align: left;
   cursor: pointer;
 }
 
-[data-part="trigger"][data-placeholder] [data-part="value"],
-[data-part="value"][data-placeholder] {
+[data-part="control"]:has([data-part="input"]) [data-part="trigger"] {
+  flex: none;
+  min-height: 0;
+  padding: 0.25rem;
+}
+
+[data-part="trigger"]:focus-visible {
+  outline: 0;
+}
+
+[data-part="value"][data-placeholder],
+[data-part="trigger"][data-placeholder] [data-part="value"] {
   color: #94a3b8;
+}
+
+[data-part="indicator"] {
+  margin-left: auto;
+  color: #94a3b8;
+  transition: transform 150ms;
 }
 
 [data-part="indicator"][data-state="open"] {
@@ -91,18 +155,24 @@ pre {
   border: 0;
   background: none;
   color: #94a3b8;
+  font: inherit;
   cursor: pointer;
 }
 
+/* The popover matches the control's width and scrolls its list. */
 [data-part="popover"] {
   z-index: 10;
-  min-width: var(--omniselect-anchor-width, 12rem);
-  max-height: var(--omniselect-available-height, 16rem);
-  overflow: auto;
-  padding: 0.25rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: var(--omniselect-anchor-width, auto);
+  min-width: 12rem;
+  max-height: min(var(--omniselect-available-height, 20rem), 20rem);
+  overflow: hidden;
   border: 1px solid #475569;
-  border-radius: 0.5rem;
+  border-radius: 0.625rem;
   background: #0b1220;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
 
 [data-part="popover"][data-state="open"] {
@@ -113,16 +183,60 @@ pre {
   animation: omniselect-out 120ms ease-in;
 }
 
+[data-part="list"] {
+  flex: 1;
+  padding: 0.25rem;
+  overflow: auto;
+}
+
+/* Popover search: a sticky, rounded search box with its own focus ring. */
+.search {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  border-bottom: 1px solid #334155;
+  background: #0b1220;
+}
+
+.search svg {
+  position: absolute;
+  left: 1.1rem;
+  width: 1rem;
+  height: 1rem;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.search [data-part="input"] {
+  flex: 1;
+  min-width: 0;
+  padding: 0.45rem 0.75rem 0.45rem 2rem;
+  border: 1px solid #475569;
+  border-radius: 0.5rem;
+  outline: 0;
+  background: #0f172a;
+  color: inherit;
+  font: inherit;
+}
+
+.search [data-part="input"]:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35);
+}
+
 [data-part="item"] {
   display: flex;
   justify-content: space-between;
   padding: 0.375rem 0.5rem;
-  border-radius: 0.25rem;
+  border-radius: 0.375rem;
   cursor: pointer;
 }
 
 [data-part="item"][data-highlighted] {
-  background: #1e293b;
+  background: #1e3a5f;
 }
 
 [data-part="item"][data-selected] {
@@ -132,6 +246,11 @@ pre {
 [data-part="item"][data-disabled] {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+[data-part="empty"] {
+  padding: 0.5rem;
+  color: #94a3b8;
 }
 
 @keyframes omniselect-in {
@@ -165,9 +284,7 @@ pre {
   font-size: 0.875rem;
 }
 
-[aria-invalid="true"],
-[data-part="trigger"][data-invalid],
-[data-part="input"][data-invalid] {
+select[aria-invalid="true"] {
   border-color: #f87171;
 }
 

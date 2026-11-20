@@ -1,7 +1,7 @@
 <script lang="ts" generics="T">
 import { getContext, setContext, untrack, type Snippet } from "svelte";
 import type { HTMLAttributes } from "svelte/elements";
-import { checkStructure } from "@zealakit/omniselect-core";
+import { checkStructure, getItemText } from "@zealakit/omniselect-core";
 import { getSelectContext, GROUP_KEY, ITEM_KEY } from "./context.js";
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, "onselect"> & {
@@ -37,7 +37,7 @@ let ready = $state(false);
 let text = "";
 $effect(() => {
   if (element) {
-    text = element.textContent?.trim() ?? text;
+    text = getItemText(element) || text;
     ready = true;
   }
 });

@@ -243,6 +243,28 @@ Thêm `Select.Input` để biến Select thành combobox có tìm kiếm (mẫu 
 
 Việc lọc không phân biệt dấu và hoa thường. Các item bị lọc vẫn được đăng ký nhưng không render gì, và nhóm không có kết quả sẽ tự ẩn. Khi đang gõ bằng IME, phím và việc lọc chờ đến khi kết thúc composition. Server render markup select-only, và effect đầu tiên ở client chuyển sang ngữ nghĩa combobox.
 
+### Popover search
+
+Đặt `Select.Input` bên trong `Select.Popover`, phía trên danh sách, để có ô tìm kiếm nằm trong dropdown. Trigger vẫn là một select control thường (placeholder, giá trị hoặc chip). Mở popover sẽ focus vào input, phím mũi tên và Enter hoạt động khi đang gõ, ô tìm kiếm luôn bắt đầu rỗng và được xóa mỗi khi đóng, và việc chọn không làm nó dịch chuyển. Input giữ `role="combobox"` còn trigger giữ nhãn và giá trị của nó, Backspace trong ô không xóa chip, và focus quay về trigger khi đóng. Với combobox inline, nhấn vào bất kỳ chỗ nào trên control (không phải nút hay input) sẽ focus input và mở danh sách. Hãy style control như một container bo tròn duy nhất, dùng `--omniselect-anchor-width` cho độ rộng popover và đặt ô tìm kiếm `position: sticky`; các ví dụ minh họa tất cả điều này.
+
+```vue
+<Select.Root>
+  <Select.Control>
+    <Select.Trigger>
+      <Select.Value placeholder="Pick a fruit" />
+      <Select.Indicator>▾</Select.Indicator>
+    </Select.Trigger>
+  </Select.Control>
+  <Select.Popover>
+    <div class="search"><Select.Input placeholder="Search…" /></div>
+    <Select.List>
+      <Select.Item value="apple">Apple</Select.Item>
+      <Select.Empty>No results</Select.Empty>
+    </Select.List>
+  </Select.Popover>
+</Select.Root>
+```
+
 ### Multiple selection
 
 Đặt `multiple` để chọn một mảng giá trị. Danh sách vẫn mở sau mỗi lần chọn, `Value` nối các nhãn lại, và `Value` cũng cung cấp các item đã chọn để bạn render chip. Đây là mẫu listbox multiselectable của APG: `aria-multiselectable` trên list và `aria-selected` trên từng item.
