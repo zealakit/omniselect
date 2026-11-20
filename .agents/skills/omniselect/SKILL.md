@@ -76,7 +76,7 @@ omniselect/
   first on Escape and is not an "outside click" for the Dialog.
 - Only documented public exports are used. Re-export Overlay types that appear in Omniselect's
   public props (`Placement`, `DismissReason`, and `Animation*` where Overlay exports them).
-- Known upstream gaps (Overlay 1.0.0): only `overlay-react` exports the `Animation*` types;
+- Known upstream gaps (Overlay 1.0.1): only `overlay-react` exports the `Animation*` types;
   `createLayerStack` is exported only by `overlay-vanilla`.
 - Unreleased Overlay changes: run `pnpm pack:packages` in `../overlay`, install the tarball from
   `../overlay/artifacts/` temporarily, never commit the override.

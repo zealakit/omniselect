@@ -17,3 +17,7 @@ minimumReleaseAgeExclude:
   - "@biomejs/cli-linux-x64@2.6.8"
   - "@biomejs/cli-win32-arm64@2.6.8"
   - "@biomejs/cli-win32-x64@2.6.8"
+  - "@zealakit/overlay-react@1.0.1"
+  - "@zealakit/overlay-svelte@1.0.1"
+  - "@zealakit/overlay-vanilla@1.0.1"
+  - "@zealakit/overlay-vue@1.0.1"

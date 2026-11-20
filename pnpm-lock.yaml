@@ -343,8 +343,8 @@ importers:
         specifier: workspace:^
         version: link:../core
       '@zealakit/overlay-react':
-        specifier: ^1.0.0
-        version: 1.0.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: ^1.0.1
+        version: 1.0.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
     devDependencies:
       '@testing-library/react':
         specifier: ^16.3.3
@@ -371,8 +371,8 @@ importers:
         specifier: workspace:^
         version: link:../core
       '@zealakit/overlay-svelte':
-        specifier: ^1.0.0
-        version: 1.0.0(svelte@5.58.0)
+        specifier: ^1.0.1
+        version: 1.0.1(svelte@5.58.0)
     devDependencies:
       '@sveltejs/package':
         specifier: ^3.0.2
@@ -393,8 +393,8 @@ importers:
         specifier: workspace:^
         version: link:../core
       '@zealakit/overlay-vanilla':
-        specifier: ^1.0.0
-        version: 1.0.0
+        specifier: ^1.0.1
+        version: 1.0.1
     devDependencies:
       happy-dom:
         specifier: ^21.0.4
@@ -406,8 +406,8 @@ importers:
         specifier: workspace:^
         version: link:../core
       '@zealakit/overlay-vue':
-        specifier: ^1.0.0
-        version: 1.0.0(vue@3.5.45(typescript@6.0.3))
+        specifier: ^1.0.1
+        version: 1.0.1(vue@3.5.45(typescript@6.0.3))
     devDependencies:
       '@vue/test-utils':
         specifier: ^2.6.0
@@ -1417,25 +1417,25 @@ packages:
       '@vue/server-renderer':
         optional: true
 
-  '@zealakit/overlay-react@1.0.0':
-    resolution: {integrity: sha512-78km4p2nSlTjp2nPPzcQb/8ktbHKSuIrJAOW6ZT2u0PBEcsvaeAgAsda4f4iXEbqCkqNFnZY6YZ1bn2198CCLQ==}
+  '@zealakit/overlay-react@1.0.1':
+    resolution: {integrity: sha512-/U7wX92GbUxcfrm1Uqo+jlNXkB7Ma09ESRmhj//8Ww9QWLkFLGXaTP1GVIDXAKmsoT9sC0kBysu2aaqqhiMzsQ==}
     engines: {node: '>=20'}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
 
-  '@zealakit/overlay-svelte@1.0.0':
-    resolution: {integrity: sha512-fa9Y71OmFi9UiPNlCQFuWIAbRO/MPPGpQnVBWZjvADhchXq9M7V8Av/T9KyPuc9E2C1IVcoFs+JYTyBqQRgbyA==}
+  '@zealakit/overlay-svelte@1.0.1':
+    resolution: {integrity: sha512-v/qW6CL5sPwgyir107yu2HS0z0gZ/DHw8tIiNN6UfQ8Ohte+ygr3NfJYv6c6Pl3FFlYNm7M3MLdbDURCJ4bu6Q==}
     engines: {node: '>=20'}
     peerDependencies:
       svelte: ^5.0.0
 
-  '@zealakit/overlay-vanilla@1.0.0':
-    resolution: {integrity: sha512-SvXIf2imQe8xOXuuVWN/4w7pQiMWnRd/6d7qm+1TDSDCeJaTOa6U6lp6KpKjtGoHy3wjrpC2E8/YKYfoE/0/2Q==}
+  '@zealakit/overlay-vanilla@1.0.1':
+    resolution: {integrity: sha512-YLpauJtR3wP5iXlxCIOm4nnevJYNyI5aQPo9jf+93Bithc1UQ/QYXLjOQB36RbzD0ASqAwd8FpybZJRVCxhiyA==}
     engines: {node: '>=20'}
 
-  '@zealakit/overlay-vue@1.0.0':
-    resolution: {integrity: sha512-EpToiLqoDM3rWq8jQ6B2ou3fXp9vV0CUAVvpZHTJfD9IrszbEDdvZ1mbNtK6TXPuNd3hxouuitGakC86pAT09w==}
+  '@zealakit/overlay-vue@1.0.1':
+    resolution: {integrity: sha512-wTLsa2IXyXKOYK+BUslKRzXLll/wrjJF28KUmi1GQTtHe9XinTo+62Vg7ko+qBcNIduEnNkCtjVgqSHYBL/03A==}
     engines: {node: '>=20'}
     peerDependencies:
       vue: ^3.5.0
@@ -2791,22 +2791,22 @@ snapshots:
     optionalDependencies:
       '@vue/server-renderer': 3.5.45
 
-  '@zealakit/overlay-react@1.0.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@zealakit/overlay-react@1.0.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@floating-ui/dom': 1.8.0
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 
-  '@zealakit/overlay-svelte@1.0.0(svelte@5.58.0)':
+  '@zealakit/overlay-svelte@1.0.1(svelte@5.58.0)':
     dependencies:
       '@floating-ui/dom': 1.8.0
       svelte: 5.58.0
 
-  '@zealakit/overlay-vanilla@1.0.0':
+  '@zealakit/overlay-vanilla@1.0.1':
     dependencies:
       '@floating-ui/dom': 1.8.0
 
-  '@zealakit/overlay-vue@1.0.0(vue@3.5.45(typescript@6.0.3))':
+  '@zealakit/overlay-vue@1.0.1(vue@3.5.45(typescript@6.0.3))':
     dependencies:
       '@floating-ui/dom': 1.8.0
       vue: 3.5.45(typescript@6.0.3)

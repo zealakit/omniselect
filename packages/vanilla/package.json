@@ -56,7 +56,7 @@
   },
   "dependencies": {
     "@zealakit/omniselect-core": "workspace:^",
-    "@zealakit/overlay-vanilla": "^1.0.0"
+    "@zealakit/overlay-vanilla": "^1.0.1"
   },
   "devDependencies": {
     "happy-dom": "^21.0.4"
