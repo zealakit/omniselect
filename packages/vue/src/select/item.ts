@@ -1,5 +1,9 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: values are user-defined
-import { checkStructure, getItemText } from "@zealakit/omniselect-core";
+import {
+  checkStructure,
+  getItemText,
+  scrollItemIntoView,
+} from "@zealakit/omniselect-core";
 import {
   Comment,
   computed,
@@ -129,7 +133,7 @@ export const Item = defineComponent({
         state.highlightSource === "keyboard"
       ) {
         queueMicrotask(() =>
-          element.value?.scrollIntoView?.({ block: "nearest" }),
+          element.value ? scrollItemIntoView(element.value) : undefined,
         );
       }
       return h(

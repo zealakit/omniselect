@@ -1,7 +1,11 @@
 <script lang="ts" generics="T">
 import { getContext, setContext, untrack, type Snippet } from "svelte";
 import type { HTMLAttributes } from "svelte/elements";
-import { checkStructure, getItemText } from "@zealakit/omniselect-core";
+import {
+  checkStructure,
+  getItemText,
+  scrollItemIntoView,
+} from "@zealakit/omniselect-core";
 import { getSelectContext, GROUP_KEY, ITEM_KEY } from "./context.js";
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, "onselect"> & {
@@ -79,7 +83,7 @@ const keyboardHighlight = $derived.by(() => {
   return state.highlightedKey === key && state.highlightSource === "keyboard";
 });
 $effect(() => {
-  if (keyboardHighlight) element?.scrollIntoView?.({ block: "nearest" });
+  if (keyboardHighlight && element) scrollItemIntoView(element);
 });
 </script>
 

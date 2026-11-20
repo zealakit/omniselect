@@ -5,6 +5,7 @@ import {
   type FilterFn,
   findScrollParent,
   getItemText,
+  scrollItemIntoView,
   getPopoverVars,
   nextId,
   type SelectCloseReason,
@@ -145,7 +146,9 @@ export function createSelect(
   const inputInPopover = inputEl !== null && popover.contains(inputEl);
   /** Combobox: the input. A search box inside the popover is hidden on close, so the trigger. */
   const focusAfterClose = () =>
-    (inputEl && !inputInPopover ? inputEl : trigger).focus();
+    (inputEl && !inputInPopover ? inputEl : trigger).focus({
+      preventScroll: true,
+    });
   const clearEl = part("clear");
   const indicator = part("indicator");
   const label = part("label");
@@ -308,7 +311,9 @@ export function createSelect(
       const el = itemElements().find(
         (item) => item.dataset.value === highlighted,
       );
-      el?.scrollIntoView?.({ block: "nearest" });
+      if (el) {
+        scrollItemIntoView(el);
+      }
     }
     renderForm();
     // Keep the overlay in step with the machine.
@@ -386,7 +391,7 @@ export function createSelect(
     });
     hidden.addEventListener("invalid", () => {
       machine.setInvalid(true);
-      (inputEl ?? trigger).focus();
+      (inputEl ?? trigger).focus({ preventScroll: true });
     });
     root.append(hidden);
     const owner = hidden.form;
@@ -497,7 +502,7 @@ export function createSelect(
   const onTriggerClick = () => {
     machine.toggle();
     if (inputEl && !inputInPopover) {
-      inputEl.focus();
+      inputEl.focus({ preventScroll: true });
     }
   };
   const onInputEvent = () => {
@@ -590,7 +595,7 @@ export function createSelect(
       !inputInPopover &&
       (event.target as Element).closest("input, button, a") === null
     ) {
-      inputEl.focus();
+      inputEl.focus({ preventScroll: true });
       machine.onInputClick();
     }
   };

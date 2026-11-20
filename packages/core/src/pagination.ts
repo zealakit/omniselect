@@ -134,3 +134,25 @@ export function findScrollParent(
   }
   return null;
 }
+
+/**
+ * Scroll the list (never the page) just enough to reveal `item`. The native
+ * `scrollIntoView` also scrolls the page, which jumps to the top while the
+ * popover is not positioned yet.
+ */
+export function scrollItemIntoView(item: Element): void {
+  const container = findScrollParent(
+    item,
+    item.closest('[data-part="popover"]'),
+  );
+  if (!container) {
+    return;
+  }
+  const box = container.getBoundingClientRect();
+  const rect = item.getBoundingClientRect();
+  if (rect.top < box.top) {
+    container.scrollTop -= box.top - rect.top;
+  } else if (rect.bottom > box.bottom) {
+    container.scrollTop += rect.bottom - box.bottom;
+  }
+}

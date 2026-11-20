@@ -120,7 +120,9 @@ const handleValue = (next: unknown) => {
 /** Combobox: the input. A search box inside the popover unmounts on close, so the trigger. */
 function focusAfterClose(): void {
   const target = machine.focusTarget();
-  (target === "input" ? (inputEl ?? triggerEl) : triggerEl)?.focus();
+  (target === "input" ? (inputEl ?? triggerEl) : triggerEl)?.focus({
+    preventScroll: true,
+  });
 }
 
 const machine = untrack(() =>
@@ -224,7 +226,7 @@ const context: SelectContext = {
   setInputEl: (element) => {
     inputEl = element;
   },
-  focusTrigger: () => triggerEl?.focus(),
+  focusTrigger: () => triggerEl?.focus({ preventScroll: true }),
   focusField: () => focusAfterClose(),
   props: {
     get placement() {
@@ -293,7 +295,7 @@ $effect(() => {
       )}
     oninvalid={() => {
       machine.setInvalid(true);
-      (inputEl ?? triggerEl)?.focus();
+      (inputEl ?? triggerEl)?.focus({ preventScroll: true });
     }}
   >
     {#each keys as key (key)}

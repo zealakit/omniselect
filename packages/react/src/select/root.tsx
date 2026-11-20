@@ -160,7 +160,7 @@ export function Root<T>(props: SelectRootProps<T>) {
     (target === "input"
       ? (inputRef.current ?? triggerRef.current)
       : triggerRef.current
-    )?.focus();
+    )?.focus({ preventScroll: true });
   }, []);
   if (machineRef.current === null) {
     machineRef.current = createSelectMachine<T>({
@@ -232,7 +232,10 @@ export function Root<T>(props: SelectRootProps<T>) {
     });
   });
 
-  const focusTrigger = useCallback(() => triggerRef.current?.focus(), []);
+  const focusTrigger = useCallback(
+    () => triggerRef.current?.focus({ preventScroll: true }),
+    [],
+  );
   const focusField = focusAfterClose;
 
   const context: SelectContextValue = {

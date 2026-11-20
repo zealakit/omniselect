@@ -146,7 +146,7 @@ export const Root = defineComponent({
       (target === "input"
         ? (inputEl.value ?? triggerEl.value)
         : triggerEl.value
-      )?.focus();
+      )?.focus({ preventScroll: true });
     }
     const version = shallowRef(0);
     const stop = machine.store.subscribe(() => {
@@ -212,7 +212,7 @@ export const Root = defineComponent({
       triggerEl,
       controlEl,
       inputEl,
-      focusTrigger: () => triggerEl.value?.focus(),
+      focusTrigger: () => triggerEl.value?.focus({ preventScroll: true }),
       focusField: focusAfterClose,
       props: new Proxy({} as SelectContext["props"], {
         get: (_target, key: string) => (props as Record<string, unknown>)[key],

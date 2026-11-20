@@ -430,3 +430,72 @@ test("LoadMore: highlight and scroll stay put when a page is appended", async ()
     proto.scrollIntoView = original;
   }
 });
+
+test("opening never scrolls the page: no scrollIntoView, and every focus() passes preventScroll", async () => {
+  const proto = window.HTMLElement.prototype as unknown as {
+    scrollIntoView?: () => void;
+    focus: (options?: FocusOptions) => void;
+  };
+  const originalScroll = proto.scrollIntoView;
+  const originalFocus = proto.focus;
+  const scrolled: string[] = [];
+  const focusOptions: (FocusOptions | undefined)[] = [];
+  proto.scrollIntoView = () => scrolled.push("scrollIntoView");
+  proto.focus = function (options?: FocusOptions) {
+    focusOptions.push(options);
+    return originalFocus.call(this, options);
+  };
+  try {
+    render(
+      h(
+        "div",
+        null,
+        h(
+          Select.Root as never,
+          { portal: false, defaultValue: "b", itemToString: (v: string) => v },
+          h(
+            Select.Control,
+            null,
+            h(Select.Trigger, null, h(Select.Value, null)),
+          ),
+          h(
+            Select.Popover,
+            null,
+            h(Select.List, null, h(Select.Item as never, { value: "b" }, "B")),
+          ),
+        ),
+        h(
+          Select.Root as never,
+          { portal: false },
+          h(Select.Control, null, h(Select.Trigger, null, "t")),
+          h(
+            Select.Popover,
+            null,
+            h(Select.Input as never, null),
+            h(Select.List, null, h(Select.Item as never, { value: "x" }, "X")),
+          ),
+        ),
+      ),
+    );
+    await flush();
+    const triggers = Array.from(
+      document.querySelectorAll("[data-part=trigger]"),
+    );
+    for (const trigger of triggers) {
+      await act(async () => click(trigger));
+      await flush();
+      await act(async () => press(trigger, "ArrowDown"));
+      await act(async () => press(trigger, "Escape"));
+      await flush();
+    }
+  } finally {
+    proto.scrollIntoView = originalScroll;
+    proto.focus = originalFocus;
+  }
+  assert.deepEqual(scrolled, []);
+  assert.ok(focusOptions.length > 0, "the library focused something");
+  assert.ok(
+    focusOptions.every((o) => o?.preventScroll === true),
+    "all library focus() calls pass preventScroll",
+  );
+});

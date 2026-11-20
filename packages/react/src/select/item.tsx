@@ -1,4 +1,8 @@
-import { checkStructure, getItemText } from "@zealakit/omniselect-core";
+import {
+  checkStructure,
+  getItemText,
+  scrollItemIntoView,
+} from "@zealakit/omniselect-core";
 import {
   forwardRef,
   type HTMLAttributes,
@@ -92,7 +96,9 @@ function ItemImpl<T>(
   const highlightedByKeyboard = highlighted === "true" && source === "keyboard";
   useEffect(() => {
     if (highlightedByKeyboard) {
-      elementRef.current?.scrollIntoView?.({ block: "nearest" });
+      if (elementRef.current) {
+        scrollItemIntoView(elementRef.current);
+      }
     }
   }, [highlightedByKeyboard]);
 

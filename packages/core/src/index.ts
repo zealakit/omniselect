@@ -75,6 +75,7 @@ export { hiddenSelectKeys, visuallyHiddenStyle } from "./form.js";
 export {
   createLoadMoreGuard,
   findScrollParent,
+  scrollItemIntoView,
   type LoadMoreGuard,
   type LoadMoreGuardOptions,
   type LoadMoreState,
