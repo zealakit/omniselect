@@ -48,7 +48,7 @@ export const Input = forwardRef<HTMLInputElement, SelectInputProps>(
     // Search-in-popover: focus the input as soon as the popover opens.
     useEffect(() => {
       if (open && machine.store.get().inputInPopover) {
-        inputRef.current?.focus();
+        inputRef.current?.focus({ preventScroll: true });
       }
     }, [open, machine, inputRef]);
     useSnapshot(machine, (m) => {

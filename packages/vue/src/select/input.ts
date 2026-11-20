@@ -28,7 +28,7 @@ export const Input = defineComponent({
           context.inputEl.value?.closest('[data-part="popover"]') != null,
       });
       if (machine.store.get().inputInPopover && machine.isOpen()) {
-        context.inputEl.value?.focus();
+        context.inputEl.value?.focus({ preventScroll: true });
       }
     });
     // Search-in-popover: focus the input as soon as the popover opens.
@@ -39,7 +39,9 @@ export const Input = defineComponent({
       },
       (open) => {
         if (open && machine.store.get().inputInPopover) {
-          void nextTick().then(() => context.inputEl.value?.focus());
+          void nextTick().then(() =>
+            context.inputEl.value?.focus({ preventScroll: true }),
+          );
         }
       },
     );

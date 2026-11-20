@@ -479,7 +479,7 @@ export function createSelect(
       if (inputEl && inputInPopover) {
         if (wasOpen) {
           offInput = machine.registerInput({ inPopover: true });
-          queueMicrotask(() => inputEl.focus());
+          queueMicrotask(() => inputEl.focus({ preventScroll: true }));
         } else {
           offInput();
         }

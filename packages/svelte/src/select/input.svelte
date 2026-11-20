@@ -35,7 +35,7 @@ $effect(() => {
   // After a tick: the popover's portal moves the node once the popover's own effects have run.
   if (open && element && machine.store.get().inputInPopover) {
     const target = element;
-    void tick().then(() => target.focus());
+    void tick().then(() => target.focus({ preventScroll: true }));
   }
 });
 $effect(() => {
