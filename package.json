@@ -2,7 +2,7 @@
   "name": "@zealakit/omniselect",
   "version": "1.0.0-beta.1",
   "private": true,
-  "description": "Headless, accessible components for building selection UIs.",
+  "description": "Headless, accessible selection components for building modern UIs.",
   "keywords": [
     "select",
     "combobox",
