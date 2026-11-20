@@ -1,7 +1,7 @@
 {
   "name": "@zealakit/omniselect-vue",
   "version": "1.0.0-beta.1",
-  "description": "Accessible, headless Select and Combobox primitives for Vue.",
+  "description": "Headless, accessible components for building selection UIs.",
   "keywords": [
     "select",
     "combobox",
