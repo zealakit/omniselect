@@ -153,7 +153,15 @@ export function Root<T>(props: SelectRootProps<T>) {
   const latest = useRef({ onOpenChange });
   latest.current = { onOpenChange };
 
+  /** Combobox: the input. A search box inside the popover unmounts on close, so the trigger. */
   const machineRef = useRef<SelectMachine<T> | null>(null);
+  const focusAfterClose = useCallback(() => {
+    const target = machineRef.current?.focusTarget();
+    (target === "input"
+      ? (inputRef.current ?? triggerRef.current)
+      : triggerRef.current
+    )?.focus();
+  }, []);
   if (machineRef.current === null) {
     machineRef.current = createSelectMachine<T>({
       rootId,
@@ -190,7 +198,7 @@ export function Root<T>(props: SelectRootProps<T>) {
           !next &&
           (reason === "select" || reason === "escape" || reason === "tab")
         ) {
-          (inputRef.current ?? triggerRef.current)?.focus();
+          focusAfterClose();
         }
       },
     });
@@ -225,10 +233,7 @@ export function Root<T>(props: SelectRootProps<T>) {
   });
 
   const focusTrigger = useCallback(() => triggerRef.current?.focus(), []);
-  const focusField = useCallback(
-    () => (inputRef.current ?? triggerRef.current)?.focus(),
-    [],
-  );
+  const focusField = focusAfterClose;
 
   const context: SelectContextValue = {
     machine,

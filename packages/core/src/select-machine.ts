@@ -66,6 +66,8 @@ export type SelectState<T> = {
   inputValue: string;
   /** `combobox` while a `Select.Input` is mounted. */
   mode: SelectMode;
+  /** The `Select.Input` lives inside the popover (search-in-dropdown pattern). */
+  inputInPopover: boolean;
   /** Bumped when the collection changes, so adapters re-render derived output. */
   version: number;
   hasClear: boolean;
@@ -188,7 +190,9 @@ export type SelectMachine<T> = {
   /** Keyboard handling for the trigger (select-only mode). */
   onTriggerKeyDown: (event: KeyEventLike) => KeyResult;
   /** Called by `Select.Input` while mounted; switches the machine to combobox mode. */
-  registerInput: () => () => void;
+  registerInput: (options?: { inPopover?: boolean }) => () => void;
+  /** Where focus goes after a pick, Escape, Tab, or Clear. */
+  focusTarget: () => "trigger" | "input";
   /** Text typed into the input. `composing` defers filtering until composition ends. */
   onInput: (text: string, options?: { composing?: boolean }) => void;
   onInputKeyDown: (event: KeyEventLike) => KeyResult;
@@ -323,6 +327,7 @@ export function createSelectMachine<T>(
     value: initialValue,
     inputValue: initialInput,
     mode: "select-only",
+    inputInPopover: false,
     version: 0,
     hasClear: false,
     hasLoading: false,
@@ -400,6 +405,11 @@ export function createSelectMachine<T>(
   };
 
   const restoreInput = (): void => {
+    // A search box inside the popover always starts empty; it never shows the selected label.
+    if (store.get().inputInPopover) {
+      setInput("", "close");
+      return;
+    }
     if (store.get().mode === "combobox" && props.restoreOnBlur) {
       setInput(selectedText(), "close");
     }
@@ -445,6 +455,7 @@ export function createSelectMachine<T>(
     // Items register after the first paint; replace a fallback label with the real one.
     if (
       state.mode === "combobox" &&
+      !state.inputInPopover &&
       !multiple &&
       filterQuery === "" &&
       props.selectionBehavior === "replace-input" &&
@@ -581,6 +592,7 @@ export function createSelectMachine<T>(
         if (
           changed &&
           store.get().mode === "combobox" &&
+          !store.get().inputInPopover &&
           !multiple &&
           props.selectionBehavior === "replace-input"
         ) {
@@ -678,7 +690,9 @@ export function createSelectMachine<T>(
         });
       }
       if (store.get().mode === "combobox") {
-        const behavior = props.selectionBehavior;
+        const behavior = store.get().inputInPopover
+          ? "clear-input"
+          : props.selectionBehavior;
         if (behavior === "replace-input" && !multiple) {
           setInput(machine.labelOf(item.value), "select");
         } else if (
@@ -939,14 +953,19 @@ export function createSelectMachine<T>(
       }
       return none;
     },
-    registerInput() {
-      store.set({ mode: "combobox" });
+    registerInput(inputOptions) {
+      const inPopover = inputOptions?.inPopover === true;
+      store.set({ mode: "combobox", inputInPopover: inPopover });
+      if (inPopover && store.get().inputValue !== "") {
+        setInput("", "close");
+      }
       applyFilter();
       return () => {
-        store.set({ mode: "select-only" });
+        store.set({ mode: "select-only", inputInPopover: false });
         applyFilter();
       };
     },
+    focusTarget: () => (store.get().inputInPopover ? "trigger" : "input"),
     onInput(text, inputOptions) {
       if (props.disabled) {
         return;
@@ -982,7 +1001,12 @@ export function createSelectMachine<T>(
       const state = store.get();
       const nav = visibleNav();
       const key = event.key;
-      if (key === "Backspace" && multiple && state.inputValue === "") {
+      if (
+        key === "Backspace" &&
+        multiple &&
+        state.inputValue === "" &&
+        !state.inputInPopover
+      ) {
         machine.removeLast();
         return none;
       }
@@ -1058,6 +1082,10 @@ export function createSelectMachine<T>(
       }
     },
     onInputBlur() {
+      // In a popover the input blurs when the trigger is pressed; closing here would reopen it.
+      if (store.get().inputInPopover) {
+        return;
+      }
       if (store.get().open) {
         machine.close("blur");
       } else {
@@ -1108,9 +1136,35 @@ export function createSelectMachine<T>(
       trigger: () => {
         const state = store.get();
         const listMounted = state.open;
+        if (state.mode === "combobox" && state.inputInPopover) {
+          // The trigger stays a labelled button showing the value; the input owns the combobox role.
+          return {
+            id: ids.trigger,
+            role: undefined,
+            tabindex: undefined,
+            "aria-label": undefined,
+            "aria-activedescendant": undefined,
+            "aria-haspopup": "listbox",
+            "aria-expanded": state.open ? "true" : "false",
+            "aria-controls": listMounted ? ids.listbox : undefined,
+            "aria-labelledby": `${ids.label} ${ids.trigger}`,
+            "aria-required": props.required ? "true" : undefined,
+            "aria-invalid": machine.isInvalid() ? "true" : undefined,
+            "aria-disabled": props.disabled ? "true" : undefined,
+            "data-state": state.open ? "open" : "closed",
+            "data-disabled": bool(props.disabled),
+            "data-invalid": bool(machine.isInvalid()),
+            "data-placeholder": bool(
+              !multiple && selection.isEmpty(state.value),
+            ),
+          };
+        }
         if (state.mode === "combobox") {
           return {
             id: ids.trigger,
+            role: undefined,
+            "aria-labelledby": undefined,
+            "aria-activedescendant": undefined,
             "aria-haspopup": "listbox",
             "aria-expanded": state.open ? "true" : "false",
             "aria-controls": listMounted ? ids.listbox : undefined,
@@ -1123,6 +1177,8 @@ export function createSelectMachine<T>(
         }
         return {
           id: ids.trigger,
+          tabindex: undefined,
+          "aria-label": undefined,
           role: "combobox",
           "aria-haspopup": "listbox",
           "aria-expanded": state.open ? "true" : "false",

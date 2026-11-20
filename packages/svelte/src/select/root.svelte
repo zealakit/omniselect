@@ -117,6 +117,12 @@ const handleValue = (next: unknown) => {
   onValueChange?.(next as T | null | T[]);
 };
 
+/** Combobox: the input. A search box inside the popover unmounts on close, so the trigger. */
+function focusAfterClose(): void {
+  const target = machine.focusTarget();
+  (target === "input" ? (inputEl ?? triggerEl) : triggerEl)?.focus();
+}
+
 const machine = untrack(() =>
   createSelectMachine<T>({
     rootId: nextId("omniselect"),
@@ -157,7 +163,7 @@ const machine = untrack(() =>
         !next &&
         (reason === "select" || reason === "escape" || reason === "tab")
       ) {
-        (inputEl ?? triggerEl)?.focus();
+        focusAfterClose();
       }
     },
   }),
@@ -219,7 +225,7 @@ const context: SelectContext = {
     inputEl = element;
   },
   focusTrigger: () => triggerEl?.focus(),
-  focusField: () => (inputEl ?? triggerEl)?.focus(),
+  focusField: () => focusAfterClose(),
   props: {
     get placement() {
       return placement;

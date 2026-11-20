@@ -135,11 +135,19 @@ export const Root = defineComponent({
           !open &&
           (reason === "select" || reason === "escape" || reason === "tab")
         ) {
-          (inputEl.value ?? triggerEl.value)?.focus();
+          focusAfterClose();
         }
       },
     });
     machine.sync({ invalid: props.invalid });
+    /** Combobox: the input. A search box inside the popover unmounts on close, so the trigger. */
+    function focusAfterClose(): void {
+      const target = machine.focusTarget();
+      (target === "input"
+        ? (inputEl.value ?? triggerEl.value)
+        : triggerEl.value
+      )?.focus();
+    }
     const version = shallowRef(0);
     const stop = machine.store.subscribe(() => {
       version.value += 1;
@@ -205,7 +213,7 @@ export const Root = defineComponent({
       controlEl,
       inputEl,
       focusTrigger: () => triggerEl.value?.focus(),
-      focusField: () => (inputEl.value ?? triggerEl.value)?.focus(),
+      focusField: focusAfterClose,
       props: new Proxy({} as SelectContext["props"], {
         get: (_target, key: string) => (props as Record<string, unknown>)[key],
       }),
@@ -252,7 +260,7 @@ export const Root = defineComponent({
                 ),
               onInvalid: () => {
                 machine.setInvalid(true);
-                (inputEl.value ?? triggerEl.value)?.focus();
+                focusAfterClose();
               },
             },
             keys.map((key) =>

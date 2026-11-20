@@ -389,4 +389,168 @@ export const comboboxScenarios: Scenario[] = [
       },
     ],
   },
+  {
+    ...(base() as Scenario),
+    name: "clicking the control (not a button) focuses the input and opens the list",
+    steps: [
+      { type: "click", target: "control" },
+      { type: "expect", expect: { present: ["popover"], active: "input" } },
+    ],
+  },
+];
+
+const searchItems = (): PartNode[] => [
+  item("apple", "Apple"),
+  item("banana", "Banana"),
+  item("cherry", "Cherry"),
+  item("date", "Date"),
+];
+
+const searchTree = (): PartNode[] => [
+  { part: "label", text: "Fruit" },
+  {
+    part: "control",
+    children: [
+      {
+        part: "trigger",
+        children: [
+          { part: "value", props: { placeholder: "Pick a fruit" } },
+          { part: "indicator", text: "▾" },
+        ],
+      },
+    ],
+  },
+  {
+    part: "popover",
+    props: { forceMount: undefined },
+    children: [
+      { part: "input", props: { placeholder: "Search" } },
+      {
+        part: "list",
+        children: [...searchItems(), { part: "empty", text: "No results" }],
+      },
+    ],
+  },
+];
+
+const search = (props: Record<string, unknown> = {}): Scenario =>
+  ({
+    primitive: "select",
+    props,
+    callbacks: ["onValueChange", "onOpenChange"],
+    tree: searchTree(),
+  }) as unknown as Scenario;
+
+/** Search input inside the popover (the trigger stays a plain select control). */
+export const popoverSearchScenarios: Scenario[] = [
+  {
+    ...search(),
+    name: "popover search: opening focuses the input; the trigger stays a labelled button",
+    steps: [
+      {
+        type: "expect",
+        expect: {
+          absent: ["popover", "input"],
+          attrs: { trigger: { role: "combobox" } },
+        },
+      },
+      { type: "click", target: "trigger" },
+      {
+        type: "expect",
+        expect: {
+          present: ["popover", "input"],
+          active: "input",
+          attrs: {
+            trigger: {
+              role: null,
+              "aria-expanded": "true",
+              "aria-label": null,
+            },
+            input: {
+              role: "combobox",
+              "aria-autocomplete": "list",
+              "aria-controls": "@id:list",
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    ...search(),
+    name: "popover search: typing filters, arrows and Enter pick, focus returns to the trigger, the box resets",
+    steps: [
+      { type: "click", target: "trigger" },
+      { type: "fill", text: "an" },
+      {
+        type: "expect",
+        expect: {
+          visibleItems: ["banana"],
+          attrs: { input: { "aria-activedescendant": "@id:item:banana" } },
+          active: "input",
+        },
+      },
+      { type: "press", key: "Enter", target: "input" },
+      {
+        type: "expect",
+        expect: {
+          absent: ["popover"],
+          text: { value: "Banana" },
+          active: "trigger",
+          attrs: { trigger: { role: "combobox", "aria-expanded": "false" } },
+          includesCalls: [{ name: "onValueChange", args: ["banana"] }],
+        },
+      },
+      { type: "click", target: "trigger" },
+      {
+        type: "expect",
+        expect: {
+          inputValue: "",
+          visibleItems: ["apple", "banana", "cherry", "date"],
+          active: "input",
+        },
+      },
+      // Reopening highlights the selected item (Banana); ArrowUp moves to Apple.
+      { type: "press", key: "ArrowUp", target: "input" },
+      { type: "press", key: "Enter", target: "input" },
+      {
+        type: "expect",
+        expect: { text: { value: "Apple" }, absent: ["popover"] },
+      },
+    ],
+  },
+  {
+    ...search(),
+    name: "popover search: Escape closes, clears the box, and returns focus to the trigger",
+    steps: [
+      { type: "click", target: "trigger" },
+      { type: "fill", text: "zz" },
+      { type: "press", key: "Escape", target: "input" },
+      { type: "expect", expect: { absent: ["popover"], active: "trigger" } },
+      { type: "click", target: "trigger" },
+      { type: "expect", expect: { inputValue: "" } },
+    ],
+  },
+  {
+    ...search({ multiple: true }),
+    name: "popover search + multiple: picks stay in the trigger, the box clears, Backspace does not remove chips",
+    steps: [
+      { type: "click", target: "trigger" },
+      { type: "fill", text: "ap" },
+      { type: "press", key: "Enter", target: "input" },
+      { type: "fill", text: "ban" },
+      { type: "press", key: "Enter", target: "input" },
+      {
+        type: "expect",
+        expect: {
+          present: ["popover"],
+          inputValue: "",
+          text: { value: "Apple, Banana" },
+          active: "input",
+        },
+      },
+      { type: "press", key: "Backspace", target: "input" },
+      { type: "expect", expect: { text: { value: "Apple, Banana" } } },
+    ],
+  },
 ];

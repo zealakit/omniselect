@@ -17,6 +17,7 @@ import {
   installIntersectionObserver,
   loadMoreScenarios,
   multiScenarios,
+  popoverSearchScenarios,
   selectScenarios,
   withCallbacks,
 } from "../../core/tests/conformance/index.ts";
@@ -131,3 +132,4 @@ runConformance("react", driver, comboboxScenarios);
 runConformance("react", driver, multiScenarios);
 runConformance("react", driver, formScenarios);
 runConformance("react", driver, loadMoreScenarios);
+runConformance("react", driver, popoverSearchScenarios);

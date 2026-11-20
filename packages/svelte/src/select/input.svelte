@@ -1,5 +1,5 @@
 <script lang="ts">
-import { onMount } from "svelte";
+import { onMount, tick } from "svelte";
 import type { HTMLInputAttributes } from "svelte/elements";
 import { getSelectContext } from "./context.js";
 
@@ -21,7 +21,23 @@ const text = $derived.by(() => {
   return machine.store.get().inputValue;
 });
 
-onMount(() => machine.registerInput());
+onMount(() =>
+  machine.registerInput({
+    inPopover: element?.closest('[data-part="popover"]') != null,
+  }),
+);
+const open = $derived.by(() => {
+  void $snapshot;
+  return machine.isOpen();
+});
+// Search-in-popover: focus the input as soon as the popover opens.
+$effect(() => {
+  // After a tick: the popover's portal moves the node once the popover's own effects have run.
+  if (open && element && machine.store.get().inputInPopover) {
+    const target = element;
+    void tick().then(() => target.focus());
+  }
+});
 $effect(() => {
   context.setInputEl(element ?? null);
   return () => context.setInputEl(null);

@@ -140,6 +140,11 @@ export function createSelect(
   const control = part("control");
   const valueEl = part("value");
   const inputEl = part("input") as HTMLInputElement | null;
+  // Search-in-popover: the input lives in the popover, which is hidden while closed.
+  const inputInPopover = inputEl !== null && popover.contains(inputEl);
+  /** Combobox: the input. A search box inside the popover is hidden on close, so the trigger. */
+  const focusAfterClose = () =>
+    (inputEl && !inputInPopover ? inputEl : trigger).focus();
   const clearEl = part("clear");
   const indicator = part("indicator");
   const label = part("label");
@@ -180,7 +185,7 @@ export function createSelect(
         !open &&
         (reason === "select" || reason === "escape" || reason === "tab")
       ) {
-        (inputEl ?? trigger).focus();
+        focusAfterClose();
       }
     },
   });
@@ -470,6 +475,14 @@ export function createSelect(
     if (machine.isOpen() !== wasOpen) {
       wasOpen = machine.isOpen();
       observeSentinel();
+      if (inputEl && inputInPopover) {
+        if (wasOpen) {
+          offInput = machine.registerInput({ inPopover: true });
+          queueMicrotask(() => inputEl.focus());
+        } else {
+          offInput();
+        }
+      }
     }
     syncGuard();
   };
@@ -482,7 +495,7 @@ export function createSelect(
 
   const onTriggerClick = () => {
     machine.toggle();
-    if (inputEl) {
+    if (inputEl && !inputInPopover) {
       inputEl.focus();
     }
   };
@@ -555,7 +568,7 @@ export function createSelect(
   };
   const onClear = () => {
     machine.clear();
-    (inputEl ?? trigger).focus();
+    focusAfterClose();
   };
   popover.addEventListener("mousedown", onPopoverMouseDown);
 
@@ -566,7 +579,21 @@ export function createSelect(
   inputEl?.addEventListener("focus", onInputFocus);
   inputEl?.addEventListener("click", onInputClick);
   inputEl?.addEventListener("blur", onInputBlur);
-  const offInput = inputEl ? machine.registerInput() : () => {};
+  // A popover input only counts while the popover is open (the trigger is a select-only control before that).
+  let offInput =
+    inputEl && !inputInPopover ? machine.registerInput() : () => {};
+  // Combobox: a press anywhere on the control (not on a button or the input) edits the text.
+  const onControlClick = (event: Event) => {
+    if (
+      inputEl &&
+      !inputInPopover &&
+      (event.target as Element).closest("input, button, a") === null
+    ) {
+      inputEl.focus();
+      machine.onInputClick();
+    }
+  };
+  control?.addEventListener("click", onControlClick);
   trigger.addEventListener("click", onTriggerClick);
   trigger.addEventListener("keydown", onKeyDown);
   trigger.addEventListener("keyup", onKeyUp);
@@ -626,6 +653,7 @@ export function createSelect(
       popover.removeEventListener("click", onItemClick);
       clearEl?.removeEventListener("click", onClear);
       popover.removeEventListener("mousedown", onPopoverMouseDown);
+      control?.removeEventListener("click", onControlClick);
       inputEl?.removeEventListener("input", onInputEvent);
       inputEl?.removeEventListener("compositionstart", onCompositionStart);
       inputEl?.removeEventListener("compositionend", onCompositionEnd);

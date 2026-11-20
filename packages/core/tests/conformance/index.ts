@@ -16,6 +16,7 @@ export {
   formScenarios,
   loadMoreScenarios,
   multiScenarios,
+  popoverSearchScenarios,
   selectScenarios,
 } from "./select/index.ts";
 export { installIntersectionObserver } from "../support/intersection-observer.ts";

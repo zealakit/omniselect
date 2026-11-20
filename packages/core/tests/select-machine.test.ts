@@ -605,3 +605,49 @@ test("multiple keyboard: Shift+Arrow extends, Ctrl+A selects all, Enter toggles 
   capped.machine.selectAll();
   assert.deepEqual(capped.machine.selectedKeys(), []);
 });
+
+test("popover search: trigger stays a labelled button; the input owns the combobox role", () => {
+  const { machine } = make(fruit);
+  machine.registerInput({ inPopover: true });
+  const trigger = machine.attrs.trigger();
+  assert.equal(trigger.role, undefined);
+  assert.equal(trigger["aria-label"], undefined);
+  assert.equal(trigger["aria-labelledby"], "r-label r-trigger");
+  assert.equal(trigger.tabindex, undefined);
+  assert.equal(machine.attrs.input().role, "combobox");
+  assert.equal(machine.focusTarget(), "trigger");
+});
+
+test("popover search: input starts empty, clears on pick and on close, ignores blur and Backspace", async () => {
+  const { machine, inputs } = combo(fruits, {
+    defaultValue: "banana",
+    multiple: false,
+  });
+  machine.registerInput({ inPopover: true });
+  assert.equal(machine.store.get().inputValue, "");
+  machine.open("trigger");
+  machine.onInput("ap");
+  await settle();
+  input(machine, "Enter");
+  assert.equal(machine.store.get().value, "apple");
+  assert.equal(machine.store.get().inputValue, "");
+  machine.open("trigger");
+  machine.onInput("zz");
+  machine.onInputBlur();
+  assert.equal(machine.isOpen(), true, "blur does not close a popover input");
+  machine.close("escape");
+  assert.equal(machine.store.get().inputValue, "");
+  assert.deepEqual(inputs.at(-1), ["", "close"]);
+  const multi = combo(fruits, { multiple: true, defaultValue: ["apple"] });
+  multi.machine.registerInput({ inPopover: true });
+  input(multi.machine, "Backspace");
+  assert.deepEqual(multi.machine.selectedKeys(), ["apple"]);
+});
+
+test("regular combobox still focuses the input and unregisters cleanly", () => {
+  const { machine } = make(fruit);
+  const off = machine.registerInput();
+  assert.equal(machine.focusTarget(), "input");
+  off();
+  assert.equal(machine.store.get().inputInPopover, false);
+});

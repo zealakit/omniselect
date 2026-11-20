@@ -17,6 +17,7 @@ import {
   installIntersectionObserver,
   loadMoreScenarios,
   multiScenarios,
+  popoverSearchScenarios,
   selectScenarios,
   withCallbacks,
 } from "../../core/tests/conformance/index.ts";
@@ -144,3 +145,4 @@ runConformance("vue", driver, comboboxScenarios);
 runConformance("vue", driver, multiScenarios);
 runConformance("vue", driver, formScenarios);
 runConformance("vue", driver, loadMoreScenarios);
+runConformance("vue", driver, popoverSearchScenarios);

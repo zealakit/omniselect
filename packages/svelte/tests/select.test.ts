@@ -11,6 +11,7 @@ import {
   installIntersectionObserver,
   loadMoreScenarios,
   multiScenarios,
+  popoverSearchScenarios,
   selectScenarios,
   withCallbacks,
 } from "../../core/tests/conformance/index.ts";
@@ -66,3 +67,4 @@ runConformance("svelte", driver, comboboxScenarios);
 runConformance("svelte", driver, multiScenarios);
 runConformance("svelte", driver, formScenarios);
 runConformance("svelte", driver, loadMoreScenarios);
+runConformance("svelte", driver, popoverSearchScenarios);

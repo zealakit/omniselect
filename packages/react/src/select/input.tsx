@@ -2,6 +2,7 @@ import {
   forwardRef,
   type InputHTMLAttributes,
   type ReactNode,
+  useEffect,
   useRef,
 } from "react";
 import { useIsomorphicLayoutEffect } from "../internal/use-isomorphic-layout-effect.js";
@@ -36,7 +37,20 @@ export const Input = forwardRef<HTMLInputElement, SelectInputProps>(
     const { machine, inputRef } = useSelectContext("Input");
     const mergedRef = useMergedRef(ref, inputRef);
     const composing = useRef(false);
-    useIsomorphicLayoutEffect(() => machine.registerInput(), [machine]);
+    const open = useSnapshot(machine, (m) => String(m.isOpen())) === "true";
+    useIsomorphicLayoutEffect(
+      () =>
+        machine.registerInput({
+          inPopover: inputRef.current?.closest('[data-part="popover"]') != null,
+        }),
+      [machine, inputRef],
+    );
+    // Search-in-popover: focus the input as soon as the popover opens.
+    useEffect(() => {
+      if (open && machine.store.get().inputInPopover) {
+        inputRef.current?.focus();
+      }
+    }, [open, machine, inputRef]);
     useSnapshot(machine, (m) => {
       const s = m.store.get();
       return `${s.open}|${s.highlightedKey}|${s.inputValue}|${m.isInvalid()}`;

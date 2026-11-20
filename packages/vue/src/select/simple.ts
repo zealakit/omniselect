@@ -41,6 +41,18 @@ export const Control = defineComponent({
           "data-part": "control",
           ref: context.controlEl,
           ...attrsOf(context.machine.attrs.root()),
+          onClick: (event: MouseEvent) => {
+            // Combobox: a press anywhere on the control (not on a button or the input) edits the text.
+            const machine = context.machine;
+            if (
+              machine.store.get().mode === "combobox" &&
+              !machine.store.get().inputInPopover &&
+              (event.target as Element).closest("input, button, a") === null
+            ) {
+              context.focusField();
+              machine.onInputClick();
+            }
+          },
         },
         slots.default?.(),
       );
