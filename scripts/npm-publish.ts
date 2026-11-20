@@ -830,7 +830,15 @@ function preflight(
 }
 
 function publishPackage(tarball: string): void {
-  runInherited("npm", ["publish", tarball, "--access", "public"], PROJECT_ROOT);
+  // A prerelease (1.0.0-beta.1) must not become the `latest` dist-tag: publish it under its
+  // prerelease id (`beta`, `rc`, ...) so `npm i` keeps resolving the last stable version.
+  const version = /-(\w+)\.\d+\.tgz$/.exec(path.basename(tarball));
+  const tag = version ? ["--tag", version[1] as string] : [];
+  runInherited(
+    "npm",
+    ["publish", tarball, "--access", "public", ...tag],
+    PROJECT_ROOT,
+  );
 }
 
 function printSummary(published: string[], failed: PackageConfig | null): void {
