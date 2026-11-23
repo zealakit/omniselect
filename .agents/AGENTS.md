@@ -43,7 +43,10 @@ pnpm install
 pnpm build        # builds packages in topological order (core first)
 pnpm typecheck    # requires a successful build (adapters resolve core from dist)
 pnpm test         # core + vanilla + react + vue + svelte tests (Node test runner + happy-dom)
-pnpm lint         # Biome
+pnpm lint         # oxlint
+pnpm lint:fix     # oxlint --fix
+pnpm format       # oxfmt (write)
+pnpm format:check # oxfmt --check (formatting gate)
 pnpm check        # build + typecheck + test + lint
 pnpm clean        # remove package/example build output and local tarballs
 pnpm pack:packages # pack the four adapter tarballs, Core bundled in, into artifacts/ (no publish)
@@ -81,6 +84,9 @@ pnpm monitor      # dependency dashboard at http://127.0.0.1:4177
   into `../overlay/packages/*` and never commit that override.
 - **Tests:** new behavior needs focused tests in the owning package (`packages/*/tests/`);
   run `pnpm test`. Do not add a second test framework or DOM library.
+- **Lint and format:** use `oxlint` and `oxfmt` (Oxc), not another linter/formatter. Suppression
+  comments must use `// oxlint-disable-next-line <rule> -- <reason>` and carry a concrete
+  reason; keep them scoped to the smallest possible range and delete them when no longer needed.
 - **SSR safety:** never touch `window`, `document`, `navigator`, or `matchMedia` during module
   initialization or during React/Vue/Svelte render. Guard DOM work behind lifecycle
   effects/actions.
@@ -108,6 +114,7 @@ pnpm monitor      # dependency dashboard at http://127.0.0.1:4177
 
 ## Definition of done
 
-`pnpm build`, `pnpm typecheck`, `pnpm test`, `pnpm lint`, and `pnpm readme:check` pass. Examples
+`pnpm build`, `pnpm typecheck`, `pnpm test`, `pnpm lint`, `pnpm format:check`, and
+`pnpm readme:check` pass. Examples
 still build (and SSR examples build) against the local workspace packages. Update this file and
 the [skill](skills/omniselect/SKILL.md) when boundaries, commands, or workflows change.

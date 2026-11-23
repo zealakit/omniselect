@@ -8,7 +8,6 @@ export const Label = forwardRef<HTMLLabelElement, NativeSelectLabelProps>(
   function NativeSelectLabel(props, ref) {
     const context = useNativeContext("Label");
     return (
-      // biome-ignore lint/a11y/noLabelWithoutControl: htmlFor links to the Control; children are user content
       <label
         data-disabled={context.disabled ? "" : undefined}
         data-required={context.required ? "" : undefined}

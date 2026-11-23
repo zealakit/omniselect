@@ -3,7 +3,7 @@ import type { Placement } from "@zealakit/overlay-vue";
 import { type InjectionKey, inject, type Ref, type ShallowRef } from "vue";
 
 export type SelectContext = {
-  // biome-ignore lint/suspicious/noExplicitAny: the value type is erased inside context
+  // oxlint-disable-next-line typescript/no-explicit-any -- the value type is erased inside context
   machine: SelectMachine<any>;
   /** Bumped on every machine state change; read it inside render functions. */
   version: Ref<number>;

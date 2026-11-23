@@ -16,7 +16,7 @@ export const Empty = forwardRef<HTMLDivElement, SelectEmptyProps>(function Selec
     return null;
   }
   return (
-    // biome-ignore lint/a11y/useFocusableInteractive: options are reached through aria-activedescendant, never focused
+    // oxlint-disable jsx-a11y/prefer-tag-over-role -- role=option is part of the listbox contract and native <option> cannot host arbitrary content
     <div
       data-part="empty"
       {...props}
@@ -25,5 +25,6 @@ export const Empty = forwardRef<HTMLDivElement, SelectEmptyProps>(function Selec
       aria-selected="false"
       ref={ref}
     />
+    // oxlint-enable jsx-a11y/prefer-tag-over-role
   );
 });

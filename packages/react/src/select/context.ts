@@ -3,7 +3,7 @@ import type { Placement } from "@zealakit/overlay-react";
 import { createContext, useContext } from "react";
 
 export type SelectContextValue = {
-  // biome-ignore lint/suspicious/noExplicitAny: the value type is erased inside context
+  // oxlint-disable-next-line typescript/no-explicit-any -- the value type is erased inside context
   machine: SelectMachine<any>;
   triggerEl: HTMLElement | null;
   setTriggerEl: (element: HTMLElement | null) => void;

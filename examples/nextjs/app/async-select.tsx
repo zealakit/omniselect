@@ -41,7 +41,6 @@ export function AsyncSelect() {
     });
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `load` only touches refs and setters; the query is the trigger
   useEffect(() => {
     const timer = setTimeout(() => load(query, 0), 250); // debounce typing
     return () => clearTimeout(timer);

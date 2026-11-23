@@ -21,7 +21,11 @@ alwaysApply: true
 - TypeScript only: `type` aliases, `import type`, strict mode, ESM. Files are `kebab-case`.
 - Build order matters: core emits `dist` first; adapters resolve core through its package
   exports. Run `pnpm build` before `pnpm typecheck`.
-- Verify with `pnpm check` (build + typecheck + test + lint) before reporting work as done.
+- Lint with `oxlint` and format with `oxfmt`; check formatting with `pnpm format:check`.
+- Suppression comments need a reason: `// oxlint-disable-next-line <rule> -- <reason>`. Keep the
+  range minimal and remove suppressions that no longer match a finding.
+- Verify with `pnpm check` (build + typecheck + test + lint) and `pnpm format:check` before
+  reporting work as done.
 - `examples/` are integration/smoke-test projects only. Product documentation lives only in the
   root and package READMEs (EN, VI, CN); there is no `docs/` folder and no separate docs app.
 - Load `.agents/skills/omniselect/SKILL.md` before code, test, docs, or release work, and

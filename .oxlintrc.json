@@ -1,0 +1,81 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "jsx-a11y", "import"],
+  "categories": {
+    "correctness": "error"
+  },
+  "env": {
+    "builtin": true,
+    "node": true
+  },
+  "options": {
+    "reportUnusedDisableDirectives": "error"
+  },
+  "rules": {
+    "typescript/no-explicit-any": "error",
+    "typescript/no-non-null-assertion": "error",
+    "react/exhaustive-deps": "error",
+    "react/rules-of-hooks": "error",
+    "react/jsx-no-useless-fragment": "error",
+    "react/refs": "off",
+    "react/set-state-in-effect": "off",
+    "array-callback-return": "error",
+    "jsx-a11y/label-has-associated-control": "error",
+    "jsx-a11y/no-aria-hidden-on-focusable": "error",
+    "jsx-a11y/no-interactive-element-to-noninteractive-role": "error",
+    "jsx-a11y/prefer-tag-over-role": "error",
+    "jsx-a11y/no-noninteractive-tabindex": "error",
+    "jsx-a11y/interactive-supports-focus": "error",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/role-supports-aria-props": "off",
+    "react/use-memo": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/tests/**", "**/*.test.ts", "**/*.test.tsx"],
+      "rules": {
+        "jsx-a11y/prefer-tag-over-role": "off",
+        "jsx-a11y/no-noninteractive-tabindex": "off",
+        "jsx-a11y/interactive-supports-focus": "off",
+        "typescript/no-non-null-assertion": "off"
+      }
+    },
+    {
+      "files": ["packages/vue/**", "**/*.svelte"],
+      "rules": {
+        "no-unused-expressions": "off",
+        "react/exhaustive-deps": "off",
+        "react/rules-of-hooks": "off",
+        "react/jsx-no-useless-fragment": "off",
+        "jsx-a11y/label-has-associated-control": "off",
+        "jsx-a11y/no-aria-hidden-on-focusable": "off",
+        "jsx-a11y/no-interactive-element-to-noninteractive-role": "off",
+        "jsx-a11y/prefer-tag-over-role": "off",
+        "jsx-a11y/no-noninteractive-tabindex": "off",
+        "jsx-a11y/interactive-supports-focus": "off"
+      }
+    },
+    {
+      "files": ["examples/vanilla/index.html"],
+      "rules": {
+        "jsx-a11y/no-noninteractive-tabindex": "off",
+        "jsx-a11y/interactive-supports-focus": "off",
+        "jsx-a11y/prefer-tag-over-role": "off",
+        "jsx-a11y/role-supports-aria-props": "off"
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "apps/**",
+    ".changeset/**",
+    "packages/react/etc/**",
+    "**/dist/**",
+    "**/coverage/**",
+    "**/benchmark-results/**",
+    "**/.next/**",
+    "**/.svelte-kit/**",
+    "**/node_modules/**",
+    "artifacts/**"
+  ]
+}

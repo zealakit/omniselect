@@ -127,7 +127,6 @@ export const Popover = forwardRef<HTMLDivElement, SelectPopoverProps>(function S
     "--omniselect-available-height": vars ? `${vars.availableHeight}px` : undefined,
   };
   const content = (
-    // biome-ignore lint/a11y/noStaticElementInteractions: the handler only keeps focus on the trigger/input
     <div
       data-part="popover"
       {...rest}

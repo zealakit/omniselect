@@ -2,7 +2,7 @@ import type { NativeSelectController } from "@zealakit/omniselect-core";
 import { type InjectionKey, inject, type Ref } from "vue";
 
 export type NativeContext = {
-  // biome-ignore lint/suspicious/noExplicitAny: the value type is erased inside context
+  // oxlint-disable-next-line typescript/no-explicit-any -- the value type is erased inside context
   controller: NativeSelectController<any>;
   controlId: string;
   /** Bumped whenever the controller state changes; read it in render functions. */

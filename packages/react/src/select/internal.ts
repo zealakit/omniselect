@@ -1,4 +1,4 @@
-// biome-ignore-all lint/suspicious/noExplicitAny: the value type is erased inside context
+// oxlint-disable typescript/no-explicit-any -- the value type is erased inside context
 import type { Attrs, SelectMachine } from "@zealakit/omniselect-core";
 import { useSyncExternalStore } from "react";
 

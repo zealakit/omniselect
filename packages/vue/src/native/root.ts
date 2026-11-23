@@ -1,4 +1,4 @@
-// biome-ignore-all lint/suspicious/noExplicitAny: values are user-defined
+// oxlint-disable typescript/no-explicit-any -- values are user-defined
 import { createNativeSelect, nextId } from "@zealakit/omniselect-core";
 import { defineComponent, type PropType, provide, shallowRef, watch, onBeforeUnmount } from "vue";
 import { type NativeContext, nativeKey } from "./context.js";

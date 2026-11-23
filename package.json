@@ -34,9 +34,10 @@
     "build:vue": "pnpm --filter @zealakit/omniselect-vue run build",
     "build:svelte": "pnpm --filter @zealakit/omniselect-svelte run build",
     "typecheck": "pnpm -r --filter './packages/*' run typecheck",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
-    "format": "biome format --write .",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "check": "pnpm build && pnpm typecheck && pnpm test && pnpm lint",
     "clean": "pnpm -r exec rm -rf dist .next && rm -rf artifacts",
     "dev:vanilla": "pnpm --filter @zealakit/omniselect-vanilla-example run dev",
@@ -58,10 +59,11 @@
     "size": "node scripts/size.mjs"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.8",
     "@types/node": "^24.19.0",
     "axe-core": "^4.14.1",
     "esbuild": "^0.28.2",
+    "oxfmt": "0.79.0",
+    "oxlint": "1.94.0",
     "typescript": "^6.0.3"
   }
 }

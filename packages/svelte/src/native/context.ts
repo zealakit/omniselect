@@ -2,7 +2,7 @@ import type { NativeSelectController, NativeState } from "@zealakit/omniselect-c
 import { getContext } from "svelte";
 
 export type NativeContext = {
-  // biome-ignore lint/suspicious/noExplicitAny: the value type is erased inside context
+  // oxlint-disable-next-line typescript/no-explicit-any -- the value type is erased inside context
   controller: NativeSelectController<any>;
   controlId: string;
   /** Svelte store contract: use `$snapshot` in components to react to changes. */

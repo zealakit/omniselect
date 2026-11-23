@@ -2,7 +2,7 @@ import type { NativeSelectController } from "@zealakit/omniselect-core";
 import { createContext, useContext } from "react";
 
 export type NativeContextValue = {
-  // biome-ignore lint/suspicious/noExplicitAny: the value type is erased inside context
+  // oxlint-disable-next-line typescript/no-explicit-any -- the value type is erased inside context
   controller: NativeSelectController<any>;
   controlId: string;
   multiple: boolean;

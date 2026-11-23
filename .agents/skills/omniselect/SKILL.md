@@ -125,8 +125,14 @@ all but the first value of a `<select multiple>`) and avoid putting DOM nodes in
 ```bash
 pnpm --filter @zealakit/omniselect-<pkg> run typecheck
 pnpm --filter @zealakit/omniselect-<pkg> run test
+pnpm lint
+pnpm format:check
 pnpm check
 ```
+
+Lint and format with Oxc (`oxlint`, `oxfmt`). A suppression needs a reason:
+`// oxlint-disable-next-line <rule> -- <reason>`, scoped as narrowly as possible and removed
+when the finding no longer applies.
 
 - Tests use Node + happy-dom, React Testing Library, Vue Test Utils, and compiled Svelte
   fixtures. Do not add a second test framework/DOM library.

@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 100,
+  "useTabs": false,
+  "tabWidth": 2,
+  "endOfLine": "lf",
+  "semi": true,
+  "singleQuote": false,
+  "jsxSingleQuote": false,
+  "trailingComma": "all",
+  "arrowParens": "always",
+  "svelte": true,
+  "sortImports": false,
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "apps/**",
+    ".changeset/**",
+    "packages/react/etc/**",
+    "**/dist/**",
+    "**/coverage/**",
+    "**/benchmark-results/**",
+    "**/.next/**",
+    "**/.svelte-kit/**",
+    "**/node_modules/**",
+    "artifacts/**",
+    "**/*.md",
+    "**/*.mdx",
+    "**/*.yaml",
+    "**/*.yml",
+    "**/*.html"
+  ]
+}

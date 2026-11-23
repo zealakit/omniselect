@@ -1,4 +1,4 @@
-// biome-ignore-all lint/suspicious/noExplicitAny: values are user-defined
+// oxlint-disable typescript/no-explicit-any -- values are user-defined
 import { checkStructure, getItemText, scrollItemIntoView } from "@zealakit/omniselect-core";
 import {
   Comment,

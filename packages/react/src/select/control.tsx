@@ -14,8 +14,6 @@ export const Control = forwardRef<HTMLDivElement, SelectControlProps>(function S
   const mergedRef = useMergedRef(ref, setControlEl);
   useSnapshot(machine, (m) => `${m.isOpen()}|${m.isInvalid()}`);
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: a pointer shortcut to the input; keyboard users reach the input directly
-    // biome-ignore lint/a11y/useKeyWithClickEvents: the input and trigger are the keyboard targets
     <div
       data-part="control"
       {...props}

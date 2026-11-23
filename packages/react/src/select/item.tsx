@@ -104,8 +104,6 @@ function ItemImpl<T>(
   }
   return (
     <ItemContext.Provider value={itemContext}>
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: role=option comes from machine attrs; keyboard handling lives on the trigger (aria-activedescendant) */}
-      {/* biome-ignore lint/a11y/useKeyWithClickEvents: keys are handled by the trigger */}
       <div
         data-part="item"
         {...rest}

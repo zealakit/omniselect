@@ -1076,7 +1076,7 @@ If proposing a different target than the "Proposed target" column, say why.`;
 - Repository: zealakit-omniselect — pnpm monorepo of headless Select and Combobox primitives (framework-agnostic core plus vanilla, React, Vue, and Svelte adapters, each built on the matching published Zealakit Overlay adapter).
 - Published packages: ${publishedPackageList()}.
 - Architecture: \`@zealakit/omniselect-core\` is framework-independent; adapters depend on it with \`workspace:*\`. Core must never gain a framework dependency and adapters must never depend on each other.
-- Tooling stack to consider: TypeScript (tsc builds, ESM only, declaration output), Biome, React/Vue/Svelte peers, Astro and Next.js example workspaces, Vite-based examples, and a Vanilla DOM controller with no framework runtime.
+- Tooling stack to consider: TypeScript (tsc builds, ESM only, declaration output), Oxlint/Oxfmt, React/Vue/Svelte peers, Astro and Next.js example workspaces, Vite-based examples, and a Vanilla DOM controller with no framework runtime.
 - Scan time: ${generatedAt}
 - Monitor summary (unique deps): total ${summary.total ?? "—"}, outdated ${summary.outdated ?? "—"}, up to date ${summary.upToDate ?? "—"}, registry errors ${summary.errors ?? "—"}.
 - Prompt scope: ${scopeNote} (${rows.length} row(s)).
@@ -1096,7 +1096,7 @@ ${investigationIntro}
 2. Whether breaking changes exist between the declared/resolved version and the proposed target.
 3. Whether peer dependency constraints remain compatible (especially React/Vue/Svelte peers vs pinned devDependencies).
 4. Whether the upgrade affects other packages in the workspace (core / vanilla / react / vue / svelte / root).
-5. Whether framework and build-tool versions remain compatible (React/Vue/Svelte, Astro, Next.js, Vite, TypeScript, Biome, etc.).
+5. Whether framework and build-tool versions remain compatible (React/Vue/Svelte, Astro, Next.js, Vite, TypeScript, Oxlint/Oxfmt, etc.).
 6. For the core and adapter packages: whether \`tsc\` ESM output, \`package.json\` exports, and declaration files still resolve after the upgrade.
 7. Whether the React/Vue/Svelte peer ranges still match the versions used by the examples.
 8. Whether configuration, examples, agent guidance, or README changes are required.

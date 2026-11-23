@@ -19,6 +19,6 @@ export function mergeRefs<T>(...refs: (Ref<T> | undefined)[]): RefCallback<T> {
  * sets state.
  */
 export function useMergedRef<T>(...refs: (Ref<T> | undefined)[]): RefCallback<T> {
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the refs array is the dependency list
+  // oxlint-disable-next-line react/exhaustive-deps -- the refs array is the dependency list
   return useMemo(() => mergeRefs(...refs), refs);
 }

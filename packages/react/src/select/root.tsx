@@ -258,7 +258,7 @@ export function Root<T>(props: SelectRootProps<T>) {
 }
 
 type HiddenSelectProps = {
-  // biome-ignore lint/suspicious/noExplicitAny: the value type is erased
+  // oxlint-disable-next-line typescript/no-explicit-any -- the value type is erased
   machine: SelectMachine<any>;
   name: string | undefined;
   form: string | undefined;
@@ -322,10 +322,11 @@ function HiddenSelect({
 }
 
 /** Polite live region for add/remove announcements. */
-// biome-ignore lint/suspicious/noExplicitAny: the value type is erased
+// oxlint-disable-next-line typescript/no-explicit-any -- the value type is erased
 function LiveRegion({ machine }: { machine: SelectMachine<any> }) {
   const message = useSnapshot(machine, (m) => m.store.get().announcement);
   return (
+    // oxlint-disable jsx-a11y/prefer-tag-over-role -- role=status is the live-region contract; <output> is not a drop-in replacement
     <span
       data-part="live-region"
       role="status"
@@ -335,5 +336,6 @@ function LiveRegion({ machine }: { machine: SelectMachine<any> }) {
     >
       {message}
     </span>
+    // oxlint-enable jsx-a11y/prefer-tag-over-role
   );
 }

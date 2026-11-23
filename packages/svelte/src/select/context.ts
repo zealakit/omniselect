@@ -3,7 +3,7 @@ import type { Placement } from "@zealakit/overlay-svelte";
 import { getContext } from "svelte";
 
 export type SelectContext = {
-  // biome-ignore lint/suspicious/noExplicitAny: the value type is erased inside context
+  // oxlint-disable-next-line typescript/no-explicit-any -- the value type is erased inside context
   machine: SelectMachine<any>;
   /** Svelte store contract: use `$snapshot` in components to react to machine changes. */
   snapshot: {

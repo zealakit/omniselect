@@ -76,7 +76,6 @@ export const LoadMore = forwardRef<HTMLDivElement, SelectLoadMoreProps>(function
   }, [open, rootMargin, guard]);
 
   // observe() reports the current state again: loads the next page when the sentinel is still visible.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: version/isLoading are the re-measure triggers
   useEffect(() => {
     const element = elementRef.current;
     const observer = observerRef.current;

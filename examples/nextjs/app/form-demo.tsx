@@ -93,7 +93,6 @@ export function FormDemo() {
       setLoading(false);
     });
   }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: load the first page once
   useEffect(() => loadPage(0), []);
 
   return (
