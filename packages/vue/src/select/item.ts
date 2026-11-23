@@ -1,9 +1,5 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: values are user-defined
-import {
-  checkStructure,
-  getItemText,
-  scrollItemIntoView,
-} from "@zealakit/omniselect-core";
+import { checkStructure, getItemText, scrollItemIntoView } from "@zealakit/omniselect-core";
 import {
   Comment,
   computed,
@@ -36,9 +32,7 @@ function vnodeText(nodes: VNode[] | undefined): string {
       if (typeof node.children === "string") {
         return node.children;
       }
-      return Array.isArray(node.children)
-        ? vnodeText(node.children as VNode[])
-        : "";
+      return Array.isArray(node.children) ? vnodeText(node.children as VNode[]) : "";
     })
     .join(" ")
     .replace(/\s+/g, " ")
@@ -67,8 +61,7 @@ export const Item = defineComponent({
       off = machine.collection.register({
         key: key(),
         value: props.value,
-        textValue:
-          props.textValue ?? (getItemText(element.value) || fallbackText),
+        textValue: props.textValue ?? (getItemText(element.value) || fallbackText),
         disabled: props.disabled,
         groupId: group?.groupId ?? null,
         node: element.value,
@@ -113,28 +106,18 @@ export const Item = defineComponent({
       void stateKey.value;
       const content = slots.default?.();
       fallbackText = vnodeText(content);
-      if (
-        !machine.collection.isVisible(key()) &&
-        machine.collection.get(key())
-      ) {
+      if (!machine.collection.isVisible(key()) && machine.collection.get(key())) {
         // Filtered out: stay registered, render nothing.
         // Drop the stale node once (updating on every render would loop).
         if (machine.collection.get(key())?.node) {
-          queueMicrotask(() =>
-            machine.collection.update(key(), { node: null }),
-          );
+          queueMicrotask(() => machine.collection.update(key(), { node: null }));
         }
         return null;
       }
       const attrs = machine.attrs.item(key());
       const state = machine.store.get();
-      if (
-        state.highlightedKey === key() &&
-        state.highlightSource === "keyboard"
-      ) {
-        queueMicrotask(() =>
-          element.value ? scrollItemIntoView(element.value) : undefined,
-        );
+      if (state.highlightedKey === key() && state.highlightSource === "keyboard") {
+        queueMicrotask(() => (element.value ? scrollItemIntoView(element.value) : undefined));
       }
       return h(
         "div",
@@ -164,9 +147,7 @@ export const ItemIndicator = defineComponent({
     const { machine, version } = useSelectContext("ItemIndicator");
     const item = inject(itemKey, null);
     if (!item) {
-      throw new Error(
-        "Select.ItemIndicator must be rendered inside Select.Item.",
-      );
+      throw new Error("Select.ItemIndicator must be rendered inside Select.Item.");
     }
     return () => {
       version.value;

@@ -1,51 +1,51 @@
 <script lang="ts">
-import { onMount, tick } from "svelte";
-import type { HTMLInputAttributes } from "svelte/elements";
-import { getSelectContext } from "./context.js";
+  import { onMount, tick } from "svelte";
+  import type { HTMLInputAttributes } from "svelte/elements";
+  import { getSelectContext } from "./context.js";
 
-type Props = Omit<HTMLInputAttributes, "value"> & {
-  oninput?: HTMLInputAttributes["oninput"];
-};
-let { oninput, onkeydown, onfocus, onclick, onblur, ...rest }: Props = $props();
+  type Props = Omit<HTMLInputAttributes, "value"> & {
+    oninput?: HTMLInputAttributes["oninput"];
+  };
+  let { oninput, onkeydown, onfocus, onclick, onblur, ...rest }: Props = $props();
 
-const context = getSelectContext("Input");
-const { machine, snapshot } = context;
-let element: HTMLInputElement | undefined = $state();
-let composing = false;
-const attrs = $derived.by(() => {
-  void $snapshot;
-  return machine.attrs.input();
-});
-const text = $derived.by(() => {
-  void $snapshot;
-  return machine.store.get().inputValue;
-});
+  const context = getSelectContext("Input");
+  const { machine, snapshot } = context;
+  let element: HTMLInputElement | undefined = $state();
+  let composing = false;
+  const attrs = $derived.by(() => {
+    void $snapshot;
+    return machine.attrs.input();
+  });
+  const text = $derived.by(() => {
+    void $snapshot;
+    return machine.store.get().inputValue;
+  });
 
-onMount(() =>
-  machine.registerInput({
-    inPopover: element?.closest('[data-part="popover"]') != null,
-  }),
-);
-const open = $derived.by(() => {
-  void $snapshot;
-  return machine.isOpen();
-});
-// Search-in-popover: focus the input as soon as the popover opens.
-$effect(() => {
-  // After a tick: the popover's portal moves the node once the popover's own effects have run.
-  if (open && element && machine.store.get().inputInPopover) {
-    const target = element;
-    void tick().then(() => target.focus({ preventScroll: true }));
-  }
-});
-$effect(() => {
-  context.setInputEl(element ?? null);
-  return () => context.setInputEl(null);
-});
-// A controlled parent may reject the text; show the machine's value again.
-$effect(() => {
-  if (element && !composing && element.value !== text) element.value = text;
-});
+  onMount(() =>
+    machine.registerInput({
+      inPopover: element?.closest('[data-part="popover"]') != null,
+    }),
+  );
+  const open = $derived.by(() => {
+    void $snapshot;
+    return machine.isOpen();
+  });
+  // Search-in-popover: focus the input as soon as the popover opens.
+  $effect(() => {
+    // After a tick: the popover's portal moves the node once the popover's own effects have run.
+    if (open && element && machine.store.get().inputInPopover) {
+      const target = element;
+      void tick().then(() => target.focus({ preventScroll: true }));
+    }
+  });
+  $effect(() => {
+    context.setInputEl(element ?? null);
+    return () => context.setInputEl(null);
+  });
+  // A controlled parent may reject the text; show the machine's value again.
+  $effect(() => {
+    if (element && !composing && element.value !== text) element.value = text;
+  });
 </script>
 
 <input

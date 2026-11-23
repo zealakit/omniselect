@@ -1,10 +1,6 @@
 import { type Collection, createCollection } from "./collection.js";
 import { compareDomOrder } from "./dom-order.js";
-import {
-  createSelection,
-  type ItemToKey,
-  type SelectionModel,
-} from "./selection.js";
+import { createSelection, type ItemToKey, type SelectionModel } from "./selection.js";
 import { createControllable } from "./store/controllable.js";
 import { createStore, type Store } from "./store/store.js";
 
@@ -85,8 +81,7 @@ export function createNativeSelect<T>(
     },
   });
 
-  const keyOf = (value: T | null): string =>
-    value === null ? "" : itemToKey(value);
+  const keyOf = (value: T | null): string => (value === null ? "" : itemToKey(value));
 
   const selectedKeys = (): string[] => {
     const value = store.get().value;
@@ -96,8 +91,7 @@ export function createNativeSelect<T>(
     return [value === null ? "" : itemToKey(value as T)];
   };
 
-  const valueForKey = (key: string): T | null =>
-    collection.get(key)?.value ?? null;
+  const valueForKey = (key: string): T | null => collection.get(key)?.value ?? null;
 
   return {
     multiple,
@@ -109,10 +103,7 @@ export function createNativeSelect<T>(
     isControlled: controllable.isControlled,
     sync(next) {
       onValueChange = next.onValueChange;
-      if (
-        next.invalid !== undefined &&
-        next.invalid !== store.get().invalidProp
-      ) {
+      if (next.invalid !== undefined && next.invalid !== store.get().invalidProp) {
         store.set({ invalidProp: next.invalid });
       }
       if (controllable.isControlled()) {
@@ -127,9 +118,7 @@ export function createNativeSelect<T>(
         .filter((option) => option.selected)
         .map((option) => option.value);
       if (multiple) {
-        const values = keys
-          .map(valueForKey)
-          .filter((value): value is T => value !== null);
+        const values = keys.map(valueForKey).filter((value): value is T => value !== null);
         controllable.set(values);
       } else {
         controllable.set(valueForKey(keys[0] ?? ""));

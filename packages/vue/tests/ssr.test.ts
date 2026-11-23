@@ -17,11 +17,10 @@ test("vue adapter and its Overlay dependency import without browser globals", ()
     }));
   `;
 
-  const output = execFileSync(
-    process.execPath,
-    ["--input-type=module", "--eval", script],
-    { cwd: packageRoot, encoding: "utf8" },
-  );
+  const output = execFileSync(process.execPath, ["--input-type=module", "--eval", script], {
+    cwd: packageRoot,
+    encoding: "utf8",
+  });
 
   const result = JSON.parse(output.trim()) as {
     window: string;
@@ -58,11 +57,10 @@ test("NativeSelect renders the default option as selected on the server", () => 
     const html = await renderToString(createSSRApp(App));
     console.log(JSON.stringify({ document: typeof document, html }));
   `;
-  const output = execFileSync(
-    process.execPath,
-    ["--input-type=module", "--eval", script],
-    { cwd: packageRoot, encoding: "utf8" },
-  );
+  const output = execFileSync(process.execPath, ["--input-type=module", "--eval", script], {
+    cwd: packageRoot,
+    encoding: "utf8",
+  });
   const result = JSON.parse(output.trim()) as {
     document: string;
     html: string;
@@ -97,11 +95,10 @@ test("Select renders closed, select-only markup on the server", () => {
     const html = await renderToString(createSSRApp(App));
     console.log(JSON.stringify({ document: typeof document, html }));
   `;
-  const output = execFileSync(
-    process.execPath,
-    ["--input-type=module", "--eval", script],
-    { cwd: packageRoot, encoding: "utf8" },
-  );
+  const output = execFileSync(process.execPath, ["--input-type=module", "--eval", script], {
+    cwd: packageRoot,
+    encoding: "utf8",
+  });
   const result = JSON.parse(output.trim()) as {
     document: string;
     html: string;

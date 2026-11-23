@@ -1,22 +1,22 @@
 <script lang="ts">
-import type { Snippet } from "svelte";
-import type { HTMLAttributes } from "svelte/elements";
-import { getSelectContext } from "./context.js";
+  import type { Snippet } from "svelte";
+  import type { HTMLAttributes } from "svelte/elements";
+  import { getSelectContext } from "./context.js";
 
-type Props = HTMLAttributes<HTMLDivElement> & { children?: Snippet };
-let { children, ...rest }: Props = $props();
-const context = getSelectContext("Control");
-const { machine, snapshot } = context;
-let element: HTMLDivElement | undefined = $state();
-const attrs = $derived.by(() => {
-  void $snapshot;
-  return machine.attrs.root();
-});
+  type Props = HTMLAttributes<HTMLDivElement> & { children?: Snippet };
+  let { children, ...rest }: Props = $props();
+  const context = getSelectContext("Control");
+  const { machine, snapshot } = context;
+  let element: HTMLDivElement | undefined = $state();
+  const attrs = $derived.by(() => {
+    void $snapshot;
+    return machine.attrs.root();
+  });
 
-$effect(() => {
-  context.setControlEl(element ?? null);
-  return () => context.setControlEl(null);
-});
+  $effect(() => {
+    context.setControlEl(element ?? null);
+    return () => context.setControlEl(null);
+  });
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
@@ -36,4 +36,6 @@ $effect(() => {
       machine.onInputClick();
     }
   }}
->{@render children?.()}</div>
+>
+  {@render children?.()}
+</div>

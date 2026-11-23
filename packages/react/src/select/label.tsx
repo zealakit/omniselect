@@ -7,8 +7,6 @@ export type SelectLabelProps = HTMLAttributes<HTMLSpanElement>;
 export const Label = forwardRef<HTMLSpanElement, SelectLabelProps>(
   function SelectLabel(props, ref) {
     const { machine } = useSelectContext("Label");
-    return (
-      <span data-part="label" {...props} id={machine.ids.label} ref={ref} />
-    );
+    return <span data-part="label" {...props} id={machine.ids.label} ref={ref} />;
   },
 );

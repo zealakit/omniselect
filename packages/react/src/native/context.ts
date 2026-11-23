@@ -21,9 +21,7 @@ export const NativeContext = createContext<NativeContextValue | null>(null);
 export function useNativeContext(part: string): NativeContextValue {
   const context = useContext(NativeContext);
   if (!context) {
-    throw new Error(
-      `NativeSelect.${part} must be rendered inside NativeSelect.Root.`,
-    );
+    throw new Error(`NativeSelect.${part} must be rendered inside NativeSelect.Root.`);
   }
   return context;
 }

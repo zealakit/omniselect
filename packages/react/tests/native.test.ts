@@ -1,11 +1,7 @@
 import { after } from "node:test";
 import { act, cleanup, render } from "@testing-library/react";
 import { createElement as h, type ReactElement } from "react";
-import type {
-  Driver,
-  PartNode,
-  Scenario,
-} from "../../core/tests/conformance/index.ts";
+import type { Driver, PartNode, Scenario } from "../../core/tests/conformance/index.ts";
 import {
   nativeScenarios,
   performNativeDomStep,
@@ -40,11 +36,7 @@ const driver: Driver = {
     const calls: { name: string; args: unknown[] }[] = [];
     let props = withCallbacks(scenario, calls);
     const tree = (): ReactElement => {
-      const root = h(
-        NativeSelect.Root as never,
-        props,
-        ...scenario.tree.map(build),
-      );
+      const root = h(NativeSelect.Root as never, props, ...scenario.tree.map(build));
       return scenario.form ? h("form", null, root) : root;
     };
     const view = render(tree());

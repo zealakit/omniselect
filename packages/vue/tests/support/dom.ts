@@ -76,10 +76,7 @@ export function dispatchEscape(target: EventTarget = document): Event {
   return event;
 }
 
-export async function waitFor(
-  assertion: () => void,
-  timeoutMs = 1000,
-): Promise<void> {
+export async function waitFor(assertion: () => void, timeoutMs = 1000): Promise<void> {
   const startedAt = Date.now();
   let lastError: unknown;
 

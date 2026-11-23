@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  Select,
-  type SelectRootProps,
-} from "@zealakit/omniselect-react/select";
+import { Select, type SelectRootProps } from "@zealakit/omniselect-react/select";
 
 const FRUITS = [
   "apple",
@@ -43,9 +40,7 @@ export function PopoverSearch({ multiple = false }: { multiple?: boolean }) {
       itemToString={(value: string) => value}
     >
       <Select.Label>
-        {multiple
-          ? "Fruits (search in the popover, multiple)"
-          : "Fruit (search in the popover)"}
+        {multiple ? "Fruits (search in the popover, multiple)" : "Fruit (search in the popover)"}
       </Select.Label>
       <Select.Control>
         <Select.Trigger>

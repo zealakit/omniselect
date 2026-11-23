@@ -1,11 +1,4 @@
-import {
-  defineComponent,
-  h,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  watch,
-} from "vue";
+import { defineComponent, h, nextTick, onBeforeUnmount, onMounted, watch } from "vue";
 import { useSelectContext } from "./context.js";
 import { attrsOf } from "./simple.js";
 
@@ -24,8 +17,7 @@ export const Input = defineComponent({
     // Registering before mount keeps hydration markup stable: the server renders select-only.
     onMounted(() => {
       off = machine.registerInput({
-        inPopover:
-          context.inputEl.value?.closest('[data-part="popover"]') != null,
+        inPopover: context.inputEl.value?.closest('[data-part="popover"]') != null,
       });
       if (machine.store.get().inputInPopover && machine.isOpen()) {
         context.inputEl.value?.focus({ preventScroll: true });
@@ -39,9 +31,7 @@ export const Input = defineComponent({
       },
       (open) => {
         if (open && machine.store.get().inputInPopover) {
-          void nextTick().then(() =>
-            context.inputEl.value?.focus({ preventScroll: true }),
-          );
+          void nextTick().then(() => context.inputEl.value?.focus({ preventScroll: true }));
         }
       },
     );

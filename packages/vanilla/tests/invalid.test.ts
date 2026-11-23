@@ -5,8 +5,7 @@ import { createSelect } from "../dist/select/index.js";
 
 test("native: setInvalid toggles data-invalid and aria-invalid", () => {
   const root = document.createElement("div");
-  root.innerHTML =
-    '<label>L</label><select><option value="a">A</option></select>';
+  root.innerHTML = '<label>L</label><select><option value="a">A</option></select>';
   document.body.append(root);
   const handle = createNativeSelect(root);
   const select = root.querySelector("select") as HTMLSelectElement;

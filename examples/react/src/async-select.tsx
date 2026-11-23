@@ -5,13 +5,8 @@ const ALL = Array.from({ length: 87 }, (_, i) => `Item ${i + 1}`);
 const PAGE = 10;
 
 /** Fake API: filters by query and returns one page after a short delay. */
-function fetchPage(
-  query: string,
-  page: number,
-): Promise<{ rows: string[]; more: boolean }> {
-  const all = ALL.filter((name) =>
-    name.toLowerCase().includes(query.toLowerCase()),
-  );
+function fetchPage(query: string, page: number): Promise<{ rows: string[]; more: boolean }> {
+  const all = ALL.filter((name) => name.toLowerCase().includes(query.toLowerCase()));
   return new Promise((resolve) =>
     setTimeout(
       () =>

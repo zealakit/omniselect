@@ -1,10 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import {
-  createLoadMoreGuard,
-  createSelectMachine,
-  findScrollParent,
-} from "../dist/index.js";
+import { createLoadMoreGuard, createSelectMachine, findScrollParent } from "../dist/index.js";
 
 function manualClock() {
   const tasks: { fn: () => void; id: number }[] = [];
@@ -26,9 +22,7 @@ function manualClock() {
 }
 
 const open = (
-  over: Partial<
-    Parameters<ReturnType<typeof createLoadMoreGuard>["sync"]>[0]
-  > = {},
+  over: Partial<Parameters<ReturnType<typeof createLoadMoreGuard>["sync"]>[0]> = {},
 ) => ({
   open: true,
   hasMore: true,
@@ -98,8 +92,7 @@ test("closing resets the guard; request() works without the sentinel", () => {
 
 test("machine: reaching the last item asks for more; loading sets aria-busy and announces", () => {
   const machine = createSelectMachine<string>({ rootId: "r" });
-  for (const k of ["a", "b"])
-    machine.collection.register({ key: k, value: k, textValue: k });
+  for (const k of ["a", "b"]) machine.collection.register({ key: k, value: k, textValue: k });
   let requests = 0;
   machine.registerLoadMore({
     request: () => {

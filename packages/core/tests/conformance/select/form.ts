@@ -26,16 +26,9 @@ const tree = (...items: PartNode[]): PartNode[] => [
   },
 ];
 
-const fruit = () => [
-  item("apple", "Apple"),
-  item("banana", "Banana"),
-  item("cherry", "Cherry"),
-];
+const fruit = () => [item("apple", "Apple"), item("banana", "Banana"), item("cherry", "Cherry")];
 
-const form = (
-  props: Record<string, unknown>,
-  items: PartNode[] = fruit(),
-): Scenario =>
+const form = (props: Record<string, unknown>, items: PartNode[] = fruit()): Scenario =>
   ({
     primitive: "select",
     form: true,

@@ -5,11 +5,7 @@
  *   → http://127.0.0.1:4177
  */
 import { execFile } from "node:child_process";
-import {
-  createServer,
-  type IncomingMessage,
-  type ServerResponse,
-} from "node:http";
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 import path from "node:path";
@@ -24,11 +20,7 @@ const HOST = "127.0.0.1";
 const PREFERRED_PORT = 4177;
 const INDEX_HTML = path.join(__dirname, "index.html");
 
-type DepType =
-  | "dependencies"
-  | "devDependencies"
-  | "peerDependencies"
-  | "optionalDependencies";
+type DepType = "dependencies" | "devDependencies" | "peerDependencies" | "optionalDependencies";
 
 type ManifestInfo = {
   id: string;
@@ -114,12 +106,7 @@ function sendJson(res: ServerResponse, status: number, body: unknown): void {
   res.end(payload);
 }
 
-function sendText(
-  res: ServerResponse,
-  status: number,
-  body: string,
-  contentType: string,
-): void {
+function sendText(res: ServerResponse, status: number, body: string, contentType: string): void {
   res.writeHead(status, {
     "Content-Type": contentType,
     "Cache-Control": "no-store",
@@ -191,10 +178,7 @@ function assertApprovedManifest(manifestId: string): ManifestInfo {
   if (!match) {
     throw new Error(`Unknown or disallowed manifest id: ${manifestId}`);
   }
-  if (
-    match.id.startsWith("examples") ||
-    match.relativePackageJson.includes("examples/")
-  ) {
+  if (match.id.startsWith("examples") || match.relativePackageJson.includes("examples/")) {
     throw new Error("examples/ manifests are excluded");
   }
   return match;
@@ -227,10 +211,7 @@ function compareSemVer(a: SemVer, b: SemVer): number {
   return a.prerelease.localeCompare(b.prerelease);
 }
 
-function maxStable(
-  versions: string[],
-  predicate?: (v: SemVer) => boolean,
-): string | null {
+function maxStable(versions: string[], predicate?: (v: SemVer) => boolean): string | null {
   let best: SemVer | null = null;
   for (const version of versions) {
     const parsed = parseSemVer(version);
@@ -273,10 +254,7 @@ function classify(
   return "patch-available";
 }
 
-async function fetchRegistry(
-  dependency: string,
-  declared: string,
-): Promise<RegistryInfo> {
+async function fetchRegistry(dependency: string, declared: string): Promise<RegistryInfo> {
   if (isSkippableSpec(declared)) {
     return {
       latest: null,
@@ -347,17 +325,11 @@ async function fetchRegistry(
     const latest = doc["dist-tags"]?.latest ?? maxStable(versions);
     const baseline = parseSemVer(declared);
     const latestPatch = baseline
-      ? maxStable(
-          versions,
-          (v) => v.major === baseline.major && v.minor === baseline.minor,
-        )
+      ? maxStable(versions, (v) => v.major === baseline.major && v.minor === baseline.minor)
       : null;
-    const latestMinor = baseline
-      ? maxStable(versions, (v) => v.major === baseline.major)
-      : null;
+    const latestMinor = baseline ? maxStable(versions, (v) => v.major === baseline.major) : null;
     const latestMajor = maxStable(versions);
-    const deprecated =
-      (latest && doc.versions?.[latest]?.deprecated) || doc.deprecated || false;
+    const deprecated = (latest && doc.versions?.[latest]?.deprecated) || doc.deprecated || false;
 
     const base: Omit<RegistryInfo, "classification" | "error"> = {
       latest: latest ?? null,
@@ -434,9 +406,7 @@ function readResolvedFromLockfile(): Map<string, string> {
 
     if (
       currentImporter &&
-      /^ {4}(dependencies|devDependencies|peerDependencies|optionalDependencies):$/.test(
-        line,
-      )
+      /^ {4}(dependencies|devDependencies|peerDependencies|optionalDependencies):$/.test(line)
     ) {
       inDepBlock = true;
       continue;
@@ -479,9 +449,10 @@ function listDeclarations(): DeclaredDependency[] {
   const rows: DeclaredDependency[] = [];
 
   for (const manifest of manifests) {
-    const json = JSON.parse(
-      fs.readFileSync(manifest.absolutePackageJson, "utf8"),
-    ) as Record<string, Record<string, string> | undefined>;
+    const json = JSON.parse(fs.readFileSync(manifest.absolutePackageJson, "utf8")) as Record<
+      string,
+      Record<string, string> | undefined
+    >;
 
     for (const depType of DEP_TYPES) {
       const block = json[depType];
@@ -505,9 +476,7 @@ function listDeclarations(): DeclaredDependency[] {
   return rows.sort((a, b) => a.id.localeCompare(b.id));
 }
 
-async function buildDependencyRows(options?: {
-  refresh?: boolean;
-}): Promise<DependencyRow[]> {
+async function buildDependencyRows(options?: { refresh?: boolean }): Promise<DependencyRow[]> {
   if (options?.refresh) {
     registryCache.clear();
   }
@@ -612,11 +581,7 @@ function validateUpdateRequest(input: unknown): UpdateRequest {
   if (typeof targetVersion !== "string" || !targetVersion.trim()) {
     throw new Error("targetVersion is required");
   }
-  if (
-    targetVersion.includes("..") ||
-    targetVersion.includes("/") ||
-    /\s/.test(targetVersion)
-  ) {
+  if (targetVersion.includes("..") || targetVersion.includes("/") || /\s/.test(targetVersion)) {
     throw new Error("targetVersion looks unsafe");
   }
 
@@ -642,15 +607,10 @@ async function applyUpdate(
 }> {
   const manifest = assertApprovedManifest(request.manifestId);
   const original = await fsp.readFile(manifest.absolutePackageJson, "utf8");
-  const json = JSON.parse(original) as Record<
-    string,
-    Record<string, string> | undefined
-  >;
+  const json = JSON.parse(original) as Record<string, Record<string, string> | undefined>;
   const block = json[request.depType];
   if (!block || !(request.dependency in block)) {
-    throw new Error(
-      `${request.dependency} not found in ${request.depType} of ${manifest.id}`,
-    );
+    throw new Error(`${request.dependency} not found in ${request.depType} of ${manifest.id}`);
   }
 
   const from = block[request.dependency] ?? "";
@@ -669,11 +629,7 @@ async function applyUpdate(
   }
 
   block[request.dependency] = to;
-  await fsp.writeFile(
-    manifest.absolutePackageJson,
-    `${JSON.stringify(json, null, 2)}\n`,
-    "utf8",
-  );
+  await fsp.writeFile(manifest.absolutePackageJson, `${JSON.stringify(json, null, 2)}\n`, "utf8");
 
   try {
     // Refresh the lockfile from manifests without upgrading unrelated ranges.
@@ -689,11 +645,7 @@ async function applyUpdate(
   }
 }
 
-async function handleApi(
-  req: IncomingMessage,
-  res: ServerResponse,
-  url: URL,
-): Promise<void> {
+async function handleApi(req: IncomingMessage, res: ServerResponse, url: URL): Promise<void> {
   const method = req.method ?? "GET";
   const pathname = url.pathname;
 
@@ -742,9 +694,7 @@ async function handleApi(
       sendJson(res, 400, { error: "name query param is required" });
       return;
     }
-    const sample =
-      listDeclarations().find((item) => item.dependency === name)?.declared ??
-      "0.0.0";
+    const sample = listDeclarations().find((item) => item.dependency === name)?.declared ?? "0.0.0";
     const info = await fetchRegistry(name, sample);
     sendJson(res, 200, { dependency: name, ...info });
     return;
@@ -753,8 +703,7 @@ async function handleApi(
   if (method === "POST" && pathname === "/api/update") {
     const body = await readJsonBody(req);
     const dryRun =
-      Boolean((body as { dryRun?: boolean }).dryRun) ||
-      url.searchParams.get("dryRun") === "1";
+      Boolean((body as { dryRun?: boolean }).dryRun) || url.searchParams.get("dryRun") === "1";
     const request = validateUpdateRequest(body);
     const result = await applyUpdate(request, { dryRun });
     sendJson(res, 200, { ok: true, ...request, ...result });
@@ -810,10 +759,7 @@ async function handleApi(
   sendJson(res, 404, { error: `Unknown API route: ${pathname}` });
 }
 
-async function requestListener(
-  req: IncomingMessage,
-  res: ServerResponse,
-): Promise<void> {
+async function requestListener(req: IncomingMessage, res: ServerResponse): Promise<void> {
   try {
     if (!isLocalHost(req)) {
       sendJson(res, 403, { error: "Host not allowed" });

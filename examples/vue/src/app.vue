@@ -21,13 +21,8 @@ const page = ref(0);
 const more = ref(true);
 const loading = ref(false);
 let requestId = 0;
-function fetchPage(
-  q: string,
-  p: number,
-): Promise<{ rows: string[]; more: boolean }> {
-  const all = ALL.filter((name) =>
-    name.toLowerCase().includes(q.toLowerCase()),
-  );
+function fetchPage(q: string, p: number): Promise<{ rows: string[]; more: boolean }> {
+  const all = ALL.filter((name) => name.toLowerCase().includes(q.toLowerCase()));
   return new Promise((resolve) =>
     setTimeout(
       () =>
@@ -115,7 +110,12 @@ function onSubmit(event: Event) {
         </Select.Control>
         <Select.Popover>
           <Select.List>
-            <Select.Item v-for="name in names" :key="name" :value="name" :disabled="name === 'cherry'">
+            <Select.Item
+              v-for="name in names"
+              :key="name"
+              :value="name"
+              :disabled="name === 'cherry'"
+            >
               {{ name }}
               <Select.ItemIndicator>✓</Select.ItemIndicator>
             </Select.Item>
@@ -136,7 +136,12 @@ function onSubmit(event: Event) {
         </Select.Control>
         <Select.Popover>
           <Select.List>
-            <Select.Item v-for="name in ['apple', 'apricot', 'banana', 'cherry', 'date']" :key="name" :value="name">{{ name }}</Select.Item>
+            <Select.Item
+              v-for="name in ['apple', 'apricot', 'banana', 'cherry', 'date']"
+              :key="name"
+              :value="name"
+              >{{ name }}</Select.Item
+            >
             <Select.Empty>No results</Select.Empty>
           </Select.List>
         </Select.Popover>
@@ -144,12 +149,25 @@ function onSubmit(event: Event) {
     </div>
     <h2>Multiple (with chips)</h2>
     <div class="field">
-      <Select.Root multiple name="fruits" :default-value="['apple']" :item-to-string="(value: string) => value">
+      <Select.Root
+        multiple
+        name="fruits"
+        :default-value="['apple']"
+        :item-to-string="(value: string) => value"
+      >
         <Select.Label>Fruits</Select.Label>
         <Select.Control>
           <Select.Trigger>
             <Select.Value placeholder="Pick fruit" v-slot="{ items, remove }">
-              <button v-for="item in items" :key="item.key" type="button" class="chip" @click.stop="remove(item.value)">{{ item.label }} ×</button>
+              <button
+                v-for="item in items"
+                :key="item.key"
+                type="button"
+                class="chip"
+                @click.stop="remove(item.value)"
+              >
+                {{ item.label }} ×
+              </button>
             </Select.Value>
           </Select.Trigger>
         </Select.Control>
@@ -162,7 +180,11 @@ function onSubmit(event: Event) {
     </div>
     <h2>Async search with LoadMore</h2>
     <div class="field">
-      <Select.Root :filter="false" :item-to-string="(value: string) => value" @input-change="onInputChange">
+      <Select.Root
+        :filter="false"
+        :item-to-string="(value: string) => value"
+        @input-change="onInputChange"
+      >
         <Select.Label>Async search</Select.Label>
         <Select.Control>
           <span class="select-control">
@@ -174,7 +196,12 @@ function onSubmit(event: Event) {
           <Select.List>
             <Select.Item v-for="name in items" :key="name" :value="name">{{ name }}</Select.Item>
             <Select.Empty>No results</Select.Empty>
-            <Select.LoadMore :is-loading="loading" :has-more="more" @load-more="load(query, page + 1)">Loading…</Select.LoadMore>
+            <Select.LoadMore
+              :is-loading="loading"
+              :has-more="more"
+              @load-more="load(query, page + 1)"
+              >Loading…</Select.LoadMore
+            >
           </Select.List>
         </Select.Popover>
       </Select.Root>
@@ -191,11 +218,23 @@ function onSubmit(event: Event) {
         </Select.Control>
         <Select.Popover>
           <div class="search">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
             <Select.Input placeholder="Search fruit…" />
           </div>
           <Select.List>
-            <Select.Item v-for="name in searchFruits" :key="name" :value="name">{{ name }}<Select.ItemIndicator>✓</Select.ItemIndicator></Select.Item>
+            <Select.Item v-for="name in searchFruits" :key="name" :value="name"
+              >{{ name }}<Select.ItemIndicator>✓</Select.ItemIndicator></Select.Item
+            >
             <Select.Empty>No results</Select.Empty>
           </Select.List>
         </Select.Popover>
@@ -207,18 +246,38 @@ function onSubmit(event: Event) {
         <Select.Control>
           <Select.Trigger>
             <Select.Value placeholder="Pick fruits" v-slot="{ items, remove }">
-              <button v-for="item in items" :key="item.key" type="button" class="chip" @click.stop="remove(item.value)">{{ item.label }} ×</button>
+              <button
+                v-for="item in items"
+                :key="item.key"
+                type="button"
+                class="chip"
+                @click.stop="remove(item.value)"
+              >
+                {{ item.label }} ×
+              </button>
             </Select.Value>
             <Select.Indicator>▾</Select.Indicator>
           </Select.Trigger>
         </Select.Control>
         <Select.Popover>
           <div class="search">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
             <Select.Input placeholder="Search fruit…" />
           </div>
           <Select.List>
-            <Select.Item v-for="name in searchFruits" :key="name" :value="name">{{ name }}<Select.ItemIndicator>✓</Select.ItemIndicator></Select.Item>
+            <Select.Item v-for="name in searchFruits" :key="name" :value="name"
+              >{{ name }}<Select.ItemIndicator>✓</Select.ItemIndicator></Select.Item
+            >
             <Select.Empty>No results</Select.Empty>
           </Select.List>
         </Select.Popover>

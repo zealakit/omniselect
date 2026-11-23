@@ -5,22 +5,9 @@ export {
   createCollection,
   type ItemInput,
 } from "./collection.js";
-export {
-  defaultFilter,
-  type FilterFn,
-  type FilterItem,
-  normalize,
-} from "./filter.js";
+export { defaultFilter, type FilterFn, type FilterItem, normalize } from "./filter.js";
 export { createIds, encodeKey, type Ids, nextId } from "./ids.js";
-export {
-  first,
-  last,
-  type NavItem,
-  next,
-  pageDown,
-  pageUp,
-  prev,
-} from "./navigation.js";
+export { first, last, type NavItem, next, pageDown, pageUp, prev } from "./navigation.js";
 export {
   createNativeSelect,
   type NativeSelectController,
@@ -42,11 +29,7 @@ export {
   createControllable,
 } from "./store/controllable.js";
 export { createStore, type Listener, type Store } from "./store/store.js";
-export {
-  createTypeahead,
-  type Typeahead,
-  type TypeaheadItem,
-} from "./typeahead.js";
+export { createTypeahead, type Typeahead, type TypeaheadItem } from "./typeahead.js";
 export { devWarn } from "./utils/dev-warn.js";
 export { getGlobalState } from "./utils/global-state.js";
 export { waitForExit } from "./presence.js";

@@ -19,9 +19,7 @@ export function App() {
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(
-      JSON.stringify([...new FormData(event.currentTarget).entries()]),
-    );
+    setSubmitted(JSON.stringify([...new FormData(event.currentTarget).entries()]));
   }
 
   return (
@@ -55,10 +53,7 @@ export function App() {
       <p>Value: {fruit?.name ?? "none"}</p>
       <h2>Select</h2>
       <div className="field">
-        <Select.Root
-          defaultValue="apple"
-          itemToString={(value: string) => value}
-        >
+        <Select.Root defaultValue="apple" itemToString={(value: string) => value}>
           <Select.Label>Fruit</Select.Label>
           <Select.Control>
             <span className="select-control">
@@ -72,11 +67,7 @@ export function App() {
           <Select.Popover>
             <Select.List>
               {["apple", "banana", "cherry", "date"].map((name) => (
-                <Select.Item
-                  key={name}
-                  value={name}
-                  disabled={name === "cherry"}
-                >
+                <Select.Item key={name} value={name} disabled={name === "cherry"}>
                   {name}
                   <Select.ItemIndicator>✓</Select.ItemIndicator>
                 </Select.Item>

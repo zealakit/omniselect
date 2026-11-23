@@ -15,10 +15,7 @@ export class MockIntersectionObserver {
   private readonly callback: Callback;
   private readonly targets = new Set<Element>();
 
-  constructor(
-    callback: Callback,
-    options: { root?: Element | null; rootMargin?: string } = {},
-  ) {
+  constructor(callback: Callback, options: { root?: Element | null; rootMargin?: string } = {}) {
     this.callback = callback;
     this.options = options;
     MockIntersectionObserver.instances.add(this);
@@ -70,7 +67,6 @@ export class MockIntersectionObserver {
 }
 
 export function installIntersectionObserver(): void {
-  (
-    globalThis as unknown as { IntersectionObserver: unknown }
-  ).IntersectionObserver = MockIntersectionObserver;
+  (globalThis as unknown as { IntersectionObserver: unknown }).IntersectionObserver =
+    MockIntersectionObserver;
 }

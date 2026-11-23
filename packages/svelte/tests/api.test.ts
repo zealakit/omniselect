@@ -23,14 +23,7 @@ const SELECT_PARTS = [
   "Trigger",
   "Value",
 ];
-const NATIVE_PARTS = [
-  "Control",
-  "Indicator",
-  "Label",
-  "Option",
-  "OptionGroup",
-  "Root",
-];
+const NATIVE_PARTS = ["Control", "Indicator", "Label", "Option", "OptionGroup", "Root"];
 
 test("Select exposes exactly the documented parts", () => {
   assert.deepEqual(Object.keys(Select).sort(), SELECT_PARTS);

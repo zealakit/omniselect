@@ -1,8 +1,6 @@
 export type SelectionMode = "single" | "multiple";
 
-export type SelectionValue<T, M extends SelectionMode> = M extends "multiple"
-  ? T[]
-  : T | null;
+export type SelectionValue<T, M extends SelectionMode> = M extends "multiple" ? T[] : T | null;
 
 export type ItemToKey<T> = (value: T) => string;
 export type ItemToString<T> = (value: T) => string;
@@ -52,16 +50,12 @@ export function createSelection<T>(options: {
       if (mode === "single") {
         return model.select(current, value);
       }
-      return has(current, value)
-        ? model.remove(current, value)
-        : model.select(current, value);
+      return has(current, value) ? model.remove(current, value) : model.select(current, value);
     },
     remove(current, value) {
       const key = itemToKey(value);
       if (mode === "single") {
-        return current !== null && itemToKey(current as T) === key
-          ? null
-          : current;
+        return current !== null && itemToKey(current as T) === key ? null : current;
       }
       return toList(current).filter((item) => itemToKey(item) !== key);
     },

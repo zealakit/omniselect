@@ -1,9 +1,7 @@
 import { defineComponent, h } from "vue";
 import { useSelectContext } from "./context.js";
 
-const attrsOf = (
-  attrs: Record<string, string | undefined>,
-): Record<string, string> => {
+const attrsOf = (attrs: Record<string, string | undefined>): Record<string, string> => {
   const out: Record<string, string> = {};
   for (const [name, value] of Object.entries(attrs)) {
     if (value !== undefined) {
@@ -19,12 +17,7 @@ export const Label = defineComponent({
   name: "SelectLabel",
   setup(_props, { slots }) {
     const { machine } = useSelectContext("Label");
-    return () =>
-      h(
-        "span",
-        { "data-part": "label", id: machine.ids.label },
-        slots.default?.(),
-      );
+    return () => h("span", { "data-part": "label", id: machine.ids.label }, slots.default?.());
   },
 });
 
@@ -87,11 +80,7 @@ export const List = defineComponent({
     const { machine, version } = useSelectContext("List");
     return () => {
       version.value;
-      return h(
-        "div",
-        { "data-part": "list", ...attrsOf(machine.attrs.list()) },
-        slots.default?.(),
-      );
+      return h("div", { "data-part": "list", ...attrsOf(machine.attrs.list()) }, slots.default?.());
     };
   },
 });
@@ -104,10 +93,7 @@ export const Empty = defineComponent({
     return () => {
       version.value;
       // While a page is loading the list is not empty yet.
-      if (
-        machine.collection.visible().length !== 0 ||
-        machine.store.get().hasLoading
-      ) {
+      if (machine.collection.visible().length !== 0 || machine.store.get().hasLoading) {
         return null;
       }
       return h(

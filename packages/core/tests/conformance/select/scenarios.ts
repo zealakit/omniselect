@@ -1,10 +1,6 @@
 import type { PartNode, Scenario } from "../types.ts";
 
-const item = (
-  value: unknown,
-  text: string,
-  props: Record<string, unknown> = {},
-): PartNode => ({
+const item = (value: unknown, text: string, props: Record<string, unknown> = {}): PartNode => ({
   part: "item",
   props: { value, ...props },
   text,
@@ -54,11 +50,7 @@ const fruitItems = (): PartNode[] => [
   item("date", "Date"),
 ];
 
-const basic: PartNode[] = [
-  { part: "label", text: "Fruit" },
-  trigger,
-  popover(...fruitItems()),
-];
+const basic: PartNode[] = [{ part: "label", text: "Fruit" }, trigger, popover(...fruitItems())];
 const basicMounted: PartNode[] = [
   { part: "label", text: "Fruit" },
   trigger,
@@ -505,9 +497,7 @@ export const selectScenarios: Scenario[] = [
       trigger,
       {
         part: "popover",
-        children: [
-          { part: "list", children: [{ part: "empty", text: "No options" }] },
-        ],
+        children: [{ part: "list", children: [{ part: "empty", text: "No options" }] }],
       },
     ],
     steps: [
@@ -530,9 +520,7 @@ export const selectScenarios: Scenario[] = [
       trigger,
       {
         part: "popover",
-        children: [
-          { part: "list", children: [{ part: "empty", text: "No options" }] },
-        ],
+        children: [{ part: "list", children: [{ part: "empty", text: "No options" }] }],
       },
     ],
     steps: [
@@ -550,10 +538,7 @@ export const selectScenarios: Scenario[] = [
         {
           part: "group",
           props: { disabled: true },
-          children: [
-            { part: "groupLabel", text: "Berries" },
-            item("blueberry", "Blueberry"),
-          ],
+          children: [{ part: "groupLabel", text: "Berries" }, item("blueberry", "Blueberry")],
         },
         item("fig", "Fig"),
       ),
@@ -581,10 +566,7 @@ export const selectScenarios: Scenario[] = [
     tree: [
       { part: "label", text: "L" },
       trigger,
-      popover(
-        itemWithIndicator("apple", "Apple"),
-        itemWithIndicator("banana", "Banana"),
-      ),
+      popover(itemWithIndicator("apple", "Apple"), itemWithIndicator("banana", "Banana")),
     ],
     steps: [
       { type: "click", target: "trigger" },
@@ -609,10 +591,7 @@ export const selectScenarios: Scenario[] = [
     tree: [
       { part: "label", text: "L" },
       trigger,
-      popover(
-        item({ id: 1, name: "One" }, "One"),
-        item({ id: 2, name: "Two" }, "Two"),
-      ),
+      popover(item({ id: 1, name: "One" }, "One"), item({ id: 2, name: "Two" }, "Two")),
     ],
     steps: [
       { type: "expect", expect: { text: { value: "Two" } } },

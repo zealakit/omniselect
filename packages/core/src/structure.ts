@@ -11,10 +11,7 @@ export function checkStructure(
   if (!element || typeof element.closest !== "function") {
     return;
   }
-  if (
-    (part === "Clear" || part === "Indicator") &&
-    element.closest('[data-part="trigger"]')
-  ) {
+  if ((part === "Clear" || part === "Indicator") && element.closest('[data-part="trigger"]')) {
     devWarn(
       `Select.${part} is inside Select.Trigger. Interactive or decorative siblings belong beside the Trigger inside Select.Control (a button cannot contain another button).`,
     );

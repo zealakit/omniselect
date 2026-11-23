@@ -22,10 +22,7 @@ const PAGE = 8;
 
 const schema = z.object({
   country: z.string().min(1, "Pick a country"),
-  fruits: z
-    .array(z.string())
-    .min(1, "Pick at least one fruit")
-    .max(3, "Pick at most three fruits"),
+  fruits: z.array(z.string()).min(1, "Pick at least one fruit").max(3, "Pick at most three fruits"),
   size: z.string().min(1, "Pick a size"),
   assignee: z.string().min(1, "Pick an assignee"),
 });
@@ -39,15 +36,7 @@ const defaults: FormValues = {
 };
 
 /** Label, control, and the error message wired with `aria-describedby`. */
-function Field({
-  id,
-  error,
-  children,
-}: {
-  id: string;
-  error?: string;
-  children: ReactNode;
-}) {
+function Field({ id, error, children }: { id: string; error?: string; children: ReactNode }) {
   return (
     <div className="field">
       {children}
@@ -61,9 +50,7 @@ function Field({
 }
 
 /** Fake paginated API. */
-function fetchPeople(
-  page: number,
-): Promise<{ rows: typeof PEOPLE; more: boolean }> {
+function fetchPeople(page: number): Promise<{ rows: typeof PEOPLE; more: boolean }> {
   return new Promise((resolve) =>
     setTimeout(
       () =>
@@ -110,9 +97,7 @@ export function FormDemo() {
   return (
     <form
       noValidate
-      onSubmit={handleSubmit((values) =>
-        setResult(JSON.stringify(values, null, 2)),
-      )}
+      onSubmit={handleSubmit((values) => setResult(JSON.stringify(values, null, 2)))}
       onReset={(event) => {
         event.preventDefault();
         reset(defaults);
@@ -138,9 +123,7 @@ export function FormDemo() {
                     ref={field.ref}
                     onBlur={field.onBlur}
                     placeholder="Type to search"
-                    aria-describedby={
-                      errors.country ? "country-error" : undefined
-                    }
+                    aria-describedby={errors.country ? "country-error" : undefined}
                   />
                   <Select.Trigger>
                     <Select.Indicator>▾</Select.Indicator>
@@ -266,9 +249,7 @@ export function FormDemo() {
                 <Select.Trigger
                   ref={field.ref}
                   onBlur={field.onBlur}
-                  aria-describedby={
-                    errors.assignee ? "assignee-error" : undefined
-                  }
+                  aria-describedby={errors.assignee ? "assignee-error" : undefined}
                 >
                   <Select.Value placeholder="Pick a person" />
                   <Select.Indicator>▾</Select.Indicator>
@@ -299,9 +280,7 @@ export function FormDemo() {
         <button type="submit">Submit</button>
         <button type="reset">Reset</button>
       </div>
-      <pre aria-live="polite">
-        {result || "Submit to see the validated values."}
-      </pre>
+      <pre aria-live="polite">{result || "Submit to see the validated values."}</pre>
     </form>
   );
 }

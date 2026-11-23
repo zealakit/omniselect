@@ -1,7 +1,4 @@
-import type {
-  NativeSelectController,
-  NativeState,
-} from "@zealakit/omniselect-core";
+import type { NativeSelectController, NativeState } from "@zealakit/omniselect-core";
 import { getContext } from "svelte";
 
 export type NativeContext = {
@@ -28,9 +25,7 @@ export const GROUP_KEY = Symbol("omniselect-native-group");
 export function getNativeContext(part: string): NativeContext {
   const context = getContext<NativeContext | undefined>(NATIVE_KEY);
   if (!context) {
-    throw new Error(
-      `NativeSelect.${part} must be rendered inside NativeSelect.Root.`,
-    );
+    throw new Error(`NativeSelect.${part} must be rendered inside NativeSelect.Root.`);
   }
   return context;
 }

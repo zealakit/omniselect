@@ -13,10 +13,7 @@ export type PortalParams = {
  * Svelte removes an `{#if}` branch's DOM before it destroys the actions, so a
  * restoring portal would re-insert the removed node and leave a ghost behind.
  */
-export const portal: Action<HTMLElement, PortalParams | undefined> = (
-  node,
-  params,
-) => {
+export const portal: Action<HTMLElement, PortalParams | undefined> = (node, params) => {
   let current = params;
   const resolve = (): Element | null => {
     const target = current?.target;

@@ -4,10 +4,7 @@ import { z } from "zod";
 
 const schema = z.object({
   country: z.string().min(1, "Pick a country"),
-  fruits: z
-    .array(z.string())
-    .min(1, "Pick at least one fruit")
-    .max(3, "Pick at most three fruits"),
+  fruits: z.array(z.string()).min(1, "Pick at least one fruit").max(3, "Pick at most three fruits"),
   size: z.string().min(1, "Pick a size"),
   assignee: z.string().min(1, "Pick an assignee"),
 });

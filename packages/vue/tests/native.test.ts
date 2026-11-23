@@ -1,11 +1,7 @@
 import { after } from "node:test";
 import { mount, type VueWrapper } from "@vue/test-utils";
 import { defineComponent, h, nextTick, reactive, type VNode } from "vue";
-import type {
-  Driver,
-  PartNode,
-  Scenario,
-} from "../../core/tests/conformance/index.ts";
+import type { Driver, PartNode, Scenario } from "../../core/tests/conformance/index.ts";
 import {
   nativeScenarios,
   performNativeDomStep,
@@ -27,14 +23,8 @@ const components = {
 
 function build(node: PartNode, index: number): VNode {
   const component = components[node.part as keyof typeof components];
-  const children = node.children
-    ? () => node.children?.map(build)
-    : () => node.text;
-  return h(
-    component as never,
-    { key: index, ...node.props },
-    { default: children },
-  );
+  const children = node.children ? () => node.children?.map(build) : () => node.text;
+  return h(component as never, { key: index, ...node.props }, { default: children });
 }
 
 const mounted: VueWrapper[] = [];

@@ -1,50 +1,48 @@
 <script lang="ts">
-import { tick, type Snippet } from "svelte";
-import type { HTMLSelectAttributes } from "svelte/elements";
-import { getNativeContext } from "./context.js";
+  import { tick, type Snippet } from "svelte";
+  import type { HTMLSelectAttributes } from "svelte/elements";
+  import { getNativeContext } from "./context.js";
 
-type Props = Omit<
-  HTMLSelectAttributes,
-  "value" | "multiple" | "name" | "form" | "required" | "disabled"
-> & {
-  children?: Snippet;
-};
-let { children, onchange, oninvalid, ...rest }: Props = $props();
-
-const context = getNativeContext("Control");
-const { controller, snapshot } = context;
-let element: HTMLSelectElement | undefined = $state();
-
-$effect(() => {
-  const select = element;
-  const owner = select?.form;
-  if (!select || !owner) {
-    return;
-  }
-  const onReset = () => {
-    queueMicrotask(() => {
-      controller.reset();
-      controller.toDom(select);
-    });
+  type Props = Omit<
+    HTMLSelectAttributes,
+    "value" | "multiple" | "name" | "form" | "required" | "disabled"
+  > & {
+    children?: Snippet;
   };
-  owner.addEventListener("reset", onReset);
-  return () => owner.removeEventListener("reset", onReset);
-});
+  let { children, onchange, oninvalid, ...rest }: Props = $props();
 
-function handleChange(
-  event: Event & { currentTarget: EventTarget & HTMLSelectElement },
-) {
-  (onchange as ((e: Event) => void) | undefined)?.(event);
-  const select = event.currentTarget;
-  controller.fromDom(select);
-  if (controller.isControlled()) {
-    void tick().then(() => controller.toDom(select));
+  const context = getNativeContext("Control");
+  const { controller, snapshot } = context;
+  let element: HTMLSelectElement | undefined = $state();
+
+  $effect(() => {
+    const select = element;
+    const owner = select?.form;
+    if (!select || !owner) {
+      return;
+    }
+    const onReset = () => {
+      queueMicrotask(() => {
+        controller.reset();
+        controller.toDom(select);
+      });
+    };
+    owner.addEventListener("reset", onReset);
+    return () => owner.removeEventListener("reset", onReset);
+  });
+
+  function handleChange(event: Event & { currentTarget: EventTarget & HTMLSelectElement }) {
+    (onchange as ((e: Event) => void) | undefined)?.(event);
+    const select = event.currentTarget;
+    controller.fromDom(select);
+    if (controller.isControlled()) {
+      void tick().then(() => controller.toDom(select));
+    }
   }
-}
 
-const placeholder = $derived(
-  !context.props.multiple && controller.selection.isEmpty($snapshot.value),
-);
+  const placeholder = $derived(
+    !context.props.multiple && controller.selection.isEmpty($snapshot.value),
+  );
 </script>
 
 <select

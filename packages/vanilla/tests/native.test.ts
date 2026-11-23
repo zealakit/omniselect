@@ -1,8 +1,4 @@
-import type {
-  Driver,
-  PartNode,
-  Scenario,
-} from "../../core/tests/conformance/index.ts";
+import type { Driver, PartNode, Scenario } from "../../core/tests/conformance/index.ts";
 import {
   nativeScenarios,
   performNativeDomStep,
@@ -19,9 +15,7 @@ const defaultKeys = (props: Record<string, unknown>): Set<string> => {
   if (value === undefined) {
     return new Set();
   }
-  return new Set(
-    Array.isArray(value) ? (value as string[]) : [value as string],
-  );
+  return new Set(Array.isArray(value) ? (value as string[]) : [value as string]);
 };
 
 function build(node: PartNode, props: Record<string, unknown>): HTMLElement {
@@ -35,17 +29,14 @@ function build(node: PartNode, props: Record<string, unknown>): HTMLElement {
   const element = document.createElement(tag);
   const own = node.props ?? {};
   if (node.part === "option") {
-    const key =
-      own.value === null || own.value === undefined ? "" : String(own.value);
+    const key = own.value === null || own.value === undefined ? "" : String(own.value);
     element.setAttribute("value", key);
     if (own.disabled) {
       element.setAttribute("disabled", "");
     }
     // A disabled placeholder must carry `selected`, or browsers pick the next option.
     const isDefault =
-      props.defaultValue !== undefined
-        ? defaultKeys(props).has(key)
-        : own.value === null;
+      props.defaultValue !== undefined ? defaultKeys(props).has(key) : own.value === null;
     if (isDefault) {
       element.setAttribute("selected", "");
     }
@@ -57,10 +48,7 @@ function build(node: PartNode, props: Record<string, unknown>): HTMLElement {
   } else if (node.part === "control") {
     for (const name of ["name", "required", "disabled"]) {
       if (props[name] !== undefined && props[name] !== false) {
-        element.setAttribute(
-          name,
-          props[name] === true ? "" : String(props[name]),
-        );
+        element.setAttribute(name, props[name] === true ? "" : String(props[name]));
       }
     }
     if (props.multiple) {

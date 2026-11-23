@@ -21,15 +21,12 @@ export type SelectContext = {
   };
 };
 
-export const selectKey: InjectionKey<SelectContext> =
-  Symbol("omniselect-select");
+export const selectKey: InjectionKey<SelectContext> = Symbol("omniselect-select");
 export const groupKey: InjectionKey<{
   groupId: string;
   hasLabel: Ref<boolean>;
 }> = Symbol("omniselect-select-group");
-export const itemKey: InjectionKey<{ key: () => string }> = Symbol(
-  "omniselect-select-item",
-);
+export const itemKey: InjectionKey<{ key: () => string }> = Symbol("omniselect-select-item");
 
 export function useSelectContext(part: string): SelectContext {
   const context = inject(selectKey, null);

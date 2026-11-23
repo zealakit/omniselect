@@ -1,9 +1,5 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: values are user-defined
-import {
-  createSelectMachine,
-  nextId,
-  visuallyHiddenStyle,
-} from "@zealakit/omniselect-core";
+import { createSelectMachine, nextId, visuallyHiddenStyle } from "@zealakit/omniselect-core";
 import type { Placement } from "@zealakit/overlay-vue";
 import {
   defineComponent,
@@ -48,9 +44,7 @@ export const Root = defineComponent({
     inputValue: { type: String, default: undefined },
     defaultInputValue: { type: String, default: undefined },
     filter: {
-      type: [Function, Boolean] as PropType<
-        ((item: any, query: string) => boolean) | false
-      >,
+      type: [Function, Boolean] as PropType<((item: any, query: string) => boolean) | false>,
       default: undefined,
     },
     openOnFocus: { type: Boolean, default: undefined },
@@ -74,9 +68,7 @@ export const Root = defineComponent({
     offset: { type: Number, default: 4 },
     matchWidth: { type: Boolean, default: true },
     portal: {
-      type: [Boolean, String, Object] as PropType<
-        boolean | string | Element | null
-      >,
+      type: [Boolean, String, Object] as PropType<boolean | string | Element | null>,
       default: true,
     },
   },
@@ -131,10 +123,7 @@ export const Root = defineComponent({
       onOpenChange(open, reason) {
         emit("update:open", open);
         emit("openChange", open, reason);
-        if (
-          !open &&
-          (reason === "select" || reason === "escape" || reason === "tab")
-        ) {
+        if (!open && (reason === "select" || reason === "escape" || reason === "tab")) {
           focusAfterClose();
         }
       },
@@ -143,10 +132,9 @@ export const Root = defineComponent({
     /** Combobox: the input. A search box inside the popover unmounts on close, so the trigger. */
     function focusAfterClose(): void {
       const target = machine.focusTarget();
-      (target === "input"
-        ? (inputEl.value ?? triggerEl.value)
-        : triggerEl.value
-      )?.focus({ preventScroll: true });
+      (target === "input" ? (inputEl.value ?? triggerEl.value) : triggerEl.value)?.focus({
+        preventScroll: true,
+      });
     }
     const version = shallowRef(0);
     const stop = machine.store.subscribe(() => {
@@ -254,18 +242,16 @@ export const Root = defineComponent({
               style: visuallyHiddenStyle,
               onChange: (event: Event) =>
                 machine.setFromKeys(
-                  Array.from(
-                    (event.target as HTMLSelectElement).selectedOptions,
-                  ).map((o) => o.value),
+                  Array.from((event.target as HTMLSelectElement).selectedOptions).map(
+                    (o) => o.value,
+                  ),
                 ),
               onInvalid: () => {
                 machine.setInvalid(true);
                 focusAfterClose();
               },
             },
-            keys.map((key) =>
-              h("option", { key, value: key, selected: true }, key),
-            ),
+            keys.map((key) => h("option", { key, value: key, selected: true }, key)),
           ),
         );
       }

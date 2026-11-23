@@ -20,9 +20,7 @@ export type Controllable<T> = {
 };
 
 /** Controlled/uncontrolled helper shared by value, open, and inputValue. */
-export function createControllable<T>(
-  options: ControllableOptions<T>,
-): Controllable<T> {
+export function createControllable<T>(options: ControllableOptions<T>): Controllable<T> {
   const equals = options.equals ?? Object.is;
   const controlled = options.value !== undefined;
   let controlledValue = options.value;

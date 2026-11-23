@@ -1,23 +1,6 @@
-import {
-  getPopoverVars,
-  type SelectCloseReason,
-  waitForExit,
-} from "@zealakit/omniselect-core";
-import {
-  type DismissReason,
-  useLayer,
-  usePositioner,
-} from "@zealakit/overlay-vue";
-import {
-  computed,
-  defineComponent,
-  h,
-  nextTick,
-  ref,
-  shallowRef,
-  Teleport,
-  watch,
-} from "vue";
+import { getPopoverVars, type SelectCloseReason, waitForExit } from "@zealakit/omniselect-core";
+import { type DismissReason, useLayer, usePositioner } from "@zealakit/overlay-vue";
+import { computed, defineComponent, h, nextTick, ref, shallowRef, Teleport, watch } from "vue";
 import { useSelectContext } from "./context.js";
 
 const dismissReasons: Record<DismissReason, SelectCloseReason> = {
@@ -67,9 +50,7 @@ export const Popover = defineComponent({
       { flush: "post" },
     );
 
-    const anchor = computed(
-      () => context.controlEl.value ?? context.triggerEl.value,
-    );
+    const anchor = computed(() => context.controlEl.value ?? context.triggerEl.value);
     const positioner = usePositioner({
       reference: anchor,
       floating: element,
@@ -96,17 +77,10 @@ export const Popover = defineComponent({
       const [side = "bottom", align = "center"] = (
         result?.placement ?? context.props.placement
       ).split("-");
-      const rect = open.value
-        ? anchor.value?.getBoundingClientRect()
-        : undefined;
+      const rect = open.value ? anchor.value?.getBoundingClientRect() : undefined;
       const vars =
         rect && result
-          ? getPopoverVars(
-              rect,
-              result.placement,
-              window.innerHeight,
-              context.props.offset,
-            )
+          ? getPopoverVars(rect, result.placement, window.innerHeight, context.props.offset)
           : null;
       const style: Record<string, string | number | undefined> = {
         position: result?.strategy ?? "absolute",
@@ -114,9 +88,7 @@ export const Popover = defineComponent({
         top: `${result?.y ?? 0}px`,
         "--omniselect-anchor-width":
           context.props.matchWidth && vars ? `${vars.width}px` : undefined,
-        "--omniselect-available-height": vars
-          ? `${vars.availableHeight}px`
-          : undefined,
+        "--omniselect-available-height": vars ? `${vars.availableHeight}px` : undefined,
       };
       const content = h(
         "div",
@@ -137,11 +109,9 @@ export const Popover = defineComponent({
       if (portal === false) {
         return content;
       }
-      return h(
-        Teleport,
-        { to: portal === true ? "body" : (portal as string | Element) },
-        [content],
-      );
+      return h(Teleport, { to: portal === true ? "body" : (portal as string | Element) }, [
+        content,
+      ]);
     };
   },
 });

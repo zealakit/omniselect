@@ -1,7 +1,4 @@
-import {
-  createNativeSelect,
-  type NativeSelectController,
-} from "@zealakit/omniselect-core";
+import { createNativeSelect, type NativeSelectController } from "@zealakit/omniselect-core";
 import { type ReactNode, useId, useRef } from "react";
 import { useIsomorphicLayoutEffect } from "../internal/use-isomorphic-layout-effect.js";
 import { NativeContext, type NativeContextValue } from "./context.js";
@@ -33,9 +30,7 @@ export type NativeSelectMultipleProps<T> = RootBase<T> & {
   onValueChange?: (value: T[]) => void;
 };
 
-export type NativeSelectRootProps<T> =
-  | NativeSelectSingleProps<T>
-  | NativeSelectMultipleProps<T>;
+export type NativeSelectRootProps<T> = NativeSelectSingleProps<T> | NativeSelectMultipleProps<T>;
 
 type AnyValue<T> = T | null | T[];
 
@@ -99,7 +94,5 @@ export function Root<T>(props: NativeSelectRootProps<T>) {
     defaultKeys: keysOf(defaultValue ?? controller.selection.empty()),
   };
 
-  return (
-    <NativeContext.Provider value={context}>{children}</NativeContext.Provider>
-  );
+  return <NativeContext.Provider value={context}>{children}</NativeContext.Provider>;
 }

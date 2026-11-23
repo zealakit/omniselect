@@ -12,13 +12,7 @@ const flush = () =>
     await new Promise((resolve) => setTimeout(resolve, 0));
   });
 const click = (target: Element) => {
-  for (const type of [
-    "pointerdown",
-    "mousedown",
-    "pointerup",
-    "mouseup",
-    "click",
-  ]) {
+  for (const type of ["pointerdown", "mousedown", "pointerup", "mouseup", "click"]) {
     const event = new window.Event(type, { bubbles: true, cancelable: true });
     Object.defineProperty(event, "button", { value: 0 });
     Object.defineProperty(event, "isPrimary", { value: true });
@@ -26,10 +20,7 @@ const click = (target: Element) => {
   }
 };
 const fill = (input: HTMLInputElement, text: string) => {
-  const setter = Object.getOwnPropertyDescriptor(
-    Object.getPrototypeOf(input),
-    "value",
-  )?.set;
+  const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(input), "value")?.set;
   setter?.call(input, text);
   input.dispatchEvent(new window.Event("input", { bubbles: true }));
 };
@@ -53,8 +44,7 @@ async function audit(label: string): Promise<void> {
     },
   });
   const violations = result.violations.map(
-    (v) =>
-      `${v.id}: ${v.help} (${v.nodes.map((n) => n.target.join(" ")).join(", ")})`,
+    (v) => `${v.id}: ${v.help} (${v.nodes.map((n) => n.target.join(" ")).join(", ")})`,
   );
   assert.deepEqual(violations, [], `${label}: ${violations.join("\n")}`);
 }
@@ -65,11 +55,7 @@ const items = () => [
   h(Select.Item as never, { key: "c", value: "c", disabled: true }, "Cherry"),
 ];
 
-const select = (
-  props: Record<string, unknown>,
-  extra: unknown[] = [],
-  empty = false,
-) =>
+const select = (props: Record<string, unknown>, extra: unknown[] = [], empty = false) =>
   h(
     "main",
     null,
@@ -107,9 +93,7 @@ test("a11y: closed select-only", async () => {
 test("a11y: open select-only with a selected item", async () => {
   render(select({ defaultValue: "b" }));
   await flush();
-  await act(async () =>
-    click(document.querySelector("[role=combobox]") as Element),
-  );
+  await act(async () => click(document.querySelector("[role=combobox]") as Element));
   await flush();
   await audit("open");
 });
@@ -117,9 +101,7 @@ test("a11y: open select-only with a selected item", async () => {
 test("a11y: open multiple", async () => {
   render(select({ multiple: true, defaultValue: ["a"] }));
   await flush();
-  await act(async () =>
-    click(document.querySelector("[role=combobox]") as Element),
-  );
+  await act(async () => click(document.querySelector("[role=combobox]") as Element));
   await flush();
   await audit("multiple");
 });
@@ -140,9 +122,7 @@ test("a11y: required and invalid", async () => {
   render(h("form", null, select({ name: "fruit", required: true })));
   await flush();
   const hidden = document.querySelector("[data-part=hidden-select]") as Element;
-  await act(async () =>
-    hidden.dispatchEvent(new window.Event("invalid", { cancelable: true })),
-  );
+  await act(async () => hidden.dispatchEvent(new window.Event("invalid", { cancelable: true })));
   await flush();
   await audit("invalid");
 });

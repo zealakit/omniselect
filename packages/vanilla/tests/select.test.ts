@@ -1,9 +1,5 @@
 import { after } from "node:test";
-import type {
-  Driver,
-  PartNode,
-  Scenario,
-} from "../../core/tests/conformance/index.ts";
+import type { Driver, PartNode, Scenario } from "../../core/tests/conformance/index.ts";
 import {
   performSelectDomStep,
   readFormData,
@@ -67,18 +63,13 @@ function build(node: PartNode): Node {
   } else if (node.text !== undefined) {
     element.textContent = node.text;
   }
-  if (
-    node.part === "trigger" ||
-    node.part === "clear" ||
-    node.part === "outside"
-  ) {
+  if (node.part === "trigger" || node.part === "clear" || node.part === "outside") {
     element.setAttribute("type", "button");
   }
   return element;
 }
 
-const hiddenAncestor = (element: Element | null): boolean =>
-  element?.closest("[hidden]") != null;
+const hiddenAncestor = (element: Element | null): boolean => element?.closest("[hidden]") != null;
 
 const driver: Driver = {
   mount(scenario: Scenario) {
@@ -94,8 +85,7 @@ const driver: Driver = {
       (...args: unknown[]) =>
         (props[name] as ((...a: unknown[]) => void) | undefined)?.(...args);
     const handle = createSelect(root, {
-      defaultValue:
-        (props.defaultValue as string | string[] | undefined) ?? null,
+      defaultValue: (props.defaultValue as string | string[] | undefined) ?? null,
       multiple: props.multiple as boolean | undefined,
       name: props.name as string | undefined,
       maxSelected: props.maxSelected as number | undefined,
@@ -115,16 +105,12 @@ const driver: Driver = {
       autoHighlight: props.autoHighlight as boolean | undefined,
     });
     if (props.loadMore) {
-      handle.setLoadMore(
-        props.loadMore as { isLoading?: boolean; hasMore?: boolean },
-      );
+      handle.setLoadMore(props.loadMore as { isLoading?: boolean; hasMore?: boolean });
     }
     return {
       query(ref) {
         const element = querySelectPart(host, ref);
-        return ref === "clear" ||
-          ref.startsWith("group:") ||
-          !hiddenAncestor(element)
+        return ref === "clear" || ref.startsWith("group:") || !hiddenAncestor(element)
           ? element
           : null;
       },
@@ -133,9 +119,7 @@ const driver: Driver = {
           if (!step.props.loadMore) {
             throw new Error("vanilla has no controlled props");
           }
-          handle.setLoadMore(
-            step.props.loadMore as { isLoading?: boolean; hasMore?: boolean },
-          );
+          handle.setLoadMore(step.props.loadMore as { isLoading?: boolean; hasMore?: boolean });
           await new Promise((resolve) => setTimeout(resolve, 0));
           return;
         }
@@ -153,9 +137,7 @@ const driver: Driver = {
       unmount: () => {
         handle.destroy();
         host.remove();
-        for (const leftover of Array.from(
-          document.querySelectorAll("[data-part=popover]"),
-        )) {
+        for (const leftover of Array.from(document.querySelectorAll("[data-part=popover]"))) {
           leftover.remove();
         }
       },

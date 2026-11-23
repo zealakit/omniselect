@@ -11,25 +11,19 @@ const units = [
   { dir: "", name: "Zealakit Omniselect" },
   ...["core", "vanilla", "react", "vue", "svelte"].map((pkg) => ({
     dir: `packages/${pkg}`,
-    name: JSON.parse(
-      readFileSync(join(root, "packages", pkg, "package.json"), "utf8"),
-    ).name,
+    name: JSON.parse(readFileSync(join(root, "packages", pkg, "package.json"), "utf8")).name,
   })),
 ];
 
 const errors = [];
 const fail = (message) => errors.push(message);
 
-const strip = (text) =>
-  text.replace(/```[\s\S]*?```/g, (block) => block.replace(/[^\n]/g, ""));
+const strip = (text) => text.replace(/```[\s\S]*?```/g, (block) => block.replace(/[^\n]/g, ""));
 
 const headings = (text) =>
-  [...text.matchAll(/^(#{1,6}) (.+)$/gm)].map(
-    (match) => `${match[1]} ${match[2]}`,
-  );
+  [...text.matchAll(/^(#{1,6}) (.+)$/gm)].map((match) => `${match[1]} ${match[2]}`);
 
-const codeBlocks = (text) =>
-  [...text.matchAll(/```(\w*)\n([\s\S]*?)```/g)].map((m) => m[0]);
+const codeBlocks = (text) => [...text.matchAll(/```(\w*)\n([\s\S]*?)```/g)].map((m) => m[0]);
 
 const tableShapes = (text) =>
   strip(text)
@@ -84,8 +78,7 @@ for (const { dir, name } of units) {
 
     if (file === "README.md") continue;
     const same = (label, a, b) => {
-      if (JSON.stringify(a) !== JSON.stringify(b))
-        fail(`${where}: ${label} differ from README.md`);
+      if (JSON.stringify(a) !== JSON.stringify(b)) fail(`${where}: ${label} differ from README.md`);
     };
     same("headings", headings(strip(english)), headings(prose));
     same("code blocks", codeBlocks(english), codeBlocks(text));

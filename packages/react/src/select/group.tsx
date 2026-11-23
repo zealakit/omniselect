@@ -1,11 +1,4 @@
-import {
-  forwardRef,
-  type HTMLAttributes,
-  useEffect,
-  useId,
-  useMemo,
-  useState,
-} from "react";
+import { forwardRef, type HTMLAttributes, useEffect, useId, useMemo, useState } from "react";
 import { GroupContext, useSelectContext } from "./context.js";
 import { reactAttrs, useSnapshot } from "./internal.js";
 import { useContext } from "react";
@@ -16,34 +9,33 @@ export type SelectGroupProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 /** Semantic option group. Labelled by `Select.GroupLabel`. */
-export const Group = forwardRef<HTMLDivElement, SelectGroupProps>(
-  function SelectGroup({ disabled = false, ...rest }, ref) {
-    const { machine } = useSelectContext("Group");
-    const groupId = useId().replaceAll(":", "");
-    const [hasLabel, setHasLabel] = useState(false);
-    useEffect(
-      () => machine.collection.registerGroup(groupId, { disabled }),
-      [machine, groupId, disabled],
-    );
-    const visible =
-      useSnapshot(machine, (m) =>
-        String(m.collection.groupHasVisible(groupId)),
-      ) === "true";
-    const value = useMemo(() => ({ groupId, setHasLabel }), [groupId]);
-    return (
-      <GroupContext.Provider value={value}>
-        <div
-          data-part="group"
-          data-disabled={disabled ? "" : undefined}
-          {...rest}
-          {...reactAttrs(machine.attrs.group(groupId, hasLabel))}
-          hidden={!visible}
-          ref={ref}
-        />
-      </GroupContext.Provider>
-    );
-  },
-);
+export const Group = forwardRef<HTMLDivElement, SelectGroupProps>(function SelectGroup(
+  { disabled = false, ...rest },
+  ref,
+) {
+  const { machine } = useSelectContext("Group");
+  const groupId = useId().replaceAll(":", "");
+  const [hasLabel, setHasLabel] = useState(false);
+  useEffect(
+    () => machine.collection.registerGroup(groupId, { disabled }),
+    [machine, groupId, disabled],
+  );
+  const visible =
+    useSnapshot(machine, (m) => String(m.collection.groupHasVisible(groupId))) === "true";
+  const value = useMemo(() => ({ groupId, setHasLabel }), [groupId]);
+  return (
+    <GroupContext.Provider value={value}>
+      <div
+        data-part="group"
+        data-disabled={disabled ? "" : undefined}
+        {...rest}
+        {...reactAttrs(machine.attrs.group(groupId, hasLabel))}
+        hidden={!visible}
+        ref={ref}
+      />
+    </GroupContext.Provider>
+  );
+});
 
 export type SelectGroupLabelProps = HTMLAttributes<HTMLDivElement>;
 
@@ -57,9 +49,7 @@ export const GroupLabel = forwardRef<HTMLDivElement, SelectGroupLabelProps>(
       return () => group?.setHasLabel(false);
     }, [group]);
     if (!group) {
-      throw new Error(
-        "Select.GroupLabel must be rendered inside Select.Group.",
-      );
+      throw new Error("Select.GroupLabel must be rendered inside Select.Group.");
     }
     return (
       <div

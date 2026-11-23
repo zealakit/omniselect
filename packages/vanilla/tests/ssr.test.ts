@@ -17,11 +17,10 @@ test("vanilla adapter and its Overlay dependency import without browser globals"
     }));
   `;
 
-  const output = execFileSync(
-    process.execPath,
-    ["--input-type=module", "--eval", script],
-    { cwd: packageRoot, encoding: "utf8" },
-  );
+  const output = execFileSync(process.execPath, ["--input-type=module", "--eval", script], {
+    cwd: packageRoot,
+    encoding: "utf8",
+  });
 
   const result = JSON.parse(output.trim()) as {
     window: string;

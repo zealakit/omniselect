@@ -22,14 +22,7 @@ test("svelte adapter and its Overlay dependency import without browser globals",
 
   const output = execFileSync(
     process.execPath,
-    [
-      "--strip-types",
-      "--import",
-      loader,
-      "--input-type=module",
-      "--eval",
-      script,
-    ],
+    ["--strip-types", "--import", loader, "--input-type=module", "--eval", script],
     { cwd: packageRoot, encoding: "utf8" },
   );
 
@@ -62,14 +55,7 @@ test("NativeSelect renders the default option as selected on the server", () => 
   `;
   const output = execFileSync(
     process.execPath,
-    [
-      "--strip-types",
-      "--import",
-      loader,
-      "--input-type=module",
-      "--eval",
-      script,
-    ],
+    ["--strip-types", "--import", loader, "--input-type=module", "--eval", script],
     { cwd: packageRoot, encoding: "utf8" },
   );
   const result = JSON.parse(output.trim()) as {
@@ -100,14 +86,7 @@ test("Select renders closed, select-only markup on the server", () => {
   `;
   const output = execFileSync(
     process.execPath,
-    [
-      "--strip-types",
-      "--import",
-      loader,
-      "--input-type=module",
-      "--eval",
-      script,
-    ],
+    ["--strip-types", "--import", loader, "--input-type=module", "--eval", script],
     { cwd: packageRoot, encoding: "utf8" },
   );
   const result = JSON.parse(output.trim()) as {

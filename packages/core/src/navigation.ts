@@ -50,9 +50,7 @@ export function prev<I extends NavItem>(
   if (index - 1 >= 0) {
     return list[index - 1]?.key ?? null;
   }
-  return options.wrap
-    ? (list[list.length - 1]?.key ?? null)
-    : (list[0]?.key ?? null);
+  return options.wrap ? (list[list.length - 1]?.key ?? null) : (list[0]?.key ?? null);
 }
 
 export function pageDown<I extends NavItem>(

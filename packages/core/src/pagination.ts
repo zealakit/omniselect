@@ -34,13 +34,10 @@ export type LoadMoreGuardOptions = {
  * `isLoading` goes from `true` to `false` (or after `settleMs` if it never
  * becomes `true`), so rapid intersection events never produce two requests.
  */
-export function createLoadMoreGuard(
-  options: LoadMoreGuardOptions = {},
-): LoadMoreGuard {
+export function createLoadMoreGuard(options: LoadMoreGuardOptions = {}): LoadMoreGuard {
   const settleMs = options.settleMs ?? 100;
   const schedule = options.setTimeout ?? ((fn, ms) => setTimeout(fn, ms));
-  const cancel =
-    options.clearTimeout ?? ((handle) => clearTimeout(handle as never));
+  const cancel = options.clearTimeout ?? ((handle) => clearTimeout(handle as never));
   let state: LoadMoreState = {
     open: false,
     hasMore: false,
@@ -72,8 +69,7 @@ export function createLoadMoreGuard(
     return true;
   };
 
-  const canLoad = () =>
-    state.open && state.hasMore && !state.isLoading && !inFlight;
+  const canLoad = () => state.open && state.hasMore && !state.isLoading && !inFlight;
 
   function evaluate(): void {
     if (intersecting && canLoad()) {
@@ -110,21 +106,11 @@ export function createLoadMoreGuard(
 }
 
 /** Nearest scrollable ancestor of `element` (up to and including `stopAt`), or `null` for the viewport. */
-export function findScrollParent(
-  element: Element,
-  stopAt?: Element | null,
-): Element | null {
+export function findScrollParent(element: Element, stopAt?: Element | null): Element | null {
   let node: Element | null = element.parentElement;
   while (node) {
-    const overflow =
-      typeof getComputedStyle === "function"
-        ? getComputedStyle(node).overflowY
-        : "";
-    if (
-      overflow === "auto" ||
-      overflow === "scroll" ||
-      overflow === "overlay"
-    ) {
+    const overflow = typeof getComputedStyle === "function" ? getComputedStyle(node).overflowY : "";
+    if (overflow === "auto" || overflow === "scroll" || overflow === "overlay") {
       return node;
     }
     if (node === stopAt) {
@@ -141,10 +127,7 @@ export function findScrollParent(
  * popover is not positioned yet.
  */
 export function scrollItemIntoView(item: Element): void {
-  const container = findScrollParent(
-    item,
-    item.closest('[data-part="popover"]'),
-  );
+  const container = findScrollParent(item, item.closest('[data-part="popover"]'));
   if (!container) {
     return;
   }

@@ -1,16 +1,5 @@
-import {
-  createLoadMoreGuard,
-  findScrollParent,
-} from "@zealakit/omniselect-core";
-import {
-  computed,
-  defineComponent,
-  h,
-  onBeforeUnmount,
-  onMounted,
-  shallowRef,
-  watch,
-} from "vue";
+import { createLoadMoreGuard, findScrollParent } from "@zealakit/omniselect-core";
+import { computed, defineComponent, h, onBeforeUnmount, onMounted, shallowRef, watch } from "vue";
 import { useSelectContext } from "./context.js";
 
 /**

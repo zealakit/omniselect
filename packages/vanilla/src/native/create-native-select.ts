@@ -25,11 +25,7 @@ function readValue(select: HTMLSelectElement): string | string[] {
   return select.multiple ? selected : (selected[0] ?? "");
 }
 
-const toggle = (
-  element: Element | null | undefined,
-  name: string,
-  on: boolean,
-) => {
+const toggle = (element: Element | null | undefined, name: string, on: boolean) => {
   if (!element) {
     return;
   }
@@ -48,15 +44,11 @@ export function createNativeSelect(
   root: HTMLElement,
   options: NativeSelectOptions = {},
 ): NativeSelectHandle {
-  const select =
-    root instanceof HTMLSelectElement ? root : root.querySelector("select");
+  const select = root instanceof HTMLSelectElement ? root : root.querySelector("select");
   if (!select) {
-    throw new Error(
-      "createNativeSelect: no <select> found inside the root element.",
-    );
+    throw new Error("createNativeSelect: no <select> found inside the root element.");
   }
-  const scope =
-    root instanceof HTMLSelectElement ? (root.parentElement ?? root) : root;
+  const scope = root instanceof HTMLSelectElement ? (root.parentElement ?? root) : root;
   if (!select.id) {
     select.id = nextId("omniselect-native");
   }
@@ -78,9 +70,7 @@ export function createNativeSelect(
     toggle(label, "data-disabled", select.disabled);
     toggle(label, "data-required", select.required);
     toggle(indicator, "data-disabled", select.disabled);
-    for (const option of Array.from(
-      select.querySelectorAll("option, optgroup"),
-    )) {
+    for (const option of Array.from(select.querySelectorAll("option, optgroup"))) {
       toggle(option, "data-disabled", (option as HTMLOptionElement).disabled);
     }
   };

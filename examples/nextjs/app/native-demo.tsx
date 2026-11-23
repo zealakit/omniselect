@@ -15,21 +15,14 @@ export function NativeDemo() {
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(
-      JSON.stringify([...new FormData(event.currentTarget).entries()]),
-    );
+    setSubmitted(JSON.stringify([...new FormData(event.currentTarget).entries()]));
   }
 
   return (
     <>
       <form onSubmit={onSubmit}>
         <div className="field">
-          <NativeSelect.Root<string>
-            name="fruit"
-            required
-            value={fruit}
-            onValueChange={setFruit}
-          >
+          <NativeSelect.Root<string> name="fruit" required value={fruit} onValueChange={setFruit}>
             <NativeSelect.Label>Fruit</NativeSelect.Label>
             <NativeSelect.Control>
               <NativeSelect.Option value={null} disabled>
@@ -49,10 +42,7 @@ export function NativeDemo() {
       </form>
       <h2>Select</h2>
       <div className="field">
-        <Select.Root
-          defaultValue="apple"
-          itemToString={(value: string) => value}
-        >
+        <Select.Root defaultValue="apple" itemToString={(value: string) => value}>
           <Select.Label>Fruit</Select.Label>
           <Select.Control>
             <span className="select-control">
@@ -66,11 +56,7 @@ export function NativeDemo() {
           <Select.Popover>
             <Select.List>
               {["apple", "banana", "cherry", "date"].map((name) => (
-                <Select.Item
-                  key={name}
-                  value={name}
-                  disabled={name === "cherry"}
-                >
+                <Select.Item key={name} value={name} disabled={name === "cherry"}>
                   {name}
                   <Select.ItemIndicator>✓</Select.ItemIndicator>
                 </Select.Item>

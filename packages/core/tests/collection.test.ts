@@ -1,12 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import {
-  createCollection,
-  createIds,
-  defaultFilter,
-  nextId,
-  normalize,
-} from "../dist/index.js";
+import { createCollection, createIds, defaultFilter, nextId, normalize } from "../dist/index.js";
 
 const make = (compare?: Parameters<typeof createCollection<string>>[0]) =>
   createCollection<string>(compare);

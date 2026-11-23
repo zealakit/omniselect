@@ -45,7 +45,9 @@ function run(command, args, cwd) {
   if (result.status !== 0) {
     throw new Error(
       `${command} ${args.join(" ")} failed (${result.status}): ${(
-        result.stderr || result.stdout || ""
+        result.stderr ||
+        result.stdout ||
+        ""
       ).trim()}`,
     );
   }
@@ -83,10 +85,7 @@ function rewriteSpecifiers(packageRoot) {
     if (!target.startsWith(".")) {
       target = `./${target}`;
     }
-    const next = source.replace(
-      SPECIFIER_RE,
-      (_match, quote) => `${quote}${target}${quote}`,
-    );
+    const next = source.replace(SPECIFIER_RE, (_match, quote) => `${quote}${target}${quote}`);
     if (next.includes(CORE_NAME)) {
       throw new Error(
         `${relative(packageRoot, file)} references ${CORE_NAME} in a form this step cannot rewrite (subpath or non-literal import).`,
@@ -127,9 +126,7 @@ export function bundleCoreIntoTarball(tarball) {
   if (!existsSync(join(coreDist, "index.js"))) {
     throw new Error("Core is not built; run `pnpm build` first.");
   }
-  const coreManifest = JSON.parse(
-    readFileSync(join(CORE_DIR, "package.json"), "utf8"),
-  );
+  const coreManifest = JSON.parse(readFileSync(join(CORE_DIR, "package.json"), "utf8"));
 
   const outDir = dirname(tarball);
   const staging = mkdtempSync(join(outDir, ".bundle-core-"));

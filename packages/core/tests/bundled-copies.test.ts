@@ -13,9 +13,7 @@ import * as primary from "../dist/index.js";
 const packageDir = dirname(dirname(fileURLToPath(import.meta.url)));
 const copyDir = mkdtempSync(join(packageDir, ".tmp-core-copy-"));
 cpSync(join(packageDir, "dist"), copyDir, { recursive: true });
-const secondary = (await import(
-  pathToFileURL(join(copyDir, "index.js")).href
-)) as typeof primary;
+const secondary = (await import(pathToFileURL(join(copyDir, "index.js")).href)) as typeof primary;
 
 after(() => {
   rmSync(copyDir, { recursive: true, force: true });

@@ -19,10 +19,7 @@ const press = (target: Element, key: string) =>
     }),
   );
 const fill = (input: HTMLInputElement, text: string) => {
-  const setter = Object.getOwnPropertyDescriptor(
-    Object.getPrototypeOf(input),
-    "value",
-  )?.set;
+  const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(input), "value")?.set;
   setter?.call(input, text);
   input.dispatchEvent(new window.Event("input", { bubbles: true }));
 };
@@ -33,11 +30,7 @@ function view(renders: Map<string, number>) {
   return h(
     Select.Root as never,
     { portal: false },
-    h(
-      Select.Control,
-      null,
-      h(Select.Input as never, { placeholder: "Search" }),
-    ),
+    h(Select.Control, null, h(Select.Input as never, { placeholder: "Search" })),
     h(
       Select.Popover,
       null,
@@ -50,8 +43,7 @@ function view(renders: Map<string, number>) {
             {
               key: i,
               id: `item-${i}`,
-              onRender: (id: string) =>
-                renders.set(id, (renders.get(id) ?? 0) + 1),
+              onRender: (id: string) => renders.set(id, (renders.get(id) ?? 0) + 1),
             },
             h(Select.Item as never, { value: `item-${i}` }, `Item ${i}`),
           ),
@@ -105,8 +97,5 @@ test("perf: 1,000 items filter in well under a frame budget and highlight moves 
   });
   const second = new Set(renders.keys());
   assert.ok(first.size <= 2, `first move re-rendered ${first.size} items`);
-  assert.ok(
-    second.size <= 2,
-    `highlight move re-rendered ${second.size} items`,
-  );
+  assert.ok(second.size <= 2, `highlight move re-rendered ${second.size} items`);
 });

@@ -1,11 +1,7 @@
 import { after } from "node:test";
 import { mount, type VueWrapper } from "@vue/test-utils";
 import { defineComponent, h, nextTick, reactive, type VNode } from "vue";
-import type {
-  Driver,
-  PartNode,
-  Scenario,
-} from "../../core/tests/conformance/index.ts";
+import type { Driver, PartNode, Scenario } from "../../core/tests/conformance/index.ts";
 import {
   performSelectDomStep,
   readFormData,
@@ -43,29 +39,19 @@ const components = {
 
 type Extra = { loadMore: Record<string, unknown>; onLoadMore: unknown };
 
-function build(
-  node: PartNode,
-  index: number,
-  extra: Extra,
-): VNode | string | undefined {
+function build(node: PartNode, index: number, extra: Extra): VNode | string | undefined {
   if (node.part === "itemText") {
     return node.text;
   }
   if (node.part === "outside") {
-    return h(
-      "button",
-      { key: index, "data-part": "outside", type: "button" },
-      node.text,
-    );
+    return h("button", { key: index, "data-part": "outside", type: "button" }, node.text);
   }
   const component = components[node.part as keyof typeof components];
   const children = node.children
     ? () => node.children?.map((child, i) => build(child, i, extra))
     : () => node.text;
   const own =
-    node.part === "loadMore"
-      ? { ...extra.loadMore, onLoadMore: extra.onLoadMore }
-      : node.props;
+    node.part === "loadMore" ? { ...extra.loadMore, onLoadMore: extra.onLoadMore } : node.props;
   return h(component as never, { key: index, ...own }, { default: children });
 }
 

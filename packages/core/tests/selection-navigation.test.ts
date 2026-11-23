@@ -41,12 +41,7 @@ test("multi selection keeps insertion order and toggles by key", () => {
   assert.equal(s.isEmpty(s.remove(v, { id: 1 })), true);
 });
 
-const items = [
-  { key: "a" },
-  { key: "b", disabled: true },
-  { key: "c" },
-  { key: "d" },
-];
+const items = [{ key: "a" }, { key: "b", disabled: true }, { key: "c" }, { key: "d" }];
 
 test("navigation skips disabled and respects wrap", () => {
   assert.equal(first(items), "a");

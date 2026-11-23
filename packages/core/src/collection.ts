@@ -46,9 +46,7 @@ export type Collection<T> = {
   subscribe: (listener: () => void) => () => void;
 };
 
-export function createCollection<T>(
-  options: CollectionOptions<T> = {},
-): Collection<T> {
+export function createCollection<T>(options: CollectionOptions<T> = {}): Collection<T> {
   const entries = new Map<string, CollectionItem<T>>();
   const order: string[] = [];
   const groups = new Map<string, { disabled: boolean }>();
@@ -84,16 +82,12 @@ export function createCollection<T>(
       .map((item) => ({
         ...item,
         disabled:
-          item.disabled ||
-          (item.groupId !== null &&
-            groups.get(item.groupId)?.disabled === true),
+          item.disabled || (item.groupId !== null && groups.get(item.groupId)?.disabled === true),
       }));
     const compare = options.compare;
     const items = compare ? [...base].sort(compare) : base;
     const visible =
-      filter === false
-        ? items
-        : items.filter((item) => (filter as FilterFn<T>)(item, query));
+      filter === false ? items : items.filter((item) => (filter as FilterFn<T>)(item, query));
     cache = {
       v: version,
       items,
@@ -101,9 +95,7 @@ export function createCollection<T>(
       byKey: new Map(items.map((item) => [item.key, item])),
       visibleKeys: new Set(visible.map((item) => item.key)),
       visibleGroups: new Set(
-        visible.flatMap((item) =>
-          item.groupId === null ? [] : [item.groupId],
-        ),
+        visible.flatMap((item) => (item.groupId === null ? [] : [item.groupId])),
       ),
     };
     return cache;

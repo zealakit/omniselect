@@ -17,18 +17,13 @@ export type NativeContext = {
   };
 };
 
-export const nativeKey: InjectionKey<NativeContext> =
-  Symbol("omniselect-native");
-export const groupKey: InjectionKey<{ disabled: boolean }> = Symbol(
-  "omniselect-native-group",
-);
+export const nativeKey: InjectionKey<NativeContext> = Symbol("omniselect-native");
+export const groupKey: InjectionKey<{ disabled: boolean }> = Symbol("omniselect-native-group");
 
 export function useNativeContext(part: string): NativeContext {
   const context = inject(nativeKey, null);
   if (!context) {
-    throw new Error(
-      `NativeSelect.${part} must be rendered inside NativeSelect.Root.`,
-    );
+    throw new Error(`NativeSelect.${part} must be rendered inside NativeSelect.Root.`);
   }
   return context;
 }

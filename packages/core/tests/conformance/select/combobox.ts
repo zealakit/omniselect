@@ -1,10 +1,6 @@
 import type { PartNode, Scenario } from "../types.ts";
 
-const item = (
-  value: string,
-  text: string,
-  props: Record<string, unknown> = {},
-): PartNode => ({
+const item = (value: string, text: string, props: Record<string, unknown> = {}): PartNode => ({
   part: "item",
   props: { value, ...props },
   text,
@@ -43,10 +39,7 @@ const tree = (mounted = false, items: PartNode[] = fruit()): PartNode[] => [
   popover(mounted, ...items),
 ];
 
-const base = (
-  props: Record<string, unknown> = {},
-  mounted = false,
-): Partial<Scenario> => ({
+const base = (props: Record<string, unknown> = {}, mounted = false): Partial<Scenario> => ({
   primitive: "select",
   props,
   callbacks: ["onValueChange", "onOpenChange", "onInputChange"],
@@ -252,10 +245,7 @@ export const comboboxScenarios: Scenario[] = [
         false,
         {
           part: "group",
-          children: [
-            { part: "groupLabel", text: "Citrus" },
-            item("lemon", "Lemon"),
-          ],
+          children: [{ part: "groupLabel", text: "Citrus" }, item("lemon", "Lemon")],
         },
         item("apple", "Apple"),
       ),

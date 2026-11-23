@@ -22,14 +22,8 @@ export const Value = defineComponent({
         clear: () => machine.clear(),
       });
       // A slot function that renders nothing returns an empty array or comments.
-      const provided = (custom ?? []).some(
-        (node: VNode) => node.type !== Comment,
-      );
-      const content = provided
-        ? custom
-        : isPlaceholder
-          ? props.placeholder
-          : labels.join(", ");
+      const provided = (custom ?? []).some((node: VNode) => node.type !== Comment);
+      const content = provided ? custom : isPlaceholder ? props.placeholder : labels.join(", ");
       return h(
         "span",
         {

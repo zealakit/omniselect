@@ -1,14 +1,5 @@
 import { nextId } from "@zealakit/omniselect-core";
-import {
-  defineComponent,
-  h,
-  onBeforeUnmount,
-  onMounted,
-  provide,
-  ref,
-  inject,
-  watch,
-} from "vue";
+import { defineComponent, h, onBeforeUnmount, onMounted, provide, ref, inject, watch } from "vue";
 import { groupKey, useSelectContext } from "./context.js";
 import { attrsOf } from "./simple.js";
 
@@ -55,9 +46,7 @@ export const GroupLabel = defineComponent({
     const { machine } = useSelectContext("GroupLabel");
     const group = inject(groupKey, null);
     if (!group) {
-      throw new Error(
-        "Select.GroupLabel must be rendered inside Select.Group.",
-      );
+      throw new Error("Select.GroupLabel must be rendered inside Select.Group.");
     }
     onMounted(() => {
       group.hasLabel.value = true;

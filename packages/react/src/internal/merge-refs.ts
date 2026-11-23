@@ -18,9 +18,7 @@ export function mergeRefs<T>(...refs: (Ref<T> | undefined)[]): RefCallback<T> {
  * old ref with `null` and the new one with the node, which loops when a ref
  * sets state.
  */
-export function useMergedRef<T>(
-  ...refs: (Ref<T> | undefined)[]
-): RefCallback<T> {
+export function useMergedRef<T>(...refs: (Ref<T> | undefined)[]): RefCallback<T> {
   // biome-ignore lint/correctness/useExhaustiveDependencies: the refs array is the dependency list
   return useMemo(() => mergeRefs(...refs), refs);
 }

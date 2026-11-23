@@ -1,11 +1,11 @@
 <script lang="ts">
-import type { Snippet } from "svelte";
-import type { HTMLLabelAttributes } from "svelte/elements";
-import { getNativeContext } from "./context.js";
+  import type { Snippet } from "svelte";
+  import type { HTMLLabelAttributes } from "svelte/elements";
+  import { getNativeContext } from "./context.js";
 
-type Props = HTMLLabelAttributes & { children?: Snippet };
-let { children, ...rest }: Props = $props();
-const context = getNativeContext("Label");
+  type Props = HTMLLabelAttributes & { children?: Snippet };
+  let { children, ...rest }: Props = $props();
+  const context = getNativeContext("Label");
 </script>
 
 <!-- svelte-ignore a11y_label_has_associated_control -->

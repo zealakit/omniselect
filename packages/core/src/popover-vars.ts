@@ -18,9 +18,7 @@ export function getPopoverVars(
 ): PopoverVars {
   const side = placement.split("-")[0];
   const room =
-    side === "top"
-      ? anchor.top - gap - padding
-      : viewportHeight - anchor.bottom - gap - padding;
+    side === "top" ? anchor.top - gap - padding : viewportHeight - anchor.bottom - gap - padding;
   return {
     width: anchor.width,
     availableHeight: Math.max(0, Math.round(room)),

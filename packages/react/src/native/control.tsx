@@ -11,13 +11,7 @@ import { useNativeContext } from "./context.js";
 
 export type NativeSelectControlProps = Omit<
   SelectHTMLAttributes<HTMLSelectElement>,
-  | "value"
-  | "defaultValue"
-  | "multiple"
-  | "name"
-  | "form"
-  | "required"
-  | "disabled"
+  "value" | "defaultValue" | "multiple" | "name" | "form" | "required" | "disabled"
 >;
 
 /** The semantic `<select>`. The only focusable element. */
@@ -64,8 +58,7 @@ export const Control = forwardRef<HTMLSelectElement, NativeSelectControlProps>(
         ? { defaultValue: multiple ? defaultKeys : defaultKeys[0] }
         : { value: multiple ? controlledKeys : (controlledKeys[0] ?? "") };
 
-    const isPlaceholder =
-      !multiple && controller.selection.isEmpty(state.value);
+    const isPlaceholder = !multiple && controller.selection.isEmpty(state.value);
 
     return (
       <select

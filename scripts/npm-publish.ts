@@ -17,10 +17,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { bundleCoreIntoTarball, VENDOR_DIR } from "./bundle-core.mjs";
 
-const PROJECT_ROOT = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "..",
-);
+const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const ARTIFACT_DIR = path.join(PROJECT_ROOT, "artifacts", "npm-publish");
 const CORE_NAME = "@zealakit/omniselect-core";
 
@@ -196,11 +193,7 @@ function readJson(filePath: string): PackageJson {
   try {
     return JSON.parse(fs.readFileSync(filePath, "utf8")) as PackageJson;
   } catch (error) {
-    fail(
-      `Failed to read ${filePath}: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    );
+    fail(`Failed to read ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -269,9 +262,7 @@ function validateCore(pkg: PackageConfig): void {
     );
   }
   if (!manifest.version || !VERSION_RE.test(manifest.version)) {
-    fail(
-      `Core package has an invalid version: "${manifest.version ?? "(missing)"}".`,
-    );
+    fail(`Core package has an invalid version: "${manifest.version ?? "(missing)"}".`);
   }
   validateWorkspaceDependencies(pkg);
 }
@@ -295,9 +286,7 @@ function validatePackage(pkg: PackageConfig): void {
   }
 
   if (!manifest.version || !VERSION_RE.test(manifest.version)) {
-    fail(
-      `${label} package has an invalid version: "${manifest.version ?? "(missing)"}".`,
-    );
+    fail(`${label} package has an invalid version: "${manifest.version ?? "(missing)"}".`);
   }
 
   if (!manifest.files || manifest.files.length === 0) {
@@ -363,10 +352,7 @@ function validateRelease(pkgs: PackageConfig[]): void {
   if (versions.size !== 1) {
     fail(
       `All five packages must share one release version. Found: ${pkgs
-        .map(
-          (pkg) =>
-            `${pkg.manifest.name}@${pkg.manifest.version ?? "(missing)"}`,
-        )
+        .map((pkg) => `${pkg.manifest.name}@${pkg.manifest.version ?? "(missing)"}`)
         .join(", ")}.`,
     );
   }
@@ -414,9 +400,7 @@ function checkNpmAuthentication(): string {
   const result = runCaptured("npm", ["whoami"], PROJECT_ROOT);
   if (result.status !== 0 || !result.stdout) {
     const detail = result.stderr || result.stdout || "unknown error";
-    fail(
-      `npm is not authenticated. Run \`npm login\` first.\nDetails: ${detail}`,
-    );
+    fail(`npm is not authenticated. Run \`npm login\` first.\nDetails: ${detail}`);
   }
   return result.stdout;
 }
@@ -432,11 +416,7 @@ function isNpmNotFound(stderr: string, stdout: string): boolean {
 }
 
 function versionExists(name: string, version: string): boolean {
-  const result = runCaptured(
-    "npm",
-    ["view", `${name}@${version}`, "version"],
-    PROJECT_ROOT,
-  );
+  const result = runCaptured("npm", ["view", `${name}@${version}`, "version"], PROJECT_ROOT);
 
   if (result.status === 0) {
     return true;
@@ -447,9 +427,7 @@ function versionExists(name: string, version: string): boolean {
   }
 
   const detail = result.stderr || result.stdout || `exit ${result.status}`;
-  fail(
-    `Could not verify whether ${name}@${version} exists on npm.\nDetails: ${detail}`,
-  );
+  fail(`Could not verify whether ${name}@${version} exists on npm.\nDetails: ${detail}`);
 }
 
 function assertVersionNotPublished(pkg: PackageConfig): void {
@@ -513,11 +491,7 @@ function buildPackages(pkgs: PackageConfig[], fullSet: boolean): void {
     runInherited("pnpm", ["run", "build"], PROJECT_ROOT);
   } else {
     const target = pkgs[pkgs.length - 1];
-    runInherited(
-      "pnpm",
-      ["--filter", `${target.expectedName}...`, "run", "build"],
-      PROJECT_ROOT,
-    );
+    runInherited("pnpm", ["--filter", `${target.expectedName}...`, "run", "build"], PROJECT_ROOT);
   }
 
   for (const pkg of pkgs) {
@@ -536,19 +510,13 @@ function resetArtifacts(): void {
 }
 
 function tarballFileName(pkg: PackageConfig): string {
-  const name = (pkg.manifest.name as string)
-    .replace(/^@/, "")
-    .replace("/", "-");
+  const name = (pkg.manifest.name as string).replace(/^@/, "").replace("/", "-");
   return `${name}-${pkg.manifest.version as string}.tgz`;
 }
 
 function packPackage(pkg: PackageConfig): string {
   const tarball = path.join(ARTIFACT_DIR, tarballFileName(pkg));
-  runInherited(
-    "pnpm",
-    ["pack", "--pack-destination", ARTIFACT_DIR],
-    pkg.packageDir,
-  );
+  runInherited("pnpm", ["pack", "--pack-destination", ARTIFACT_DIR], pkg.packageDir);
 
   if (!fs.existsSync(tarball)) {
     fail(`${pkg.label} pack did not produce ${tarball}.`);
@@ -566,11 +534,7 @@ function packPackage(pkg: PackageConfig): string {
 }
 
 function readPackedManifest(pkg: PackageConfig, tarball: string): PackageJson {
-  const result = runCaptured(
-    "tar",
-    ["-xOzf", tarball, "package/package.json"],
-    PROJECT_ROOT,
-  );
+  const result = runCaptured("tar", ["-xOzf", tarball, "package/package.json"], PROJECT_ROOT);
   if (result.status !== 0 || !result.stdout) {
     fail(
       `Could not read package/package.json from ${path.basename(tarball)}.\nDetails: ${
@@ -589,10 +553,7 @@ function readPackedManifest(pkg: PackageConfig, tarball: string): PackageJson {
   }
 }
 
-function assertNoWorkspaceProtocol(
-  pkg: PackageConfig,
-  packed: PackageJson,
-): void {
+function assertNoWorkspaceProtocol(pkg: PackageConfig, packed: PackageJson): void {
   for (const field of DEPENDENCY_FIELDS) {
     for (const [name, range] of Object.entries(packed[field] ?? {})) {
       if (range.startsWith("workspace:")) {
@@ -604,10 +565,7 @@ function assertNoWorkspaceProtocol(
   }
 }
 
-function assertPackedEntryPoints(
-  pkg: PackageConfig,
-  packed: PackageJson,
-): void {
+function assertPackedEntryPoints(pkg: PackageConfig, packed: PackageJson): void {
   for (const field of ["main", "module", "types"] as const) {
     const value = packed[field];
     if (!value?.startsWith("./dist/")) {
@@ -626,13 +584,9 @@ function assertPackedEntryPoints(
     fail(`${pkg.label} packed manifest is missing the "." export.`);
   }
 
-  for (const [condition, target] of Object.entries(
-    rootExport as Record<string, unknown>,
-  )) {
+  for (const [condition, target] of Object.entries(rootExport as Record<string, unknown>)) {
     if (typeof target === "string" && !target.startsWith("./dist/")) {
-      fail(
-        `${pkg.label} packed export "${condition}" must point into ./dist (found "${target}").`,
-      );
+      fail(`${pkg.label} packed export "${condition}" must point into ./dist (found "${target}").`);
     }
   }
 }
@@ -640,10 +594,7 @@ function assertPackedEntryPoints(
 const OVERLAY_SCOPE = "@zealakit/overlay-";
 
 /** Exactly one Overlay runtime dependency: the adapter for the same framework. */
-function assertOverlayDependency(
-  pkg: PackageConfig,
-  packed: PackageJson,
-): void {
+function assertOverlayDependency(pkg: PackageConfig, packed: PackageJson): void {
   const overlays = Object.keys(packed.dependencies ?? {}).filter((name) =>
     name.startsWith(OVERLAY_SCOPE),
   );
@@ -663,11 +614,7 @@ function assertOverlayDependency(
 }
 
 /** Omniselect Core may only appear under the vendored folder; Overlay Core nowhere. */
-function assertNoStrayCoreReferences(
-  pkg: PackageConfig,
-  tarball: string,
-  entries: string[],
-): void {
+function assertNoStrayCoreReferences(pkg: PackageConfig, tarball: string, entries: string[]): void {
   for (const entry of entries) {
     if (!/\.(js|d\.ts|svelte|json)$/.test(entry)) {
       continue;
@@ -675,15 +622,9 @@ function assertNoStrayCoreReferences(
     if (entry.startsWith(`package/${VENDOR_DIR}/`)) {
       continue;
     }
-    const content = runCaptured(
-      "tar",
-      ["-xOzf", tarball, entry],
-      PROJECT_ROOT,
-    ).stdout;
+    const content = runCaptured("tar", ["-xOzf", tarball, entry], PROJECT_ROOT).stdout;
     if (entry !== "package/package.json" && content.includes(CORE_NAME)) {
-      fail(
-        `${pkg.label} tarball references ${CORE_NAME} outside ${VENDOR_DIR}: ${entry}`,
-      );
+      fail(`${pkg.label} tarball references ${CORE_NAME} outside ${VENDOR_DIR}: ${entry}`);
     }
     if (content.includes("@zealakit/overlay-core")) {
       fail(`${pkg.label} tarball references @zealakit/overlay-core: ${entry}`);
@@ -691,11 +632,7 @@ function assertNoStrayCoreReferences(
   }
 }
 
-function inspectTarball(
-  pkg: PackageConfig,
-  tarball: string,
-  core: PackageConfig,
-): void {
+function inspectTarball(pkg: PackageConfig, tarball: string, core: PackageConfig): void {
   const listing = runCaptured("tar", ["-tzf", tarball], PROJECT_ROOT);
   if (listing.status !== 0) {
     fail(
@@ -758,19 +695,14 @@ function inspectTarball(
     }
   }
   assertOverlayDependency(pkg, packed);
-  for (const [name, range] of Object.entries(
-    core.manifest.dependencies ?? {},
-  )) {
+  for (const [name, range] of Object.entries(core.manifest.dependencies ?? {})) {
     if (packed.dependencies?.[name] !== range) {
       fail(
         `${pkg.label} tarball must depend on Core's runtime dependency ${name}@${range} (found "${packed.dependencies?.[name] ?? "(missing)"}").`,
       );
     }
   }
-  for (const required of [
-    `package/${VENDOR_DIR}/index.js`,
-    `package/${VENDOR_DIR}/index.d.ts`,
-  ]) {
+  for (const required of [`package/${VENDOR_DIR}/index.js`, `package/${VENDOR_DIR}/index.d.ts`]) {
     if (!entries.includes(required)) {
       fail(`${pkg.label} tarball is missing bundled Core entry "${required}".`);
     }
@@ -779,9 +711,7 @@ function inspectTarball(
   assertNoStrayCoreReferences(pkg, tarball, entries);
 
   const sizeKb = Math.ceil(fs.statSync(tarball).size / 1024);
-  console.log(
-    `  ${path.relative(PROJECT_ROOT, tarball)} (${entries.length} files, ${sizeKb} KB)`,
-  );
+  console.log(`  ${path.relative(PROJECT_ROOT, tarball)} (${entries.length} files, ${sizeKb} KB)`);
 }
 
 function logStep(current: number, total: number, message: string): void {
@@ -802,9 +732,7 @@ function preflight(
   logStep(
     2,
     4,
-    buildAll
-      ? "Building all packages"
-      : `Building ${targets[0].label} and its dependencies`,
+    buildAll ? "Building all packages" : `Building ${targets[0].label} and its dependencies`,
   );
   buildPackages(buildSet, buildAll);
 
@@ -834,18 +762,12 @@ function publishPackage(tarball: string): void {
   // prerelease id (`beta`, `rc`, ...) so `npm i` keeps resolving the last stable version.
   const version = /-(\w+)\.\d+\.tgz$/.exec(path.basename(tarball));
   const tag = version ? ["--tag", version[1] as string] : [];
-  runInherited(
-    "npm",
-    ["publish", tarball, "--access", "public", ...tag],
-    PROJECT_ROOT,
-  );
+  runInherited("npm", ["publish", tarball, "--access", "public", ...tag], PROJECT_ROOT);
 }
 
 function printSummary(published: string[], failed: PackageConfig | null): void {
   console.error("\n=== Publish summary ===");
-  console.error(
-    `Published: ${published.length > 0 ? published.join(", ") : "(none)"}`,
-  );
+  console.error(`Published: ${published.length > 0 ? published.join(", ") : "(none)"}`);
   if (failed) {
     console.error(`Failed: ${failed.manifest.name}@${failed.manifest.version}`);
     console.error(
@@ -854,10 +776,7 @@ function printSummary(published: string[], failed: PackageConfig | null): void {
   }
 }
 
-function publishTargets(
-  targets: PackageConfig[],
-  tarballs: Map<PackageId, string>,
-): void {
+function publishTargets(targets: PackageConfig[], tarballs: Map<PackageId, string>): void {
   const published: string[] = [];
 
   for (const pkg of targets) {
@@ -866,9 +785,7 @@ function publishTargets(
       fail(`Missing tarball for ${pkg.label}.`);
     }
 
-    console.log(
-      `\n=== Publishing ${pkg.label}: ${pkg.manifest.name}@${pkg.manifest.version} ===`,
-    );
+    console.log(`\n=== Publishing ${pkg.label}: ${pkg.manifest.name}@${pkg.manifest.version} ===`);
 
     try {
       publishPackage(tarball);
@@ -888,16 +805,12 @@ function main(): void {
   const command = parseCommand(process.argv.slice(2));
   process.chdir(PROJECT_ROOT);
 
-  const allPackages = PACKAGES.map((framework) =>
-    getPackageConfig(framework.id),
-  );
+  const allPackages = PACKAGES.map((framework) => getPackageConfig(framework.id));
   validateRelease(allPackages);
 
   console.log(`repository: ${PROJECT_ROOT}`);
   console.log("public packages: vanilla, react, vue, svelte");
-  console.log(
-    `internal: ${CORE_NAME} (private, bundled into each adapter, never published)`,
-  );
+  console.log(`internal: ${CORE_NAME} (private, bundled into each adapter, never published)`);
   const adapters = allPackages.filter((pkg) => pkg.id !== "core");
 
   let targets: PackageConfig[];
@@ -939,8 +852,6 @@ function main(): void {
 try {
   main();
 } catch (error) {
-  console.error(
-    `\nError: ${error instanceof Error ? error.message : String(error)}`,
-  );
+  console.error(`\nError: ${error instanceof Error ? error.message : String(error)}`);
   process.exit(1);
 }

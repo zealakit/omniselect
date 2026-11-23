@@ -2,10 +2,7 @@ import { MockIntersectionObserver } from "../support/intersection-observer.ts";
 import type { PartRef, Scenario } from "./types.ts";
 
 /** Native-select part lookup shared by every adapter driver. */
-export function queryNativePart(
-  root: ParentNode,
-  ref: PartRef,
-): Element | null {
+export function queryNativePart(root: ParentNode, ref: PartRef): Element | null {
   if (ref === "control") {
     return root.querySelector("select");
   }
@@ -85,10 +82,7 @@ function encodeKey(key: string): string {
 }
 
 /** Select part lookup. Popover content is portaled, so the whole document is searched. */
-export function querySelectPart(
-  root: ParentNode,
-  ref: PartRef,
-): Element | null {
+export function querySelectPart(root: ParentNode, ref: PartRef): Element | null {
   const doc = root.ownerDocument ?? document;
   const first = (selector: string) => doc.querySelector(selector);
   if (ref === "trigger") return first("[data-part=trigger]");
@@ -106,9 +100,7 @@ export function querySelectPart(
       `[role=option][id$="-item-${encodeKey(ref.slice(14))}"] [data-part=item-indicator]`,
     );
   }
-  return first(
-    `[data-part=${ref.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}]`,
-  );
+  return first(`[data-part=${ref.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}]`);
 }
 
 export function readSelectVisibleItems(root: ParentNode): string[] {
@@ -137,10 +129,7 @@ const keyboardInit = (
 
 /** Set `value` the way a user edit does, so React notices the change. */
 function setNativeValue(input: HTMLInputElement, text: string): void {
-  const setter = Object.getOwnPropertyDescriptor(
-    Object.getPrototypeOf(input),
-    "value",
-  )?.set;
+  const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(input), "value")?.set;
   if (setter) {
     setter.call(input, text);
   } else {
@@ -161,16 +150,12 @@ export function performSelectDomStep(
   root: ParentNode,
   step: { type: string; [key: string]: unknown },
 ): boolean {
-  const find = (ref: string) =>
-    querySelectPart(root, ref) as HTMLElement | null;
+  const find = (ref: string) => querySelectPart(root, ref) as HTMLElement | null;
   switch (step.type) {
     case "press": {
       const target = find((step.target as string | undefined) ?? "trigger");
       target?.dispatchEvent(
-        new window.KeyboardEvent(
-          "keydown",
-          keyboardInit(step.key as string, step.mods as never),
-        ),
+        new window.KeyboardEvent("keydown", keyboardInit(step.key as string, step.mods as never)),
       );
       return true;
     }
@@ -190,25 +175,19 @@ export function performSelectDomStep(
         (step.target as string | undefined) ?? "input",
       ) as HTMLInputElement | null;
       if (target) {
-        target.dispatchEvent(
-          new window.Event("compositionstart", { bubbles: true }),
-        );
+        target.dispatchEvent(new window.Event("compositionstart", { bubbles: true }));
         setNativeValue(target, step.text as string);
         const event = new window.Event("input", { bubbles: true });
         Object.defineProperty(event, "isComposing", { value: true });
         target.dispatchEvent(event);
-        target.dispatchEvent(
-          new window.Event("compositionend", { bubbles: true }),
-        );
+        target.dispatchEvent(new window.Event("compositionend", { bubbles: true }));
       }
       return true;
     }
     case "type": {
       const target = find((step.target as string | undefined) ?? "trigger");
       for (const char of step.text as string) {
-        target?.dispatchEvent(
-          new window.KeyboardEvent("keydown", keyboardInit(char)),
-        );
+        target?.dispatchEvent(new window.KeyboardEvent("keydown", keyboardInit(char)));
       }
       return true;
     }
@@ -223,9 +202,7 @@ export function performSelectDomStep(
           }),
         );
         pointer(target, "pointerup");
-        target.dispatchEvent(
-          new window.MouseEvent("click", { bubbles: true, cancelable: true }),
-        );
+        target.dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
       }
       return true;
     }
@@ -253,9 +230,7 @@ export function performSelectDomStep(
       (document.activeElement as HTMLElement | null)?.blur();
       return true;
     case "invalid":
-      find(step.target as string)?.dispatchEvent(
-        new window.Event("invalid", { cancelable: true }),
-      );
+      find(step.target as string)?.dispatchEvent(new window.Event("invalid", { cancelable: true }));
       return true;
     case "submitForm":
       return true;
@@ -276,14 +251,11 @@ export function makeItemToString(
   return (value) => String((value as Record<string, unknown>)[labelBy]);
 }
 
-export function makeItemToKey(
-  keyBy: string | undefined,
-): ((value: unknown) => string) | undefined {
+export function makeItemToKey(keyBy: string | undefined): ((value: unknown) => string) | undefined {
   if (!keyBy) {
     return undefined;
   }
-  return (value) =>
-    value === null ? "" : String((value as Record<string, unknown>)[keyBy]);
+  return (value) => (value === null ? "" : String((value as Record<string, unknown>)[keyBy]));
 }
 
 /** Replace listed callback props with loggers that record into `log`. */
@@ -316,10 +288,7 @@ export function performNativeDomStep(
   const select = root.querySelector("select");
   switch (step.type) {
     case "select": {
-      const target = queryNativePart(
-        root,
-        step.target as string,
-      ) as HTMLSelectElement;
+      const target = queryNativePart(root, step.target as string) as HTMLSelectElement;
       const wanted = new Set(step.values as string[]);
       for (const option of Array.from(target.options)) {
         option.selected = wanted.has(option.value);
@@ -334,9 +303,7 @@ export function performNativeDomStep(
       );
       return true;
     case "focus":
-      (
-        queryNativePart(root, step.target as string) as HTMLElement | null
-      )?.focus();
+      (queryNativePart(root, step.target as string) as HTMLElement | null)?.focus();
       return true;
     case "blur":
       (select as HTMLElement | null)?.blur();

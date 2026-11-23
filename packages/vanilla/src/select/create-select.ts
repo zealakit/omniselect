@@ -37,10 +37,7 @@ export type SelectOptions = {
   announce?: boolean;
   messages?: Partial<SelectMessages>;
   defaultOpen?: boolean;
-  onOpenChange?: (
-    open: boolean,
-    reason: SelectOpenReason | SelectCloseReason,
-  ) => void;
+  onOpenChange?: (open: boolean, reason: SelectOpenReason | SelectCloseReason) => void;
   disabled?: boolean;
   required?: boolean;
   closeOnSelect?: boolean;
@@ -105,11 +102,7 @@ function applyAttrs(element: Element | null | undefined, attrs: Attrs): void {
   }
 }
 
-const toggleAttr = (
-  element: Element | null | undefined,
-  name: string,
-  on: boolean,
-) => {
+const toggleAttr = (element: Element | null | undefined, name: string, on: boolean) => {
   if (!element) {
     return;
   }
@@ -125,12 +118,8 @@ const toggleAttr = (
  * `value`, `clear`, `indicator`, `popover` > `list` > `item` (`data-value`),
  * `group`, `group-label`, `item-indicator`, and `empty`.
  */
-export function createSelect(
-  root: HTMLElement,
-  options: SelectOptions = {},
-): SelectHandle {
-  const part = (name: string) =>
-    root.querySelector<HTMLElement>(`[data-part="${name}"]`);
+export function createSelect(root: HTMLElement, options: SelectOptions = {}): SelectHandle {
+  const part = (name: string) => root.querySelector<HTMLElement>(`[data-part="${name}"]`);
   const trigger = part("trigger");
   const popover = part("popover");
   const list = part("list");
@@ -163,10 +152,8 @@ export function createSelect(
     maxSelected: options.maxSelected,
     announce: options.announce,
     messages: options.messages,
-    defaultValue: (options.defaultValue ??
-      (options.multiple ? [] : null)) as never,
-    onValueChange: (value) =>
-      options.onValueChange?.(value as string | string[] | null),
+    defaultValue: (options.defaultValue ?? (options.multiple ? [] : null)) as never,
+    onValueChange: (value) => options.onValueChange?.(value as string | string[] | null),
     defaultOpen: options.defaultOpen,
     disabled: options.disabled,
     required: options.required,
@@ -185,10 +172,7 @@ export function createSelect(
     triggerLabel: options.triggerLabel,
     onOpenChange(open, reason) {
       options.onOpenChange?.(open, reason);
-      if (
-        !open &&
-        (reason === "select" || reason === "escape" || reason === "tab")
-      ) {
+      if (!open && (reason === "select" || reason === "escape" || reason === "tab")) {
         focusAfterClose();
       }
     },
@@ -205,9 +189,7 @@ export function createSelect(
     for (const off of unregister.splice(0)) {
       off();
     }
-    for (const group of Array.from(
-      popover.querySelectorAll<HTMLElement>('[data-part="group"]'),
-    )) {
+    for (const group of Array.from(popover.querySelectorAll<HTMLElement>('[data-part="group"]'))) {
       const id = group.id || nextId("group");
       group.dataset.groupId = id;
       unregister.push(
@@ -216,9 +198,7 @@ export function createSelect(
         }),
       );
     }
-    for (const el of Array.from(
-      list.querySelectorAll<HTMLElement>('[data-part="item"]'),
-    )) {
+    for (const el of Array.from(list.querySelectorAll<HTMLElement>('[data-part="item"]'))) {
       const key = el.dataset.value ?? "";
       const group = el.closest<HTMLElement>('[data-part="group"]');
       unregister.push(
@@ -226,9 +206,7 @@ export function createSelect(
           key,
           value: key,
           textValue: el.dataset.textValue ?? getItemText(el),
-          disabled:
-            el.hasAttribute("data-disabled") ||
-            el.getAttribute("aria-disabled") === "true",
+          disabled: el.hasAttribute("data-disabled") || el.getAttribute("aria-disabled") === "true",
           groupId: group?.dataset.groupId ?? null,
           node: el,
         }),
@@ -236,8 +214,7 @@ export function createSelect(
     }
   };
 
-  const itemElements = () =>
-    Array.from(list.querySelectorAll<HTMLElement>('[data-part="item"]'));
+  const itemElements = () => Array.from(list.querySelectorAll<HTMLElement>('[data-part="item"]'));
 
   let renderForm: () => void = () => {};
   const render = () => {
@@ -255,10 +232,7 @@ export function createSelect(
       }
     }
     applyAttrs(list, machine.attrs.list());
-    applyAttrs(
-      clearEl,
-      machine.attrs.clear(options.clearLabel ?? "Clear selection"),
-    );
+    applyAttrs(clearEl, machine.attrs.clear(options.clearLabel ?? "Clear selection"));
     indicator?.setAttribute("aria-hidden", "true");
     indicator?.setAttribute("data-state", open ? "open" : "closed");
     popover.setAttribute("data-state", open ? "open" : "closed");
@@ -272,8 +246,7 @@ export function createSelect(
     }
     if (empty) {
       // While a page is loading the list is not empty yet.
-      empty.hidden =
-        machine.collection.visible().length !== 0 || state.hasLoading;
+      empty.hidden = machine.collection.visible().length !== 0 || state.hasLoading;
       empty.setAttribute("role", "option");
       empty.setAttribute("aria-disabled", "true");
       empty.setAttribute("aria-selected", "false");
@@ -295,22 +268,16 @@ export function createSelect(
         mark.setAttribute("data-state", selected ? "checked" : "unchecked");
       }
     }
-    for (const group of Array.from(
-      popover.querySelectorAll<HTMLElement>('[data-part="group"]'),
-    )) {
+    for (const group of Array.from(popover.querySelectorAll<HTMLElement>('[data-part="group"]'))) {
       const id = group.dataset.groupId ?? "";
-      const groupLabel = group.querySelector<HTMLElement>(
-        '[data-part="group-label"]',
-      );
+      const groupLabel = group.querySelector<HTMLElement>('[data-part="group-label"]');
       applyAttrs(group, machine.attrs.group(id, groupLabel !== null));
       group.hidden = !machine.collection.groupHasVisible(id);
       applyAttrs(groupLabel, machine.attrs.groupLabel(id));
     }
     const highlighted = state.highlightedKey;
     if (open && highlighted !== null && state.highlightSource === "keyboard") {
-      const el = itemElements().find(
-        (item) => item.dataset.value === highlighted,
-      );
+      const el = itemElements().find((item) => item.dataset.value === highlighted);
       if (el) {
         scrollItemIntoView(el);
       }
@@ -339,10 +306,7 @@ export function createSelect(
     if (options.matchWidth !== false) {
       popover.style.setProperty("--omniselect-anchor-width", `${vars.width}px`);
     }
-    popover.style.setProperty(
-      "--omniselect-available-height",
-      `${vars.availableHeight}px`,
-    );
+    popover.style.setProperty("--omniselect-available-height", `${vars.availableHeight}px`);
     const [side = "bottom", align = "center"] = overlay.placement.split("-");
     popover.dataset.side = side;
     popover.dataset.align = align;
@@ -385,9 +349,7 @@ export function createSelect(
     hidden.required = options.required ?? false;
     hidden.disabled = options.disabled ?? false;
     hidden.addEventListener("change", () => {
-      machine.setFromKeys(
-        Array.from(hidden?.selectedOptions ?? []).map((o) => o.value),
-      );
+      machine.setFromKeys(Array.from(hidden?.selectedOptions ?? []).map((o) => o.value));
     });
     hidden.addEventListener("invalid", () => {
       machine.setInvalid(true);
@@ -446,11 +408,7 @@ export function createSelect(
   const observeSentinel = () => {
     sentinelObserver?.disconnect();
     sentinelObserver = null;
-    if (
-      !sentinel ||
-      !machine.isOpen() ||
-      typeof IntersectionObserver === "undefined"
-    ) {
+    if (!sentinel || !machine.isOpen() || typeof IntersectionObserver === "undefined") {
       return;
     }
     sentinelObserver = new IntersectionObserver(
@@ -552,9 +510,7 @@ export function createSelect(
   // Keep focus on the trigger/input (also when grabbing the scrollbar).
   const onPopoverMouseDown = (event: Event) => event.preventDefault();
   const itemOf = (event: Event): HTMLElement | null =>
-    (event.target as Element | null)?.closest?.(
-      '[data-part="item"]',
-    ) as HTMLElement | null;
+    (event.target as Element | null)?.closest?.('[data-part="item"]') as HTMLElement | null;
   const onPointerDown = (event: Event) => {
     if (itemOf(event)) {
       event.preventDefault();
@@ -586,8 +542,7 @@ export function createSelect(
   inputEl?.addEventListener("click", onInputClick);
   inputEl?.addEventListener("blur", onInputBlur);
   // A popover input only counts while the popover is open (the trigger is a select-only control before that).
-  let offInput =
-    inputEl && !inputInPopover ? machine.registerInput() : () => {};
+  let offInput = inputEl && !inputInPopover ? machine.registerInput() : () => {};
   // Combobox: a press anywhere on the control (not on a button or the input) edits the text.
   const onControlClick = (event: Event) => {
     if (
@@ -610,9 +565,7 @@ export function createSelect(
   const offClear = clearEl ? machine.registerClear() : () => {};
 
   const observer =
-    typeof MutationObserver === "undefined"
-      ? null
-      : new MutationObserver(() => registerItems());
+    typeof MutationObserver === "undefined" ? null : new MutationObserver(() => registerItems());
   observer?.observe(list, { childList: true, subtree: true });
 
   registerItems();

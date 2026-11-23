@@ -1,22 +1,22 @@
 <script lang="ts">
-import type { Snippet } from "svelte";
-import type { HTMLButtonAttributes } from "svelte/elements";
-import { getSelectContext } from "./context.js";
+  import type { Snippet } from "svelte";
+  import type { HTMLButtonAttributes } from "svelte/elements";
+  import { getSelectContext } from "./context.js";
 
-type Props = HTMLButtonAttributes & { children?: Snippet };
-let { children, onclick, onkeydown, onkeyup, ...rest }: Props = $props();
-const context = getSelectContext("Trigger");
-const { machine, snapshot } = context;
-let element: HTMLButtonElement | undefined = $state();
-const attrs = $derived.by(() => {
-  void $snapshot;
-  return machine.attrs.trigger();
-});
+  type Props = HTMLButtonAttributes & { children?: Snippet };
+  let { children, onclick, onkeydown, onkeyup, ...rest }: Props = $props();
+  const context = getSelectContext("Trigger");
+  const { machine, snapshot } = context;
+  let element: HTMLButtonElement | undefined = $state();
+  const attrs = $derived.by(() => {
+    void $snapshot;
+    return machine.attrs.trigger();
+  });
 
-$effect(() => {
-  context.setTriggerEl(element ?? null);
-  return () => context.setTriggerEl(null);
-});
+  $effect(() => {
+    context.setTriggerEl(element ?? null);
+    return () => context.setTriggerEl(null);
+  });
 </script>
 
 <button

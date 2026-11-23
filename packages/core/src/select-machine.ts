@@ -27,12 +27,7 @@ export type SelectCloseReason =
 
 export type SelectOpenReason = "trigger" | "keyboard" | "imperative";
 
-export type SelectInputChangeReason =
-  | "input"
-  | "select"
-  | "clear"
-  | "close"
-  | "reset";
+export type SelectInputChangeReason = "input" | "select" | "clear" | "close" | "reset";
 
 export type SelectionBehavior = "replace-input" | "keep-input" | "clear-input";
 
@@ -90,10 +85,7 @@ export type SelectMachineOptions<T> = {
   onValueChange?: (value: SelectValue<T>) => void;
   open?: boolean | undefined;
   defaultOpen?: boolean;
-  onOpenChange?: (
-    open: boolean,
-    reason: SelectOpenReason | SelectCloseReason,
-  ) => void;
+  onOpenChange?: (open: boolean, reason: SelectOpenReason | SelectCloseReason) => void;
   disabled?: boolean;
   required?: boolean;
   closeOnSelect?: boolean;
@@ -246,9 +238,7 @@ export type SelectMachine<T> = {
 
 const bool = (on: boolean): string | undefined => (on ? "" : undefined);
 
-export function createSelectMachine<T>(
-  options: SelectMachineOptions<T>,
-): SelectMachine<T> {
+export function createSelectMachine<T>(options: SelectMachineOptions<T>): SelectMachine<T> {
   const multiple = options.multiple ?? false;
   const itemToKey: ItemToKey<T> = options.itemToKey ?? ((v) => String(v));
   const selection = createSelection<T>({
@@ -281,11 +271,7 @@ export function createSelectMachine<T>(
   > &
     Pick<
       SelectProps<T>,
-      | "onValueChange"
-      | "onOpenChange"
-      | "onInputChange"
-      | "filter"
-      | "maxSelected"
+      "onValueChange" | "onOpenChange" | "onInputChange" | "filter" | "maxSelected"
     > & { messages: SelectMessages } = {
     disabled: options.disabled ?? false,
     required: options.required ?? false,
@@ -294,8 +280,7 @@ export function createSelectMachine<T>(
     loop: options.loop ?? false,
     openOnFocus: options.openOnFocus ?? false,
     openOnInput: options.openOnInput ?? true,
-    selectionBehavior:
-      options.selectionBehavior ?? (multiple ? "clear-input" : "replace-input"),
+    selectionBehavior: options.selectionBehavior ?? (multiple ? "clear-input" : "replace-input"),
     restoreOnBlur: options.restoreOnBlur ?? true,
     autoHighlight: options.autoHighlight ?? true,
     autoSelectOnTab: options.autoSelectOnTab ?? false,
@@ -310,16 +295,12 @@ export function createSelectMachine<T>(
   };
 
   const defaultValue = options.defaultValue ?? selection.empty();
-  const initialValue =
-    options.value !== undefined ? options.value : defaultValue;
-  const fallbackLabel = (value: T): string =>
-    options.itemToString?.(value) ?? itemToKey(value);
+  const initialValue = options.value !== undefined ? options.value : defaultValue;
+  const fallbackLabel = (value: T): string => options.itemToString?.(value) ?? itemToKey(value);
   const initialInput =
     options.inputValue ??
     options.defaultInputValue ??
-    (!multiple && initialValue !== null
-      ? fallbackLabel(initialValue as T)
-      : "");
+    (!multiple && initialValue !== null ? fallbackLabel(initialValue as T) : "");
   const store = createStore<SelectState<T>>({
     open: options.open ?? options.defaultOpen ?? false,
     highlightedKey: null,
@@ -345,9 +326,7 @@ export function createSelectMachine<T>(
   const sameKeys = (a: SelectValue<T>, b: SelectValue<T>) =>
     selection.keys(a).join("\u0000") === selection.keys(b).join("\u0000");
 
-  const valueCtl: Controllable<SelectValue<T>> = createControllable<
-    SelectValue<T>
-  >({
+  const valueCtl: Controllable<SelectValue<T>> = createControllable<SelectValue<T>>({
     value: options.value,
     defaultValue,
     equals: sameKeys,
@@ -470,11 +449,7 @@ export function createSelectMachine<T>(
     }
     if (state.highlightedKey !== null) {
       const item = collection.get(state.highlightedKey);
-      if (
-        !item ||
-        item.disabled ||
-        !collection.visible().some((v) => v.key === item.key)
-      ) {
+      if (!item || item.disabled || !collection.visible().some((v) => v.key === item.key)) {
         store.set({ highlightedKey: null, highlightSource: null });
       }
     }
@@ -523,11 +498,7 @@ export function createSelectMachine<T>(
     pendingScheduled = true;
     queueMicrotask(() => {
       pendingScheduled = false;
-      if (
-        pending === null ||
-        !store.get().open ||
-        store.get().highlightedKey !== null
-      ) {
+      if (pending === null || !store.get().open || store.get().highlightedKey !== null) {
         return;
       }
       const key = resolveHighlight(pending);
@@ -557,10 +528,7 @@ export function createSelectMachine<T>(
     return null;
   };
 
-  const setOpen = (
-    next: boolean,
-    why: SelectOpenReason | SelectCloseReason,
-  ): void => {
+  const setOpen = (next: boolean, why: SelectOpenReason | SelectCloseReason): void => {
     reason = why;
     openCtl.set(next);
   };
@@ -599,10 +567,7 @@ export function createSelectMachine<T>(
           setInput(selectedText(), "select");
         }
       }
-      if (
-        next.invalid !== undefined &&
-        next.invalid !== store.get().invalidProp
-      ) {
+      if (next.invalid !== undefined && next.invalid !== store.get().invalidProp) {
         store.set({ invalidProp: next.invalid });
       }
       if (inputCtl.isControlled() && next.inputValue !== undefined) {
@@ -690,15 +655,10 @@ export function createSelectMachine<T>(
         });
       }
       if (store.get().mode === "combobox") {
-        const behavior = store.get().inputInPopover
-          ? "clear-input"
-          : props.selectionBehavior;
+        const behavior = store.get().inputInPopover ? "clear-input" : props.selectionBehavior;
         if (behavior === "replace-input" && !multiple) {
           setInput(machine.labelOf(item.value), "select");
-        } else if (
-          behavior === "clear-input" ||
-          (multiple && behavior === "replace-input")
-        ) {
+        } else if (behavior === "clear-input" || (multiple && behavior === "replace-input")) {
           setInput("", "select");
         }
         filterQuery = "";
@@ -740,10 +700,7 @@ export function createSelectMachine<T>(
       valueCtl.set(value.filter((item) => itemToKey(item as T) !== key));
       if (props.announce) {
         store.set({
-          announcement: props.messages.removed(
-            machine.labelOf(target as T),
-            value.length - 1,
-          ),
+          announcement: props.messages.removed(machine.labelOf(target as T), value.length - 1),
         });
       }
     },
@@ -754,9 +711,7 @@ export function createSelectMachine<T>(
         filterQuery = "";
         setInput(
           options.defaultInputValue ??
-            (!multiple && defaultValue !== null
-              ? machine.labelOf(defaultValue as T)
-              : ""),
+            (!multiple && defaultValue !== null ? machine.labelOf(defaultValue as T) : ""),
           "reset",
         );
         applyFilter();
@@ -806,18 +761,13 @@ export function createSelectMachine<T>(
     onTriggerKeyDown(event) {
       const none: KeyResult = { preventDefault: false };
       const handled: KeyResult = { preventDefault: true };
-      if (
-        props.disabled ||
-        event.isComposing ||
-        store.get().mode === "combobox"
-      ) {
+      if (props.disabled || event.isComposing || store.get().mode === "combobox") {
         return none;
       }
       const state = store.get();
       const nav = visibleNav();
       const key = event.key;
-      const printable =
-        key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
+      const printable = key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
 
       if (!state.open) {
         switch (key) {
@@ -855,11 +805,7 @@ export function createSelectMachine<T>(
           default:
         }
         if (printable || key === " ") {
-          const match = typeahead.onKey(
-            key,
-            collection.visible(),
-            firstSelectedVisibleKey(),
-          );
+          const match = typeahead.onKey(key, collection.visible(), firstSelectedVisibleKey());
           if (match !== null) {
             machine.selectKey(match);
           }
@@ -872,20 +818,11 @@ export function createSelectMachine<T>(
       const extend = (target: string | null) => {
         machine.highlight(target);
         reachEnd(target);
-        if (
-          multiple &&
-          event.shiftKey &&
-          target !== null &&
-          !machine.isSelected(target)
-        ) {
+        if (multiple && event.shiftKey && target !== null && !machine.isSelected(target)) {
           machine.selectKey(target);
         }
       };
-      if (
-        multiple &&
-        (event.ctrlKey || event.metaKey) &&
-        key.toLowerCase() === "a"
-      ) {
+      if (multiple && (event.ctrlKey || event.metaKey) && key.toLowerCase() === "a") {
         machine.selectAll();
         return handled;
       }
@@ -1001,12 +938,7 @@ export function createSelectMachine<T>(
       const state = store.get();
       const nav = visibleNav();
       const key = event.key;
-      if (
-        key === "Backspace" &&
-        multiple &&
-        state.inputValue === "" &&
-        !state.inputInPopover
-      ) {
+      if (key === "Backspace" && multiple && state.inputValue === "" && !state.inputInPopover) {
         machine.removeLast();
         return none;
       }
@@ -1094,10 +1026,7 @@ export function createSelectMachine<T>(
     },
     visibleKeys: () => collection.visible().map((item) => item.key),
     labelOf: (value) =>
-      collection.labelOf(
-        itemToKey(value),
-        () => options.itemToString?.(value) ?? itemToKey(value),
-      ),
+      collection.labelOf(itemToKey(value), () => options.itemToString?.(value) ?? itemToKey(value)),
     selectedLabels() {
       const value = store.get().value;
       const list = Array.isArray(value) ? value : value === null ? [] : [value];
@@ -1154,9 +1083,7 @@ export function createSelectMachine<T>(
             "data-state": state.open ? "open" : "closed",
             "data-disabled": bool(props.disabled),
             "data-invalid": bool(machine.isInvalid()),
-            "data-placeholder": bool(
-              !multiple && selection.isEmpty(state.value),
-            ),
+            "data-placeholder": bool(!multiple && selection.isEmpty(state.value)),
           };
         }
         if (state.mode === "combobox") {

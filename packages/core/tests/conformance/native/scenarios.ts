@@ -1,10 +1,6 @@
 import type { PartNode, Scenario } from "../types.ts";
 
-const opt = (
-  value: unknown,
-  text: string,
-  props: Record<string, unknown> = {},
-): PartNode => ({
+const opt = (value: unknown, text: string, props: Record<string, unknown> = {}): PartNode => ({
   part: "option",
   props: { value, ...props },
   text,
@@ -109,10 +105,7 @@ export const nativeScenarios: Scenario[] = [
     tree: [
       {
         part: "control",
-        children: [
-          opt({ id: 1, name: "One" }, "One"),
-          opt({ id: 2, name: "Two" }, "Two"),
-        ],
+        children: [opt({ id: 1, name: "One" }, "One"), opt({ id: 2, name: "Two" }, "Two")],
       },
     ],
     steps: [

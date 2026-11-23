@@ -10,14 +10,7 @@ import {
   visuallyHiddenStyle,
 } from "@zealakit/omniselect-core";
 import type { Placement } from "@zealakit/overlay-react";
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-} from "react";
+import { type ReactNode, useCallback, useEffect, useId, useRef, useState } from "react";
 import { useIsomorphicLayoutEffect } from "../internal/use-isomorphic-layout-effect.js";
 import { SelectContext, type SelectContextValue } from "./context.js";
 import { useSnapshot } from "./internal.js";
@@ -157,10 +150,9 @@ export function Root<T>(props: SelectRootProps<T>) {
   const machineRef = useRef<SelectMachine<T> | null>(null);
   const focusAfterClose = useCallback(() => {
     const target = machineRef.current?.focusTarget();
-    (target === "input"
-      ? (inputRef.current ?? triggerRef.current)
-      : triggerRef.current
-    )?.focus({ preventScroll: true });
+    (target === "input" ? (inputRef.current ?? triggerRef.current) : triggerRef.current)?.focus({
+      preventScroll: true,
+    });
   }, []);
   if (machineRef.current === null) {
     machineRef.current = createSelectMachine<T>({
@@ -194,10 +186,7 @@ export function Root<T>(props: SelectRootProps<T>) {
       triggerLabel,
       onOpenChange(next, reason) {
         latest.current.onOpenChange?.(next, reason);
-        if (
-          !next &&
-          (reason === "select" || reason === "escape" || reason === "tab")
-        ) {
+        if (!next && (reason === "select" || reason === "escape" || reason === "tab")) {
           focusAfterClose();
         }
       },
@@ -232,10 +221,7 @@ export function Root<T>(props: SelectRootProps<T>) {
     });
   });
 
-  const focusTrigger = useCallback(
-    () => triggerRef.current?.focus({ preventScroll: true }),
-    [],
-  );
+  const focusTrigger = useCallback(() => triggerRef.current?.focus({ preventScroll: true }), []);
   const focusField = focusAfterClose;
 
   const context: SelectContextValue = {
@@ -319,9 +305,7 @@ function HiddenSelect({
       style={visuallyHiddenStyle}
       value={multiple ? keys : (keys[0] ?? "")}
       onChange={(event) =>
-        machine.setFromKeys(
-          Array.from(event.currentTarget.selectedOptions).map((o) => o.value),
-        )
+        machine.setFromKeys(Array.from(event.currentTarget.selectedOptions).map((o) => o.value))
       }
       onInvalid={() => {
         machine.setInvalid(true);

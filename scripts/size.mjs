@@ -11,9 +11,7 @@ import { build } from "esbuild";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 // Svelte is a dependency of the Svelte package, not of the repository root.
-const requireFromSvelte = createRequire(
-  join(root, "packages", "svelte", "package.json"),
-);
+const requireFromSvelte = createRequire(join(root, "packages", "svelte", "package.json"));
 const svelteCompiler = await import(
   pathToFileURL(requireFromSvelte.resolve("svelte/compiler")).href
 );
@@ -86,12 +84,10 @@ for (const adapter of adapters) {
 console.log("adapter  entry   gzip      budget    status");
 for (const r of rows) {
   console.log(
-    `${r.adapter.padEnd(8)} ${r.entry.padEnd(7)} ${(`${(r.gzip / 1024).toFixed(2)} kB`).padEnd(9)} ${(`${(r.budget / 1024).toFixed(0)} kB`).padEnd(9)} ${r.status}`,
+    `${r.adapter.padEnd(8)} ${r.entry.padEnd(7)} ${`${(r.gzip / 1024).toFixed(2)} kB`.padEnd(9)} ${`${(r.budget / 1024).toFixed(0)} kB`.padEnd(9)} ${r.status}`,
   );
 }
 if (failed) {
-  console.error(
-    "\nBundle size budget exceeded (or Overlay leaked into /native).",
-  );
+  console.error("\nBundle size budget exceeded (or Overlay leaked into /native).");
   process.exit(1);
 }

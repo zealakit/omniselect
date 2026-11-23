@@ -12,11 +12,7 @@ function check(mounted: Mounted, expect: Expectation, where: string): void {
         typeof want === "string" && want.startsWith("@id:")
           ? (mounted.query(want.slice(4))?.id ?? null)
           : want;
-      assert.equal(
-        el.getAttribute(name),
-        expected,
-        `${where}: ${ref}[${name}]`,
-      );
+      assert.equal(el.getAttribute(name), expected, `${where}: ${ref}[${name}]`);
     }
   }
   if (expect.active !== undefined) {
@@ -36,17 +32,10 @@ function check(mounted: Mounted, expect: Expectation, where: string): void {
     assert.ok(mounted.query(ref), `${where}: "${ref}" should be present`);
   }
   for (const ref of expect.absent ?? []) {
-    assert.ok(
-      mounted.query(ref) === null,
-      `${where}: "${ref}" should be absent`,
-    );
+    assert.ok(mounted.query(ref) === null, `${where}: "${ref}" should be absent`);
   }
   for (const [ref, text] of Object.entries(expect.text ?? {})) {
-    assert.equal(
-      mounted.query(ref)?.textContent?.trim(),
-      text,
-      `${where}: text of ${ref}`,
-    );
+    assert.equal(mounted.query(ref)?.textContent?.trim(), text, `${where}: text of ${ref}`);
   }
   if (expect.calls) {
     assert.deepEqual(mounted.calls(), expect.calls, `${where}: calls`);
@@ -56,8 +45,7 @@ function check(mounted: Mounted, expect: Expectation, where: string): void {
     let from = 0;
     for (const wanted of expect.includesCalls) {
       const at = log.findIndex(
-        (call, index) =>
-          index >= from && JSON.stringify(call) === JSON.stringify(wanted),
+        (call, index) => index >= from && JSON.stringify(call) === JSON.stringify(wanted),
       );
       assert.ok(
         at !== -1,
@@ -68,11 +56,7 @@ function check(mounted: Mounted, expect: Expectation, where: string): void {
   }
   if (expect.lastCall) {
     const all = mounted.calls();
-    assert.deepEqual(
-      all[all.length - 1],
-      expect.lastCall,
-      `${where}: last call`,
-    );
+    assert.deepEqual(all[all.length - 1], expect.lastCall, `${where}: last call`);
   }
   if (expect.formData) {
     assert.deepEqual(mounted.formData(), expect.formData, `${where}: formData`);
@@ -85,11 +69,7 @@ function check(mounted: Mounted, expect: Expectation, where: string): void {
     assert.equal(field?.value, expect.inputValue, `${where}: input value`);
   }
   if (expect.visibleItems) {
-    assert.deepEqual(
-      mounted.visibleItems(),
-      expect.visibleItems,
-      `${where}: visible items`,
-    );
+    assert.deepEqual(mounted.visibleItems(), expect.visibleItems, `${where}: visible items`);
   }
 }
 
@@ -100,8 +80,7 @@ export function runConformance(
   scenarios: readonly Scenario[],
 ): void {
   for (const scenario of scenarios) {
-    const skip =
-      scenario.skip?.[adapter as keyof NonNullable<Scenario["skip"]>];
+    const skip = scenario.skip?.[adapter as keyof NonNullable<Scenario["skip"]>];
     test(`[${adapter}] ${scenario.name}`, { skip }, async () => {
       const mounted = await driver.mount(scenario);
       try {
@@ -113,8 +92,7 @@ export function runConformance(
               check(mounted, step.expect, `step ${index}`);
             } catch (error) {
               // Keep failures readable: diffs of whole DOM strings can be huge.
-              const message =
-                error instanceof Error ? error.message : String(error);
+              const message = error instanceof Error ? error.message : String(error);
               throw new Error(message.slice(0, 600));
             }
           } else {

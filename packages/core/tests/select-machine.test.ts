@@ -26,8 +26,7 @@ function make(
   return { machine, events };
 }
 
-const key = (m: Machine, k: string, extra: object = {}) =>
-  m.onTriggerKeyDown({ key: k, ...extra });
+const key = (m: Machine, k: string, extra: object = {}) => m.onTriggerKeyDown({ key: k, ...extra });
 const fruit = [
   { key: "apple" },
   { key: "banana" },
@@ -118,10 +117,9 @@ test("open: Tab selects the highlighted item, closes, and lets focus move", () =
 
 test("type-ahead: closed selects without opening, open highlights, Space joins the buffer", () => {
   let t = 0;
-  const closed = make(
-    [{ key: "apple" }, { key: "banana" }, { key: "blueberry" }],
-    { now: () => t },
-  );
+  const closed = make([{ key: "apple" }, { key: "banana" }, { key: "blueberry" }], {
+    now: () => t,
+  });
   key(closed.machine, "b");
   assert.equal(closed.machine.store.get().value, "banana");
   assert.equal(closed.machine.isOpen(), false);
@@ -160,10 +158,7 @@ test("disabled blocks opening and keys; composing is ignored", () => {
   machine.open("imperative");
   assert.equal(machine.isOpen(), false);
   const other = make(fruit);
-  assert.equal(
-    key(other.machine, "ArrowDown", { isComposing: true }).preventDefault,
-    false,
-  );
+  assert.equal(key(other.machine, "ArrowDown", { isComposing: true }).preventDefault, false);
 });
 
 test("allowsEmptyCollection=false blocks opening an empty list and closes when it empties", () => {
@@ -233,14 +228,8 @@ test("attrs: select-only trigger, list, item, group", () => {
   assert.equal(item["aria-selected"], "false");
   assert.equal(machine.attrs.item("cherry")["aria-disabled"], "true");
   assert.equal(machine.attrs.list().role, "listbox");
-  assert.equal(
-    machine.attrs.group("g", true)["aria-labelledby"],
-    "r-group-g-label",
-  );
-  assert.equal(
-    machine.attrs.clear("Clear selection")["aria-label"],
-    "Clear selection",
-  );
+  assert.equal(machine.attrs.group("g", true)["aria-labelledby"], "r-group-g-label");
+  assert.equal(machine.attrs.clear("Clear selection")["aria-label"], "Clear selection");
   assert.equal(machine.attrs.root()["data-state"], "open");
 });
 
@@ -276,8 +265,7 @@ const fruits = [
   { key: "banana", text: "Banana" },
   { key: "cherry", text: "Cherry" },
 ];
-const input = (m: Machine, k: string, extra: object = {}) =>
-  m.onInputKeyDown({ key: k, ...extra });
+const input = (m: Machine, k: string, extra: object = {}) => m.onInputKeyDown({ key: k, ...extra });
 
 test("combobox: registering an input switches attrs and disables trigger keys", () => {
   const { machine } = combo(fruits);
@@ -448,10 +436,7 @@ test("composition defers filtering until it ends", async () => {
   machine.onInput("an");
   await settle();
   assert.deepEqual(machine.visibleKeys(), ["banana"]);
-  assert.equal(
-    input(machine, "ArrowDown", { isComposing: true }).preventDefault,
-    false,
-  );
+  assert.equal(input(machine, "ArrowDown", { isComposing: true }).preventDefault, false);
 });
 
 test("clear in combobox mode clears value and input", () => {

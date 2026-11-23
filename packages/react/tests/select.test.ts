@@ -1,11 +1,7 @@
 import { after } from "node:test";
 import { act, cleanup, render } from "@testing-library/react";
 import { createElement as h, type ReactElement, type ReactNode } from "react";
-import type {
-  Driver,
-  PartNode,
-  Scenario,
-} from "../../core/tests/conformance/index.ts";
+import type { Driver, PartNode, Scenario } from "../../core/tests/conformance/index.ts";
 import {
   performSelectDomStep,
   readFormData,
@@ -48,11 +44,7 @@ function build(node: PartNode, index: number, extra: Extra): ReactNode {
     return node.text;
   }
   if (node.part === "outside") {
-    return h(
-      "button",
-      { key: index, "data-part": "outside", type: "button" },
-      node.text,
-    );
+    return h("button", { key: index, "data-part": "outside", type: "button" }, node.text);
   }
   const component = components[node.part as keyof typeof components];
   const children = node.children
@@ -61,9 +53,7 @@ function build(node: PartNode, index: number, extra: Extra): ReactNode {
       ? [node.text]
       : [];
   const own =
-    node.part === "loadMore"
-      ? { ...extra.loadMore, onLoadMore: extra.onLoadMore }
-      : node.props;
+    node.part === "loadMore" ? { ...extra.loadMore, onLoadMore: extra.onLoadMore } : node.props;
   return h(component as never, { key: index, ...own }, ...children);
 }
 
@@ -80,10 +70,7 @@ const driver: Driver = {
     const calls: { name: string; args: unknown[] }[] = [];
     let props = withCallbacks(scenario, calls);
     const tree = (): ReactElement => {
-      const { onLoadMore, loadMore, ...rootProps } = props as Record<
-        string,
-        unknown
-      >;
+      const { onLoadMore, loadMore, ...rootProps } = props as Record<string, unknown>;
       const extra: Extra = {
         loadMore: (loadMore ?? {}) as Record<string, unknown>,
         onLoadMore,

@@ -8,9 +8,7 @@ export function getItemText(element: Element | null | undefined): string {
   }
   const clone = element.cloneNode(true) as Element;
   for (const hidden of Array.from(
-    clone.querySelectorAll(
-      '[aria-hidden="true"], [data-part="item-indicator"]',
-    ),
+    clone.querySelectorAll('[aria-hidden="true"], [data-part="item-indicator"]'),
   )) {
     hidden.remove();
   }

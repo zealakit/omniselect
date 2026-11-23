@@ -5,11 +5,7 @@ export type FilterFn<T> = (item: FilterItem<T>, query: string) => boolean;
 
 /** NFD, strip combining marks, lowercase, trim. */
 export function normalize(text: string): string {
-  return text
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "")
-    .toLocaleLowerCase()
-    .trim();
+  return text.normalize("NFD").replace(/\p{M}/gu, "").toLocaleLowerCase().trim();
 }
 
 /** Diacritic- and case-insensitive "contains". An empty query matches all. */

@@ -1,8 +1,4 @@
-import {
-  checkStructure,
-  getItemText,
-  scrollItemIntoView,
-} from "@zealakit/omniselect-core";
+import { checkStructure, getItemText, scrollItemIntoView } from "@zealakit/omniselect-core";
 import {
   forwardRef,
   type HTMLAttributes,
@@ -18,10 +14,7 @@ import { useIsomorphicLayoutEffect } from "../internal/use-isomorphic-layout-eff
 import { GroupContext, ItemContext, useSelectContext } from "./context.js";
 import { reactAttrs, useSnapshot } from "./internal.js";
 
-export type SelectItemProps<T> = Omit<
-  HTMLAttributes<HTMLDivElement>,
-  "onSelect"
-> & {
+export type SelectItemProps<T> = Omit<HTMLAttributes<HTMLDivElement>, "onSelect"> & {
   value: T;
   disabled?: boolean;
   /** Label used for the Value and type-ahead. Defaults to the item's text. */
@@ -42,9 +35,7 @@ function textFromChildren(children: unknown): string {
     if ((children as { type?: unknown }).type === ItemIndicator) {
       return "";
     }
-    return textFromChildren(
-      (children as { props: { children?: unknown } }).props.children,
-    );
+    return textFromChildren((children as { props: { children?: unknown } }).props.children);
   }
   return "";
 }
@@ -78,8 +69,7 @@ function ItemImpl<T>(
       machine.collection.register({
         key,
         value: valueRef.current,
-        textValue:
-          textValue ?? (getItemText(elementRef.current) || fallbackText),
+        textValue: textValue ?? (getItemText(elementRef.current) || fallbackText),
         disabled,
         groupId,
         node: elementRef.current,
@@ -144,9 +134,7 @@ function ItemImpl<T>(
 }
 
 /** One option. Registers with the Root; exposes `data-highlighted`, `data-selected`, `data-disabled`. */
-export const Item = forwardRef(ItemImpl) as <T>(
-  props: SelectItemProps<T>,
-) => ReactElement | null;
+export const Item = forwardRef(ItemImpl) as <T>(props: SelectItemProps<T>) => ReactElement | null;
 
 export type SelectItemIndicatorProps = HTMLAttributes<HTMLSpanElement> & {
   /** Keep mounted while unselected (for animated checkmarks). */
@@ -154,29 +142,25 @@ export type SelectItemIndicatorProps = HTMLAttributes<HTMLSpanElement> & {
 };
 
 /** Renders only while its Item is selected. */
-export const ItemIndicator = forwardRef<
-  HTMLSpanElement,
-  SelectItemIndicatorProps
->(function SelectItemIndicator({ forceMount = false, ...rest }, ref) {
-  const { machine } = useSelectContext("ItemIndicator");
-  const item = useContext(ItemContext);
-  if (!item) {
-    throw new Error(
-      "Select.ItemIndicator must be rendered inside Select.Item.",
+export const ItemIndicator = forwardRef<HTMLSpanElement, SelectItemIndicatorProps>(
+  function SelectItemIndicator({ forceMount = false, ...rest }, ref) {
+    const { machine } = useSelectContext("ItemIndicator");
+    const item = useContext(ItemContext);
+    if (!item) {
+      throw new Error("Select.ItemIndicator must be rendered inside Select.Item.");
+    }
+    const selected = useSnapshot(machine, (m) => String(m.isSelected(item.key))) === "true";
+    if (!selected && !forceMount) {
+      return null;
+    }
+    return (
+      <span
+        data-part="item-indicator"
+        {...rest}
+        aria-hidden="true"
+        data-state={selected ? "checked" : "unchecked"}
+        ref={ref}
+      />
     );
-  }
-  const selected =
-    useSnapshot(machine, (m) => String(m.isSelected(item.key))) === "true";
-  if (!selected && !forceMount) {
-    return null;
-  }
-  return (
-    <span
-      data-part="item-indicator"
-      {...rest}
-      aria-hidden="true"
-      data-state={selected ? "checked" : "unchecked"}
-      ref={ref}
-    />
-  );
-});
+  },
+);

@@ -1,10 +1,6 @@
 import type { PartNode, Scenario } from "../types.ts";
 
-const item = (
-  value: string,
-  text: string,
-  props: Record<string, unknown> = {},
-): PartNode => ({
+const item = (value: string, text: string, props: Record<string, unknown> = {}): PartNode => ({
   part: "item",
   props: { value, ...props },
   text,
@@ -39,11 +35,7 @@ const multi = (props: Record<string, unknown> = {}, mounted = true): Scenario =>
     primitive: "select",
     props: { multiple: true, ...props },
     callbacks: ["onValueChange", "onOpenChange"],
-    tree: [
-      { part: "label", text: "Fruit" },
-      trigger,
-      popover(mounted, ...fruit()),
-    ],
+    tree: [{ part: "label", text: "Fruit" }, trigger, popover(mounted, ...fruit())],
   }) as unknown as Scenario;
 
 const comboTree: PartNode[] = [

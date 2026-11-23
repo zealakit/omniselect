@@ -18,9 +18,7 @@ export type Typeahead = {
   reset: () => void;
 };
 
-export function createTypeahead(
-  options: { timeout?: number; now?: () => number } = {},
-): Typeahead {
+export function createTypeahead(options: { timeout?: number; now?: () => number } = {}): Typeahead {
   const timeout = options.timeout ?? 500;
   const now = options.now ?? (() => Date.now());
   let buffer = "";
@@ -41,16 +39,12 @@ export function createTypeahead(
       if (candidates.length === 0) {
         return null;
       }
-      const repeated =
-        buffer.length > 1 && [...buffer].every((c) => c === buffer[0]);
+      const repeated = buffer.length > 1 && [...buffer].every((c) => c === buffer[0]);
       const query = repeated ? (buffer[0] as string) : buffer;
       const currentIndex = candidates.findIndex((i) => i.key === currentKey);
       // Cycling (single repeated char) starts after the current item; growing
       // queries may keep the current item if it still matches.
-      const start =
-        repeated || buffer.length === 1
-          ? currentIndex + 1
-          : Math.max(currentIndex, 0);
+      const start = repeated || buffer.length === 1 ? currentIndex + 1 : Math.max(currentIndex, 0);
       for (let step = 0; step < candidates.length; step += 1) {
         const item = candidates[(start + step) % candidates.length];
         if (item && normalize(item.textValue).startsWith(query)) {

@@ -1,31 +1,31 @@
 <script lang="ts">
-import type { Snippet } from "svelte";
-import type { HTMLButtonAttributes } from "svelte/elements";
-import { checkStructure } from "@zealakit/omniselect-core";
-import { getSelectContext } from "./context.js";
+  import type { Snippet } from "svelte";
+  import type { HTMLButtonAttributes } from "svelte/elements";
+  import { checkStructure } from "@zealakit/omniselect-core";
+  import { getSelectContext } from "./context.js";
 
-type Props = HTMLButtonAttributes & {
-  /** Accessible name. Default "Clear selection". */
-  label?: string;
-  children?: Snippet;
-};
-let { label = "Clear selection", children, onclick, ...rest }: Props = $props();
-const context = getSelectContext("Clear");
-const { machine, snapshot } = context;
-const attrs = $derived.by(() => {
-  void $snapshot;
-  return machine.attrs.clear(label);
-});
-const hasValue = $derived.by(() => {
-  void $snapshot;
-  return !machine.selection.isEmpty(machine.store.get().value);
-});
+  type Props = HTMLButtonAttributes & {
+    /** Accessible name. Default "Clear selection". */
+    label?: string;
+    children?: Snippet;
+  };
+  let { label = "Clear selection", children, onclick, ...rest }: Props = $props();
+  const context = getSelectContext("Clear");
+  const { machine, snapshot } = context;
+  const attrs = $derived.by(() => {
+    void $snapshot;
+    return machine.attrs.clear(label);
+  });
+  const hasValue = $derived.by(() => {
+    void $snapshot;
+    return !machine.selection.isEmpty(machine.store.get().value);
+  });
 
-let element: HTMLButtonElement | undefined = $state();
-$effect(() => {
-  checkStructure("Clear", element);
-  return machine.registerClear();
-});
+  let element: HTMLButtonElement | undefined = $state();
+  $effect(() => {
+    checkStructure("Clear", element);
+    return machine.registerClear();
+  });
 </script>
 
 <button

@@ -21,13 +21,7 @@ const press = (target: Element, key: string) =>
     }),
   );
 const click = (target: Element) => {
-  for (const type of [
-    "pointerdown",
-    "mousedown",
-    "pointerup",
-    "mouseup",
-    "click",
-  ]) {
+  for (const type of ["pointerdown", "mousedown", "pointerup", "mouseup", "click"]) {
     const event = new window.Event(type, { bubbles: true, cancelable: true });
     Object.defineProperty(event, "button", { value: 0 });
     Object.defineProperty(event, "isPrimary", { value: true });
@@ -63,12 +57,7 @@ test("inside an Overlay Dialog: Escape closes the Select first, then the Dialog"
     h(
       Dialog,
       { defaultOpen: true },
-      h(
-        DialogContent,
-        null,
-        h(DialogTitle, null, "Title"),
-        tree({ portal: false }),
-      ),
+      h(DialogContent, null, h(DialogTitle, null, "Title"), tree({ portal: false })),
     ),
   );
   await flush();
@@ -85,11 +74,7 @@ test("inside an Overlay Dialog: Escape closes the Select first, then the Dialog"
 
   await act(async () => press(trigger, "Escape"));
   await flush();
-  assert.equal(
-    document.querySelector("[role=dialog]"),
-    null,
-    "dialog closed on the second Escape",
-  );
+  assert.equal(document.querySelector("[role=dialog]"), null, "dialog closed on the second Escape");
 });
 
 test("inside an Overlay Dialog: pressing an item is not an outside press for the Dialog", async () => {
@@ -97,12 +82,7 @@ test("inside an Overlay Dialog: pressing an item is not an outside press for the
     h(
       Dialog,
       { defaultOpen: true },
-      h(
-        DialogContent,
-        null,
-        h(DialogTitle, null, "Title"),
-        tree({ portal: false }),
-      ),
+      h(DialogContent, null, h(DialogTitle, null, "Title"), tree({ portal: false })),
     ),
   );
   await flush();
@@ -112,10 +92,7 @@ test("inside an Overlay Dialog: pressing an item is not an outside press for the
   const item = document.querySelector("[role=option]") as HTMLElement;
   await act(async () => click(item));
   await flush();
-  assert.ok(
-    document.querySelector("[role=dialog]"),
-    "dialog still open after picking an item",
-  );
+  assert.ok(document.querySelector("[role=dialog]"), "dialog still open after picking an item");
   assert.equal(trigger.textContent?.trim(), "A");
 });
 
@@ -166,12 +143,7 @@ test("structure: Clear inside Trigger warns in development", async () => {
         h(
           Select.Control,
           null,
-          h(
-            Select.Trigger,
-            null,
-            h(Select.Value, null),
-            h(Select.Clear, null, "x"),
-          ),
+          h(Select.Trigger, null, h(Select.Value, null), h(Select.Clear, null, "x")),
         ),
       ),
     );
@@ -201,30 +173,15 @@ function comboTree(withInput: boolean) {
 test("mode switch: mounting and unmounting an Input flips the ARIA pattern at runtime", async () => {
   const view = render(comboTree(false));
   await flush();
-  assert.equal(
-    document.querySelector("[data-part=trigger]")?.getAttribute("role"),
-    "combobox",
-  );
+  assert.equal(document.querySelector("[data-part=trigger]")?.getAttribute("role"), "combobox");
   view.rerender(comboTree(true));
   await flush();
-  assert.equal(
-    document.querySelector("[data-part=trigger]")?.getAttribute("role"),
-    null,
-  );
-  assert.equal(
-    document.querySelector("[data-part=trigger]")?.getAttribute("tabindex"),
-    "-1",
-  );
-  assert.equal(
-    document.querySelector("input")?.getAttribute("role"),
-    "combobox",
-  );
+  assert.equal(document.querySelector("[data-part=trigger]")?.getAttribute("role"), null);
+  assert.equal(document.querySelector("[data-part=trigger]")?.getAttribute("tabindex"), "-1");
+  assert.equal(document.querySelector("input")?.getAttribute("role"), "combobox");
   view.rerender(comboTree(false));
   await flush();
-  assert.equal(
-    document.querySelector("[data-part=trigger]")?.getAttribute("role"),
-    "combobox",
-  );
+  assert.equal(document.querySelector("[data-part=trigger]")?.getAttribute("role"), "combobox");
 });
 
 test("hydration: server markup is select-only; the client switches to combobox without mismatch warnings", async () => {
@@ -240,8 +197,7 @@ test("hydration: server markup is select-only; the client switches to combobox w
   );
   const errors: string[] = [];
   const original = console.error;
-  console.error = (...args: unknown[]) =>
-    errors.push(args.map(String).join(" "));
+  console.error = (...args: unknown[]) => errors.push(args.map(String).join(" "));
   try {
     await act(async () => {
       hydrateRoot(container, comboTree(true));
@@ -251,14 +207,8 @@ test("hydration: server markup is select-only; the client switches to combobox w
     console.error = original;
   }
   assert.deepEqual(errors, []);
-  assert.equal(
-    container.querySelector("[data-part=trigger]")?.getAttribute("role"),
-    null,
-  );
-  assert.equal(
-    (container.querySelector("input") as HTMLInputElement).value,
-    "A",
-  );
+  assert.equal(container.querySelector("[data-part=trigger]")?.getAttribute("role"), null);
+  assert.equal((container.querySelector("input") as HTMLInputElement).value, "A");
   container.remove();
 });
 
@@ -276,19 +226,14 @@ test("parity: NativeSelect and Select submit identical FormData for the same con
           h(
             NativeSelect.Control,
             null,
-            ...options.map((o) =>
-              h(NativeSelect.Option as never, { key: o, value: o }, o),
-            ),
+            ...options.map((o) => h(NativeSelect.Option as never, { key: o, value: o }, o)),
           ),
         ),
       ),
     );
     await flush();
-    const read = (form: Element) =>
-      readFormData(form.parentElement as ParentNode);
-    const nativeEntries = read(
-      native.container.querySelector("form") as Element,
-    );
+    const read = (form: Element) => readFormData(form.parentElement as ParentNode);
+    const nativeEntries = read(native.container.querySelector("form") as Element);
     native.unmount();
     const custom = render(
       h(
@@ -297,18 +242,12 @@ test("parity: NativeSelect and Select submit identical FormData for the same con
         h(
           Select.Root as never,
           { name: "fruit", multiple, defaultValue: value },
-          h(
-            Select.Control,
-            null,
-            h(Select.Trigger, null, h(Select.Value, null)),
-          ),
+          h(Select.Control, null, h(Select.Trigger, null, h(Select.Value, null))),
         ),
       ),
     );
     await flush();
-    const selectEntries = read(
-      custom.container.querySelector("form") as Element,
-    );
+    const selectEntries = read(custom.container.querySelector("form") as Element);
     custom.unmount();
     return [nativeEntries, selectEntries] as const;
   };
@@ -354,9 +293,7 @@ test("Value render function exposes items, remove, and clear for chips", async (
   );
   await flush();
   const chips = () =>
-    Array.from(document.querySelectorAll("[data-chip]")).map(
-      (el) => el.textContent,
-    );
+    Array.from(document.querySelectorAll("[data-chip]")).map((el) => el.textContent);
   assert.deepEqual(chips(), ["A", "B"]);
   await act(async () =>
     (document.querySelector("[data-chip=a]") as HTMLElement).dispatchEvent(
@@ -368,9 +305,7 @@ test("Value render function exposes items, remove, and clear for chips", async (
 });
 
 test("LoadMore: highlight and scroll stay put when a page is appended", async () => {
-  const { installIntersectionObserver } = await import(
-    "../../core/tests/conformance/index.ts"
-  );
+  const { installIntersectionObserver } = await import("../../core/tests/conformance/index.ts");
   installIntersectionObserver();
   const calls: string[] = [];
   const view = (count: number) =>
@@ -406,12 +341,8 @@ test("LoadMore: highlight and scroll stay put when a page is appended", async ()
     const trigger = document.querySelector("[role=combobox]") as HTMLElement;
     await act(async () => click(trigger));
     await flush();
-    const item = document.querySelector(
-      '[role=option][id$="-item-i1"]',
-    ) as HTMLElement;
-    await act(async () =>
-      item.dispatchEvent(new window.Event("pointermove", { bubbles: true })),
-    );
+    const item = document.querySelector('[role=option][id$="-item-i1"]') as HTMLElement;
+    await act(async () => item.dispatchEvent(new window.Event("pointermove", { bubbles: true })));
     await flush();
     assert.equal(item.getAttribute("data-highlighted"), "");
     const before = scrolls.length;
@@ -419,9 +350,9 @@ test("LoadMore: highlight and scroll stay put when a page is appended", async ()
     await flush();
     assert.equal(document.querySelectorAll("[role=option]").length, 6);
     assert.equal(
-      (
-        document.querySelector('[role=option][id$="-item-i1"]') as HTMLElement
-      ).getAttribute("data-highlighted"),
+      (document.querySelector('[role=option][id$="-item-i1"]') as HTMLElement).getAttribute(
+        "data-highlighted",
+      ),
       "",
       "the same item stays highlighted",
     );
@@ -453,11 +384,7 @@ test("opening never scrolls the page: no scrollIntoView, and every focus() passe
         h(
           Select.Root as never,
           { portal: false, defaultValue: "b", itemToString: (v: string) => v },
-          h(
-            Select.Control,
-            null,
-            h(Select.Trigger, null, h(Select.Value, null)),
-          ),
+          h(Select.Control, null, h(Select.Trigger, null, h(Select.Value, null))),
           h(
             Select.Popover,
             null,
@@ -478,9 +405,7 @@ test("opening never scrolls the page: no scrollIntoView, and every focus() passe
       ),
     );
     await flush();
-    const triggers = Array.from(
-      document.querySelectorAll("[data-part=trigger]"),
-    );
+    const triggers = Array.from(document.querySelectorAll("[data-part=trigger]"));
     for (const trigger of triggers) {
       await act(async () => click(trigger));
       await flush();

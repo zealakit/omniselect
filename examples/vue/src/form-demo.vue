@@ -57,9 +57,7 @@ const onSubmit = handleSubmit(
   },
   ({ errors }) => {
     // vee-validate does not move focus: focus the first invalid field ourselves.
-    const first = ["country", "fruits", "size", "assignee"].find(
-      (name) => name in errors,
-    );
+    const first = ["country", "fruits", "size", "assignee"].find((name) => name in errors);
     root.value
       ?.querySelector<HTMLElement>(
         `[data-field="${first}"] input, [data-field="${first}"] [data-part="trigger"], [data-field="${first}"] select`,
@@ -116,12 +114,16 @@ onMounted(() => loadPage(0));
         </Select.Control>
         <Select.Popover>
           <Select.List>
-            <Select.Item v-for="(name, code) in COUNTRIES" :key="code" :value="code">{{ name }}</Select.Item>
+            <Select.Item v-for="(name, code) in COUNTRIES" :key="code" :value="code">{{
+              name
+            }}</Select.Item>
             <Select.Empty>No countries</Select.Empty>
           </Select.List>
         </Select.Popover>
       </Select.Root>
-      <p v-if="country.errorMessage.value" id="country-error" class="error" role="alert">{{ country.errorMessage.value }}</p>
+      <p v-if="country.errorMessage.value" id="country-error" class="error" role="alert">
+        {{ country.errorMessage.value }}
+      </p>
     </div>
 
     <div class="field" data-field="fruits">
@@ -136,9 +138,20 @@ onMounted(() => loadPage(0));
       >
         <Select.Label>Fruits (pick up to 3)</Select.Label>
         <Select.Control>
-          <Select.Trigger :aria-describedby="fruits.errorMessage.value ? 'fruits-error' : undefined" @blur="fruits.handleBlur">
+          <Select.Trigger
+            :aria-describedby="fruits.errorMessage.value ? 'fruits-error' : undefined"
+            @blur="fruits.handleBlur"
+          >
             <Select.Value placeholder="Pick fruits" v-slot="{ items, remove }">
-              <button v-for="item in items" :key="item.key" type="button" class="chip" @click.stop="remove(item.value)">{{ item.label }} ×</button>
+              <button
+                v-for="item in items"
+                :key="item.key"
+                type="button"
+                class="chip"
+                @click.stop="remove(item.value)"
+              >
+                {{ item.label }} ×
+              </button>
             </Select.Value>
           </Select.Trigger>
         </Select.Control>
@@ -151,7 +164,9 @@ onMounted(() => loadPage(0));
           </Select.List>
         </Select.Popover>
       </Select.Root>
-      <p v-if="fruits.errorMessage.value" id="fruits-error" class="error" role="alert">{{ fruits.errorMessage.value }}</p>
+      <p v-if="fruits.errorMessage.value" id="fruits-error" class="error" role="alert">
+        {{ fruits.errorMessage.value }}
+      </p>
     </div>
 
     <div class="field" data-field="size">
@@ -162,12 +177,19 @@ onMounted(() => loadPage(0));
         @update:model-value="(v: unknown) => (size.value.value = (v as string | null) ?? '')"
       >
         <NativeSelect.Label>Size (native)</NativeSelect.Label>
-        <NativeSelect.Control :aria-describedby="size.errorMessage.value ? 'size-error' : undefined" @blur="size.handleBlur">
+        <NativeSelect.Control
+          :aria-describedby="size.errorMessage.value ? 'size-error' : undefined"
+          @blur="size.handleBlur"
+        >
           <NativeSelect.Option :value="null" disabled>Choose a size…</NativeSelect.Option>
-          <NativeSelect.Option v-for="s in ['S', 'M', 'L']" :key="s" :value="s">{{ s }}</NativeSelect.Option>
+          <NativeSelect.Option v-for="s in ['S', 'M', 'L']" :key="s" :value="s">{{
+            s
+          }}</NativeSelect.Option>
         </NativeSelect.Control>
       </NativeSelect.Root>
-      <p v-if="size.errorMessage.value" id="size-error" class="error" role="alert">{{ size.errorMessage.value }}</p>
+      <p v-if="size.errorMessage.value" id="size-error" class="error" role="alert">
+        {{ size.errorMessage.value }}
+      </p>
     </div>
 
     <div class="field" data-field="assignee">
@@ -180,19 +202,28 @@ onMounted(() => loadPage(0));
       >
         <Select.Label>Assignee (async, paginated)</Select.Label>
         <Select.Control>
-          <Select.Trigger :aria-describedby="assignee.errorMessage.value ? 'assignee-error' : undefined" @blur="assignee.handleBlur">
+          <Select.Trigger
+            :aria-describedby="assignee.errorMessage.value ? 'assignee-error' : undefined"
+            @blur="assignee.handleBlur"
+          >
             <Select.Value placeholder="Pick a person" />
             <Select.Indicator>▾</Select.Indicator>
           </Select.Trigger>
         </Select.Control>
         <Select.Popover>
           <Select.List>
-            <Select.Item v-for="person in people" :key="person.id" :value="person.id">{{ person.name }}</Select.Item>
-            <Select.LoadMore :is-loading="loading" :has-more="more" @load-more="loadPage(page + 1)">Loading…</Select.LoadMore>
+            <Select.Item v-for="person in people" :key="person.id" :value="person.id">{{
+              person.name
+            }}</Select.Item>
+            <Select.LoadMore :is-loading="loading" :has-more="more" @load-more="loadPage(page + 1)"
+              >Loading…</Select.LoadMore
+            >
           </Select.List>
         </Select.Popover>
       </Select.Root>
-      <p v-if="assignee.errorMessage.value" id="assignee-error" class="error" role="alert">{{ assignee.errorMessage.value }}</p>
+      <p v-if="assignee.errorMessage.value" id="assignee-error" class="error" role="alert">
+        {{ assignee.errorMessage.value }}
+      </p>
     </div>
 
     <div class="actions">

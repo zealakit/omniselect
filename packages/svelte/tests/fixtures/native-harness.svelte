@@ -1,21 +1,18 @@
 <script lang="ts">
-import { NativeSelect } from "../../dist/native/index.js";
+  import { NativeSelect } from "../../dist/native/index.js";
 
-type Node = {
-  part: string;
-  props?: Record<string, unknown>;
-  text?: string;
-  children?: Node[];
-};
-let {
-  tree,
-  initial,
-  form,
-}: { tree: Node[]; initial: Record<string, unknown>; form: boolean } = $props();
-let rootProps = $state.raw(initial);
-export function setRootProps(next: Record<string, unknown>) {
-  rootProps = { ...rootProps, ...next };
-}
+  type Node = {
+    part: string;
+    props?: Record<string, unknown>;
+    text?: string;
+    children?: Node[];
+  };
+  let { tree, initial, form }: { tree: Node[]; initial: Record<string, unknown>; form: boolean } =
+    $props();
+  let rootProps = $state.raw(initial);
+  export function setRootProps(next: Record<string, unknown>) {
+    rootProps = { ...rootProps, ...next };
+  }
 </script>
 
 {#snippet render(node: Node)}
@@ -26,7 +23,7 @@ export function setRootProps(next: Record<string, unknown>) {
       {#each node.children ?? [] as child}{@render render(child)}{/each}
     </NativeSelect.Control>
   {:else if node.part === "option"}
-    <NativeSelect.Option {...(node.props as any)}>{node.text}</NativeSelect.Option>
+    <NativeSelect.Option {...node.props as any}>{node.text}</NativeSelect.Option>
   {:else if node.part === "optionGroup"}
     <NativeSelect.OptionGroup {...node.props}>
       {#each node.children ?? [] as child}{@render render(child)}{/each}

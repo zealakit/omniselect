@@ -1,11 +1,4 @@
-import {
-  defineComponent,
-  h,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-} from "vue";
+import { defineComponent, h, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import { useNativeContext } from "./context.js";
 
 /** The semantic `<select>`. The only focusable element. */
@@ -38,8 +31,7 @@ export const Control = defineComponent({
       context.version.value; // re-render on state changes
       const state = controller.store.get();
       const props = context.props;
-      const placeholder =
-        !props.multiple && controller.selection.isEmpty(state.value);
+      const placeholder = !props.multiple && controller.selection.isEmpty(state.value);
       return h(
         "select",
         {
@@ -54,8 +46,7 @@ export const Control = defineComponent({
           "data-disabled": props.disabled ? "" : undefined,
           "data-required": props.required ? "" : undefined,
           "data-invalid": state.invalid || state.invalidProp ? "" : undefined,
-          "aria-invalid":
-            state.invalid || state.invalidProp ? "true" : undefined,
+          "aria-invalid": state.invalid || state.invalidProp ? "true" : undefined,
           "data-placeholder": placeholder ? "" : undefined,
           onChange: (event: Event) => {
             const element = event.currentTarget as HTMLSelectElement;
