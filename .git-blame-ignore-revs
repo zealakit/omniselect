@@ -1,4 +1,0 @@
-# Formatting-only commits. Configure git with:
-#   git config blame.ignoreRevsFile .git-blame-ignore-revs
-# Formatting with oxfmt 0.79.0.
-9329a81cbdd5cd0f585e97c1ae4fca7fa26b1461
