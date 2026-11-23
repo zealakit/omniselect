@@ -47,7 +47,7 @@ pnpm lint         # oxlint
 pnpm lint:fix     # oxlint --fix
 pnpm format       # oxfmt (write)
 pnpm format:check # oxfmt --check (formatting gate)
-pnpm check        # build + typecheck + test + lint
+pnpm check        # build + typecheck + test + lint + format check
 pnpm clean        # remove package/example build output and local tarballs
 pnpm pack:packages # pack the four adapter tarballs, Core bundled in, into artifacts/ (no publish)
 pnpm release:check # full checks + package tarballs (no publish)

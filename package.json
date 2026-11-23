@@ -38,7 +38,7 @@
     "lint:fix": "oxlint --fix",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "check": "pnpm build && pnpm typecheck && pnpm test && pnpm lint",
+    "check": "pnpm build && pnpm typecheck && pnpm test && pnpm lint && pnpm format:check",
     "clean": "pnpm -r exec rm -rf dist .next && rm -rf artifacts",
     "dev:vanilla": "pnpm --filter @zealakit/omniselect-vanilla-example run dev",
     "dev:react": "pnpm --filter @zealakit/omniselect-react-example run dev",
