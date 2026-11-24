@@ -2,7 +2,7 @@
 
 [English](https://github.com/zealakit/omniselect/blob/main/packages/core/README.md) | [Tiếng Việt](https://github.com/zealakit/omniselect/blob/main/packages/core/README_VI.md) | [中文](https://github.com/zealakit/omniselect/blob/main/packages/core/README_CN.md)
 
-![Zealakit Omniselect cover](https://github.com/zealakit/omniselect/blob/main/assets/images/omniselect-cover.jpg)
+![Zealakit Omniselect cover](https://github.com/zealakit/omniselect/blob/main/assets/images/omniselect-cover.jpg?raw=true)
 
 为每个 Zealakit Omniselect 适配器提供的内部选择、集合、键盘导航和过滤逻辑。Core 是私有包，绝不会发布到 npm：每个适配器都打包了自己的副本，因此应用代码应使用对应框架的适配器。本文面向在 monorepo 内开发适配器的贡献者。
 

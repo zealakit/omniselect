@@ -16,7 +16,7 @@ Read `.agents/AGENTS.md` first. Keep this file compact.
 ```text
 vanilla ─┐                      ┌─> @zealakit/omniselect-core (private, no deps)
 react ───┤  adapters import ────┤
-vue ─────┤                      └─> @zealakit/overlay-<same framework> (npm)
+vue ─────┤                      └─> @zealakit/ui-engine (peer: layers + /position)
 svelte ──┘
 
 examples/* -> adapters
@@ -26,8 +26,9 @@ READMEs (EN/VI/CN) -> product documentation
 - **Core** (`packages/core`) owns framework-independent logic: selection model, option
   collection, keyboard navigation, type-ahead, filtering, ids. It has no DOM-framework or
   Overlay imports.
-- **Adapters** own framework lifecycle and idiomatic APIs, and glue to the matching Overlay
-  adapter for positioning, layers, dismissal, focus, and portal.
+- **Adapters** own framework lifecycle and idiomatic APIs, and float the listbox on the engine:
+  `createLayer` for dismissal, `computePosition`/`autoUpdate` from `/position` for placement,
+  and their own portal (`createPortal`, `Teleport`, a portal action, or a DOM move).
 - **Docs** live only in the root and package READMEs (EN, VI, CN), structured by the
   [readme-system skill](../readme-system/SKILL.md). There is no `docs/` folder.
 
@@ -61,26 +62,24 @@ omniselect/
 - No speculative APIs, placeholders, or unimplemented components.
 - Keep `workspace:^` for Core in adapter manifests.
 
-## Overlay dependency
+## Engine dependency (X4)
 
-| Omniselect package | Depends on (npm) | Low-level APIs used |
-| --- | --- | --- |
-| vanilla | `@zealakit/overlay-vanilla` | `createFloating`, `createOverlay`, `createLayerStack`, focus helpers |
-| react | `@zealakit/overlay-react` | `usePositioner`, `useLayer`, `useOverlay`, `useEscapeKey`, `Portal`, focus helpers |
-| vue | `@zealakit/overlay-vue` | `usePositioner`, `useLayer`, `useOverlay`, `useEscapeKey`, focus helpers |
-| svelte | `@zealakit/overlay-svelte` | `floating`, `layer`, `overlay`, `outsideInteraction`, `escapeKey`, `portal` actions |
+| Omniselect package | Peer | Engine APIs used | Portal |
+| --- | --- | --- | --- |
+| vanilla | `@zealakit/ui-engine` | `createLayer`, `computePosition`, `autoUpdate` | DOM move in `select/popover.ts` |
+| react | `@zealakit/ui-engine` | `createLayer`, `computePosition`, `autoUpdate` | `createPortal` from `react-dom` |
+| vue | `@zealakit/ui-engine` | `createLayer`, `computePosition`, `autoUpdate` | `Teleport` |
+| svelte | `@zealakit/ui-engine` | `createLayer`, `computePosition`, `autoUpdate` | `portal` action |
 
-- Use low-level APIs, not Overlay's `Popover` components, so the listbox controls its own ARIA
-  (`role="listbox"`, `aria-activedescendant`) instead of inheriting dialog semantics.
-- The layer stack is shared through `globalThis`, so a Select inside an Overlay Dialog closes
-  first on Escape and is not an "outside click" for the Dialog.
-- Only documented public exports are used. Re-export Overlay types that appear in Omniselect's
-  public props (`Placement`, `DismissReason`, and `Animation*` where Overlay exports them).
-- Overlay 1.0.1 exports the `Animation*` types from every adapter; Omniselect still exposes no
-  `animation` prop (exit animation is CSS-only). `createLayerStack` is exported only by
-  `overlay-vanilla`.
-- Unreleased Overlay changes: run `pnpm pack:packages` in `../overlay`, install the tarball from
-  `../overlay/artifacts/` temporarily, never commit the override.
+- **No `@zealakit/overlay-*` adapter is used or declared.** X4 chose the engine-direct popover:
+  a Select inside an overlay Dialog used to close both on one Escape, because the published
+  overlay carried its own Escape stack. On the engine they share one stack, so one Escape closes
+  one layer.
+- No focus scope: DOM focus stays on the trigger or the search input and the active option is
+  exposed with `aria-activedescendant`, so the listbox keeps combobox semantics.
+- The engine is a peer, never a dependency and never bundled; the size script externalises it.
+- `Placement` comes from `@zealakit/ui-engine/position`; `SelectDismissReason` is omniselect's own
+  type, and `DismissReason` is a deprecated alias of it.
 
 ## ARIA pattern
 
@@ -145,14 +144,15 @@ when the finding no longer applies.
   npm. Core is private: adapters keep `workspace:^` in the repository, and
   `scripts/bundle-core.mjs` (used by `pnpm pack:packages` and the publish script) vendors the
   built Core into each tarball under `dist/vendor/core/` and rewrites the imports.
-- Page-global state in Core lives on `globalThis` via `getGlobalState()`; bump its version when
-  a stored shape changes. `tests/bundled-copies.test.ts` guards this.
+- Core keeps **no page-global state** (03-1 removed it): ids, the live region, layers and the
+  gesture claim come from the engine, which shares them across copies through its own versioned
+  protocol (X11). `tests/bundled-copies.test.ts` proves two bundled copies never mint the same id.
 - Peer ranges: React `^18.0.0 || ^19.0.0`, Vue `^3.5.0`, Svelte `^5.0.0`.
 - Preflight: `pnpm install --frozen-lockfile`, `pnpm clean`, `pnpm check`, `pnpm readme:check`,
   build every example, then `pnpm pack:packages` (tarballs in `artifacts/`, no publish).
 - Inspect each adapter tarball: only `package.json`, `README*.md`, `LICENSE`, and `dist/**`; no
   `workspace:`; no `@zealakit/omniselect-core` outside `dist/vendor/core/`; exactly one
-  `@zealakit/overlay-<fw>` dependency and no `@zealakit/overlay-core` anywhere; `main`/`module`/
+  `@zealakit/overlay-*` dependency at all; `main`/`module`/
   `types`/`exports` point into `dist`; no sources, tests, source maps, or credentials.
 - Validate tarballs in temporary projects outside the repository, never with `workspace:*`
   aliases.

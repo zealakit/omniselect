@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
 import { act, cleanup, render } from "@testing-library/react";
 import { readFormData } from "../../core/tests/conformance/index.ts";
-import { Dialog, DialogContent, DialogTitle } from "@zealakit/overlay-react";
 import { createElement as h, type ReactNode } from "react";
 import { Select } from "../dist/select/index.js";
 
@@ -52,39 +51,48 @@ function tree(props: Record<string, unknown> = {}, extra: ReactNode[] = []) {
   );
 }
 
-test("inside an Overlay Dialog: Escape closes the Select first, then the Dialog", async () => {
-  render(
-    h(
-      Dialog,
-      { defaultOpen: true },
-      h(DialogContent, null, h(DialogTitle, null, "Title"), tree({ portal: false })),
-    ),
-  );
+test("[X4] inside an engine layer: one Escape closes only the Select", async () => {
+  // The Select floats on the engine now, so a surrounding layer gets exactly the
+  // same treatment an overlay Dialog will once it is on the engine too (G-OV):
+  // the first Escape closes the Select, the second reaches the outer layer.
+  const { createLayer } = await import("@zealakit/ui-engine");
+  const outer = document.createElement("div");
+  document.body.append(outer);
+  const dismissals: string[] = [];
+  const layer = createLayer({ element: outer, onDismiss: (reason) => dismissals.push(reason) });
+
+  render(tree({ portal: false }));
   await flush();
   const trigger = document.querySelector("[role=combobox]") as HTMLElement;
-  assert.ok(trigger, "select trigger renders inside the dialog");
+  assert.ok(trigger, "select trigger renders inside the layer");
   await act(async () => click(trigger));
   await flush();
   assert.ok(document.querySelector("[role=listbox]"), "select is open");
+  // Opening the Select pressed a target outside the outer layer, which is a
+  // legitimate outside press for it; start counting from the open state.
+  dismissals.length = 0;
 
   await act(async () => press(trigger, "Escape"));
   await flush();
   assert.equal(document.querySelector("[role=listbox]"), null, "select closed");
-  assert.ok(document.querySelector("[role=dialog]"), "dialog stays open");
+  assert.deepEqual(dismissals, [], "the outer layer did not receive the first Escape");
 
   await act(async () => press(trigger, "Escape"));
   await flush();
-  assert.equal(document.querySelector("[role=dialog]"), null, "dialog closed on the second Escape");
+  assert.deepEqual(dismissals, ["escape-key"], "the second Escape reaches the outer layer");
+
+  layer.release();
+  outer.remove();
 });
 
-test("inside an Overlay Dialog: pressing an item is not an outside press for the Dialog", async () => {
-  render(
-    h(
-      Dialog,
-      { defaultOpen: true },
-      h(DialogContent, null, h(DialogTitle, null, "Title"), tree({ portal: false })),
-    ),
-  );
+test("[X4] pressing an item keeps a surrounding engine layer open", async () => {
+  const { createLayer } = await import("@zealakit/ui-engine");
+  const outer = document.createElement("div");
+  document.body.append(outer);
+  const dismissals: string[] = [];
+  const layer = createLayer({ element: outer, onDismiss: (reason) => dismissals.push(reason) });
+
+  render(tree({ portal: false }));
   await flush();
   const trigger = document.querySelector("[role=combobox]") as HTMLElement;
   await act(async () => click(trigger));
@@ -92,8 +100,11 @@ test("inside an Overlay Dialog: pressing an item is not an outside press for the
   const item = document.querySelector("[role=option]") as HTMLElement;
   await act(async () => click(item));
   await flush();
-  assert.ok(document.querySelector("[role=dialog]"), "dialog still open after picking an item");
+  assert.deepEqual(dismissals, ["outside-press"], "only the opening press, never the item");
   assert.equal(trigger.textContent?.trim(), "A");
+
+  layer.release();
+  outer.remove();
 });
 
 test("presence: the popover stays mounted until exit animations finish", async () => {

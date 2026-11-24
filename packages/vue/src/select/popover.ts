@@ -1,20 +1,15 @@
-import { getPopoverVars, type SelectCloseReason } from "@zealakit/omniselect-core";
-import { waitForExit } from "@zealakit/omniselect-core/dom";
-import { type DismissReason, useLayer, usePositioner } from "@zealakit/overlay-vue";
+import { availableHeight, waitForExit } from "@zealakit/omniselect-core/dom";
+import { createLayer, type LayerHandle } from "@zealakit/ui-engine";
+import { autoUpdate, computePosition, type PositionResult } from "@zealakit/ui-engine/position";
 import { computed, defineComponent, h, nextTick, ref, shallowRef, Teleport, watch } from "vue";
 import { useSelectContext } from "./context.js";
 
-const dismissReasons: Record<DismissReason, SelectCloseReason> = {
-  "escape-key": "escape",
-  "outside-press": "outside",
-  "reference-press": "toggle",
-  imperative: "imperative",
-};
-
 /**
- * Floating surface. Positioned against the Control (or Trigger), dismissed by
- * Escape and outside presses through Overlay's shared layer stack, and kept
- * mounted until CSS exit animations finish.
+ * Floating surface on the engine (X4: engine-direct, no overlay).
+ *
+ * `computePosition` + `autoUpdate` place it, a non-modal `createLayer` dismisses
+ * it, and `Teleport` portals it. No focus scope: DOM focus stays on the trigger
+ * or search input and the active option is `aria-activedescendant`.
  */
 export const Popover = defineComponent({
   name: "SelectPopover",
@@ -23,11 +18,23 @@ export const Popover = defineComponent({
     const context = useSelectContext("Popover");
     const { machine } = context;
     const element = shallowRef<HTMLElement | null>(null);
+    const position = shallowRef<PositionResult | null>(null);
     const open = computed(() => {
       context.version.value;
       return machine.isOpen();
     });
     const mounted = ref(machine.isOpen());
+    const anchor = computed(() => context.controlEl.value ?? context.triggerEl.value);
+
+    let layer: LayerHandle | null = null;
+    let stopAutoUpdate: (() => void) | null = null;
+    const teardown = (): void => {
+      layer?.release();
+      layer = null;
+      stopAutoUpdate?.();
+      stopAutoUpdate = null;
+    };
+
     watch(
       open,
       (isOpen) => {
@@ -35,9 +42,15 @@ export const Popover = defineComponent({
           mounted.value = true;
           return;
         }
+        teardown();
         void nextTick().then(() => {
           const el = element.value;
           if (!el) {
+            mounted.value = false;
+            return;
+          }
+          const animations = typeof el.getAnimations === "function" ? el.getAnimations() : [];
+          if (animations.length === 0) {
             mounted.value = false;
             return;
           }
@@ -51,45 +64,59 @@ export const Popover = defineComponent({
       { flush: "post" },
     );
 
-    const anchor = computed(() => context.controlEl.value ?? context.triggerEl.value);
-    const positioner = usePositioner({
-      reference: anchor,
-      floating: element,
-      placement: () => context.props.placement,
-      offset: () => context.props.offset,
-      flip: true,
-      shift: true,
-    });
-    useLayer({
-      element,
-      reference: context.triggerEl,
-      boundaries: () => [context.controlEl.value],
-      dismissOnEscape: true,
-      dismissOnOutsidePress: true,
-      disabled: () => !open.value || element.value === null,
-      onDismiss: (reason) => machine.close(dismissReasons[reason]),
-    });
+    // One watch owns positioning and dismissal, and tears both down on close or
+    // unmount, so a remount never leaves a second layer (NP1/NP4).
+    watch(
+      [open, element, anchor],
+      ([isOpen, el, reference]) => {
+        teardown();
+        if (!isOpen || el === null || reference === null) {
+          return;
+        }
+        const update = (): void => {
+          position.value = computePosition(reference, el, {
+            placement: context.props.placement,
+            offset: context.props.offset,
+            flip: true,
+            shift: true,
+            strategy: "fixed",
+          });
+        };
+        update();
+        stopAutoUpdate = autoUpdate(reference, el, update);
+        layer = createLayer({
+          element: el,
+          inside: [context.controlEl.value, context.triggerEl.value],
+          dismiss: { escapeKey: true, outsidePress: true },
+          onDismiss: (reason) => {
+            if (reason === "escape-key" || reason === "outside-press") {
+              machine.close(reason === "escape-key" ? "escape" : "outside");
+            }
+          },
+        });
+      },
+      { flush: "post", immediate: true },
+    );
 
     return () => {
       if (!mounted.value && !props.forceMount) {
         return null;
       }
-      const result = positioner.result.value;
+      const result = position.value;
       const [side = "bottom", align = "center"] = (
         result?.placement ?? context.props.placement
       ).split("-");
-      const rect = open.value ? anchor.value?.getBoundingClientRect() : undefined;
-      const vars =
-        rect && result
-          ? getPopoverVars(rect, result.placement, window.innerHeight, context.props.offset)
-          : null;
+      const room =
+        result === null
+          ? null
+          : availableHeight(result, window.innerHeight, { gap: context.props.offset });
       const style: Record<string, string | number | undefined> = {
-        position: result?.strategy ?? "absolute",
+        position: "fixed",
         left: `${result?.x ?? 0}px`,
         top: `${result?.y ?? 0}px`,
         "--omniselect-anchor-width":
-          context.props.matchWidth && vars ? `${vars.width}px` : undefined,
-        "--omniselect-available-height": vars ? `${vars.availableHeight}px` : undefined,
+          context.props.matchWidth && result ? `${result.rects.reference.width}px` : undefined,
+        "--omniselect-available-height": room === null ? undefined : `${room}px`,
       };
       const content = h(
         "div",
@@ -98,7 +125,7 @@ export const Popover = defineComponent({
           ref: element,
           // Keep focus on the trigger/input (also when grabbing the scrollbar).
           onMousedown: (event: Event) => event.preventDefault(),
-          hidden: !open.value && !mounted.value,
+          hidden: !open.value,
           "data-state": open.value ? "open" : "closed",
           "data-side": side,
           "data-align": align,

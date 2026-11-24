@@ -127,9 +127,6 @@ for (const name of PACKAGES) {
   for (const [dependency, range] of Object.entries(manifest.dependencies ?? {})) {
     if (dependency === ENGINE) {
       fail("NS1", `${name}: lists ${ENGINE} in dependencies; it must be a peer`);
-    } else if (dependency.startsWith("@zealakit/overlay-")) {
-      // X4/03-3: the listbox still floats through published overlay; the
-      // dependency is removed when X4's engine-direct popover lands.
     } else if (dependency.startsWith("@zealakit/") && dependency !== "@zealakit/omniselect-core") {
       fail(
         "NS1",

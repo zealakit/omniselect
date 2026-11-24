@@ -54,8 +54,7 @@
     }
   },
   "dependencies": {
-    "@zealakit/omniselect-core": "workspace:^",
-    "@zealakit/overlay-react": "^1.0.1"
+    "@zealakit/omniselect-core": "workspace:^"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",

@@ -54,8 +54,7 @@
     }
   },
   "dependencies": {
-    "@zealakit/omniselect-core": "workspace:^",
-    "@zealakit/overlay-vue": "^1.0.1"
+    "@zealakit/omniselect-core": "workspace:^"
   },
   "peerDependencies": {
     "vue": "^3.5.0",

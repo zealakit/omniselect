@@ -2,12 +2,12 @@
 
 [English](https://github.com/zealakit/omniselect/blob/main/README.md) | [Tiếng Việt](https://github.com/zealakit/omniselect/blob/main/README_VI.md) | [中文](https://github.com/zealakit/omniselect/blob/main/README_CN.md)
 
-![Zealakit Omniselect cover](https://github.com/zealakit/omniselect/blob/main/assets/images/omniselect-cover.jpg)
+![Zealakit Omniselect cover](https://github.com/zealakit/omniselect/blob/main/assets/images/omniselect-cover.jpg?raw=true)
 
 Các primitive Select và Combobox headless để xây dựng giao diện chọn giá trị bằng Vanilla TypeScript, React, Vue và Svelte.
 
 - **Core** — package logic dùng chung nội bộ cho selection, collection, điều hướng bàn phím và lọc, được đóng gói sẵn trong mọi adapter và không bao giờ được publish riêng.
-- **Adapters** — các package React, Vue, Svelte và Vanilla. Mỗi adapter xây trên adapter Zealakit Overlay tương ứng để định vị, phân lớp và đóng overlay.
+- **Adapters** — các package React, Vue, Svelte và Vanilla. Mỗi adapter nổi listbox trên `@zealakit/ui-engine` (layer và `/position`) để định vị và đóng.
 - **An toàn với SSR** — import package không bao giờ chạm vào biến toàn cục của trình duyệt.
 
 Omniselect chỉ xử lý trạng thái chọn, điều hướng bàn phím, thuộc tính accessibility và kết nối với Overlay. Không kèm style, theme hay icon.
@@ -27,7 +27,7 @@ Omniselect chỉ xử lý trạng thái chọn, điều hướng bàn phím, thu
 | `@zealakit/omniselect-vue` | Vue 3.5+ | [README](https://github.com/zealakit/omniselect/blob/main/packages/vue/README.md) |
 | `@zealakit/omniselect-svelte` | Svelte 5 | [README](https://github.com/zealakit/omniselect/blob/main/packages/svelte/README.md) |
 
-Hãy cài một adapter cho framework của bạn. Ứng dụng của bạn đã có sẵn runtime của framework, nên bạn chỉ cần thêm adapter. Mỗi adapter tự cài package `@zealakit/overlay-*` tương ứng và đóng gói sẵn `@zealakit/omniselect-core`, vốn không được publish lên npm; bạn không bao giờ cài hay cấu hình core trực tiếp. Các adapter không dùng chung runtime.
+Hãy cài một adapter cho framework của bạn cùng `@zealakit/ui-engine`, thứ mọi adapter khai báo là **peer** để mọi package Zealakit trên trang dùng chung một layer stack và một live region. Mỗi adapter đóng gói sẵn `@zealakit/omniselect-core`, vốn không được publish lên npm; bạn không bao giờ cài hay cấu hình core trực tiếp. Không cần overlay.
 
 ## Installation
 

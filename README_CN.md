@@ -2,7 +2,7 @@
 
 [English](https://github.com/zealakit/omniselect/blob/main/README.md) | [Tiếng Việt](https://github.com/zealakit/omniselect/blob/main/README_VI.md) | [中文](https://github.com/zealakit/omniselect/blob/main/README_CN.md)
 
-![Zealakit Omniselect cover](https://github.com/zealakit/omniselect/blob/main/assets/images/omniselect-cover.jpg)
+![Zealakit Omniselect cover](https://github.com/zealakit/omniselect/blob/main/assets/images/omniselect-cover.jpg?raw=true)
 
 用于在 Vanilla TypeScript、React、Vue 和 Svelte 中构建选择类界面的 headless Select 与 Combobox 原语。
 
@@ -27,7 +27,7 @@ Omniselect 只处理选择状态、键盘导航、无障碍属性以及与 Overl
 | `@zealakit/omniselect-vue` | Vue 3.5+ | [README](https://github.com/zealakit/omniselect/blob/main/packages/vue/README.md) |
 | `@zealakit/omniselect-svelte` | Svelte 5 | [README](https://github.com/zealakit/omniselect/blob/main/packages/svelte/README.md) |
 
-请为你的框架安装一个适配器。你的应用已提供框架运行时，因此只需添加适配器。每个适配器会自动安装对应的 `@zealakit/overlay-*` 包，并打包 `@zealakit/omniselect-core`（它不会发布到 npm）；你无需直接安装或配置 core。各适配器之间不共享运行时。
+请为你的框架安装一个适配器，并安装 `@zealakit/ui-engine`——每个适配器都把它声明为 **peer**，使页面上所有 Zealakit 包共享同一个 layer stack 和同一个 live region。每个适配器会打包 `@zealakit/omniselect-core`（它不会发布到 npm）；你无需直接安装或配置 core。不再需要 overlay。
 
 ## Installation
 

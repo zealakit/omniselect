@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Bundle-size budgets (gzip, minified) for every adapter entry. Framework runtimes and
-// @zealakit/overlay-* are external; the private core is bundled, as it is in a release tarball.
-// Also checks that `/native` carries no Overlay code.
+// The engine is a peer (X4) and is external, as it is in a release tarball; the
+// private core is bundled. Also checks that `/native` carries no floating code.
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
@@ -26,7 +26,8 @@ const external = [
   "vue",
   "svelte",
   "svelte/*",
-  "@zealakit/overlay-*",
+  "@zealakit/ui-engine",
+  "@zealakit/ui-engine/*",
 ];
 
 const sveltePlugin = {

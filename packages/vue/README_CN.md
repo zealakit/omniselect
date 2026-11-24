@@ -2,7 +2,7 @@
 
 [English](https://github.com/zealakit/omniselect/blob/main/packages/vue/README.md) | [Tiếng Việt](https://github.com/zealakit/omniselect/blob/main/packages/vue/README_VI.md) | [中文](https://github.com/zealakit/omniselect/blob/main/packages/vue/README_CN.md)
 
-![Zealakit Omniselect cover](https://github.com/zealakit/omniselect/blob/main/assets/images/omniselect-cover.jpg)
+![Zealakit Omniselect cover](https://github.com/zealakit/omniselect/blob/main/assets/images/omniselect-cover.jpg?raw=true)
 
 适用于 Vue 的 headless Select 与 Combobox。视觉样式由你负责。
 

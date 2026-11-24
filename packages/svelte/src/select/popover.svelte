@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { getPopoverVars, type SelectCloseReason } from "@zealakit/omniselect-core";
-  import { waitForExit } from "@zealakit/omniselect-core/dom";
-  import { type DismissReason, overlay, type PositionerResult } from "@zealakit/overlay-svelte";
+  import { availableHeight, waitForExit } from "@zealakit/omniselect-core/dom";
+  import type { PositionResult } from "@zealakit/ui-engine/position";
   import { portal as portalAction } from "./portal.js";
+  import { enginePopover } from "./popover-action.svelte.js";
   import type { Snippet } from "svelte";
   import type { HTMLAttributes } from "svelte/elements";
   import { getSelectContext } from "./context.js";
@@ -24,14 +24,7 @@
   let element: HTMLDivElement | undefined = $state();
   let side = $state("bottom");
   let align = $state("center");
-  let vars: { width: number; availableHeight: number } | null = $state(null);
-
-  const reasons: Record<DismissReason, SelectCloseReason> = {
-    "escape-key": "escape",
-    "outside-press": "outside",
-    "reference-press": "toggle",
-    imperative: "imperative",
-  };
+  let vars: { x: number; y: number; width: number; availableHeight: number } | null = $state(null);
 
   $effect(() => {
     if (open) {
@@ -41,6 +34,12 @@
     if (!mounted) return;
     const node = element;
     if (!node) {
+      mounted = false;
+      return;
+    }
+    // No running animation: hide in the same tick, like the other adapters.
+    const animations = typeof node.getAnimations === "function" ? node.getAnimations() : [];
+    if (animations.length === 0) {
       mounted = false;
       return;
     }
@@ -55,22 +54,27 @@
 
   const anchor = $derived(context.controlEl ?? context.triggerEl);
 
-  function onUpdate(result: PositionerResult) {
+  function onUpdate(result: PositionResult) {
     const [nextSide = "bottom", nextAlign = "center"] = result.placement.split("-");
     // Only write state when something changed, or the action's parameters would
     // be recreated and re-run the positioner endlessly.
     if (side !== nextSide) side = nextSide;
     if (align !== nextAlign) align = nextAlign;
-    if (anchor) {
-      const next = getPopoverVars(
-        anchor.getBoundingClientRect(),
-        result.placement,
-        window.innerHeight,
-        context.props.offset,
-      );
-      if (!vars || vars.width !== next.width || vars.availableHeight !== next.availableHeight) {
-        vars = next;
-      }
+    const room = availableHeight(result, window.innerHeight, { gap: context.props.offset });
+    const next = {
+      x: result.x,
+      y: result.y,
+      width: result.rects.reference.width,
+      availableHeight: room,
+    };
+    if (
+      !vars ||
+      vars.x !== next.x ||
+      vars.y !== next.y ||
+      vars.width !== next.width ||
+      vars.availableHeight !== next.availableHeight
+    ) {
+      vars = next;
     }
   }
 </script>
@@ -86,10 +90,13 @@
       // Keep focus on the trigger/input (also when grabbing the scrollbar).
       event.preventDefault();
     }}
-    hidden={!open && !mounted}
+    hidden={!open}
     data-state={open ? "open" : "closed"}
     data-side={side}
     data-align={align}
+    style:position="fixed"
+    style:left={vars ? `${vars.x}px` : undefined}
+    style:top={vars ? `${vars.y}px` : undefined}
     style:--omniselect-anchor-width={context.props.matchWidth && vars
       ? `${vars.width}px`
       : undefined}
@@ -101,18 +108,14 @@
           ? undefined
           : context.props.portal,
     }}
-    use:overlay={{
+    use:enginePopover={{
       reference: anchor,
       open,
-      boundaries: [context.controlEl],
+      inside: [context.controlEl, context.triggerEl],
       placement: context.props.placement,
       offset: context.props.offset,
-      flip: true,
-      shift: true,
-      dismissOnEscape: true,
-      dismissOnOutsidePress: true,
-      onDismiss: (reason) => machine.close(reasons[reason]),
       onUpdate,
+      onDismiss: (reason) => machine.close(reason === "escape-key" ? "escape" : "outside"),
     }}
   >
     {@render children?.()}

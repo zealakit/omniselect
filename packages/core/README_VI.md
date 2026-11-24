@@ -2,7 +2,7 @@
 
 [English](https://github.com/zealakit/omniselect/blob/main/packages/core/README.md) | [Tiếng Việt](https://github.com/zealakit/omniselect/blob/main/packages/core/README_VI.md) | [中文](https://github.com/zealakit/omniselect/blob/main/packages/core/README_CN.md)
 
-![Zealakit Omniselect cover](https://github.com/zealakit/omniselect/blob/main/assets/images/omniselect-cover.jpg)
+![Zealakit Omniselect cover](https://github.com/zealakit/omniselect/blob/main/assets/images/omniselect-cover.jpg?raw=true)
 
 Logic nội bộ cho selection, collection, điều hướng bàn phím và lọc của mọi adapter Zealakit Omniselect. Core là package private và không bao giờ được publish lên npm: mỗi adapter đóng gói sẵn một bản core riêng, nên code ứng dụng dùng adapter của framework. Tài liệu này dành cho người đóng góp phát triển các adapter trong monorepo.
 

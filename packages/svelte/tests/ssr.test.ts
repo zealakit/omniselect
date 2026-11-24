@@ -8,14 +8,14 @@ const loader = pathToFileURL(
   fileURLToPath(new URL("./svelte-ssr-loader.ts", import.meta.url)),
 ).href;
 
-test("svelte adapter and its Overlay dependency import without browser globals", () => {
+test("svelte adapter and the engine it floats on import without browser globals", () => {
   const script = `
-    const overlay = await import("@zealakit/overlay-svelte");
+    const engine = await import("@zealakit/ui-engine");
     const omniselect = await import("./dist/index.js");
     console.log(JSON.stringify({
       window: typeof window,
       document: typeof document,
-      overlayExports: Object.keys(overlay).length,
+      engineExports: Object.keys(engine).length,
       omniselectLoaded: typeof omniselect,
     }));
   `;
@@ -29,13 +29,13 @@ test("svelte adapter and its Overlay dependency import without browser globals",
   const result = JSON.parse(output.trim()) as {
     window: string;
     document: string;
-    overlayExports: number;
+    engineExports: number;
     omniselectLoaded: string;
   };
 
   assert.equal(result.window, "undefined");
   assert.equal(result.document, "undefined");
-  assert.ok(result.overlayExports > 0);
+  assert.ok(result.engineExports > 0);
   assert.equal(result.omniselectLoaded, "object");
 });
 

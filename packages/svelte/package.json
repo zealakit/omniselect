@@ -59,8 +59,7 @@
     }
   },
   "dependencies": {
-    "@zealakit/omniselect-core": "workspace:^",
-    "@zealakit/overlay-svelte": "^1.0.1"
+    "@zealakit/omniselect-core": "workspace:^"
   },
   "peerDependencies": {
     "svelte": "^5.0.0",
