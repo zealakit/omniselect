@@ -1,6 +1,6 @@
 // oxlint-disable typescript/no-explicit-any -- values are user-defined
 import { createSelectMachine, nextId, visuallyHiddenStyle } from "@zealakit/omniselect-core";
-import type { Placement } from "@zealakit/overlay-vue";
+import type { Placement } from "@zealakit/ui-engine/position";
 import {
   defineComponent,
   h,

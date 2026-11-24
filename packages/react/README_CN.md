@@ -378,7 +378,7 @@ export function FruitSelect() {
 | `AnimationSetting` (type) | `@zealakit/overlay-react` |
 | `CustomAnimationClasses` (type) | `@zealakit/overlay-react` |
 | `DismissReason` (type) | `@zealakit/overlay-react` |
-| `Placement` (type) | `@zealakit/overlay-react` |
+| `Placement` (type) | `@zealakit/ui-engine/position` |
 | `ResolvedAnimationConfig` (type) | `@zealakit/overlay-react` |
 
 ## Agent Skill

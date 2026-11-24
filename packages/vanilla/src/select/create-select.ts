@@ -15,12 +15,8 @@ import {
   type SelectOpenReason,
   visuallyHiddenStyle,
 } from "@zealakit/omniselect-core";
-import {
-  createOverlay,
-  type DismissReason,
-  type Overlay,
-  type Placement,
-} from "@zealakit/overlay-vanilla";
+import { createOverlay, type DismissReason, type Overlay } from "@zealakit/overlay-vanilla";
+import type { Placement } from "@zealakit/ui-engine/position";
 
 export type SelectOptions = {
   /** Keys are strings. An array of strings with `multiple`. */

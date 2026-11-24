@@ -331,7 +331,7 @@ Duplicate requests are blocked while `isLoading` is `true`. When a page finishes
 | Export | From |
 | --- | --- |
 | `DismissReason` (type) | `@zealakit/overlay-vanilla` |
-| `Placement` (type) | `@zealakit/overlay-vanilla` |
+| `Placement` (type) | `@zealakit/ui-engine/position` |
 
 ## Agent Skill
 

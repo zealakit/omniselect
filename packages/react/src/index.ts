@@ -10,6 +10,6 @@ export type {
   AnimationSetting,
   CustomAnimationClasses,
   DismissReason,
-  Placement,
   ResolvedAnimationConfig,
 } from "@zealakit/overlay-react";
+export type { Placement } from "@zealakit/ui-engine/position";

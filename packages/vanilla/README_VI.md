@@ -331,7 +331,7 @@ Request trùng lặp bị chặn khi `isLoading` là `true`. Khi một trang t�
 | Export | From |
 | --- | --- |
 | `DismissReason` (type) | `@zealakit/overlay-vanilla` |
-| `Placement` (type) | `@zealakit/overlay-vanilla` |
+| `Placement` (type) | `@zealakit/ui-engine/position` |
 
 ## Agent Skill
 

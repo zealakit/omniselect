@@ -363,7 +363,7 @@ Peer 依赖：`svelte` `^5.0.0`。应用已提供它。
 | Export | From |
 | --- | --- |
 | `DismissReason` (type) | `@zealakit/overlay-svelte` |
-| `Placement` (type) | `@zealakit/overlay-svelte` |
+| `Placement` (type) | `@zealakit/ui-engine/position` |
 
 ## Agent Skill
 

@@ -1,5 +1,5 @@
 import type { SelectMachine, SelectState } from "@zealakit/omniselect-core";
-import type { Placement } from "@zealakit/overlay-svelte";
+import type { Placement } from "@zealakit/ui-engine/position";
 import { getContext } from "svelte";
 
 export type SelectContext = {

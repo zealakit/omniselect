@@ -331,7 +331,7 @@ select.setLoadMore({ hasMore: true });
 | Export | From |
 | --- | --- |
 | `DismissReason` (type) | `@zealakit/overlay-vanilla` |
-| `Placement` (type) | `@zealakit/overlay-vanilla` |
+| `Placement` (type) | `@zealakit/ui-engine/position` |
 
 ## Agent Skill
 

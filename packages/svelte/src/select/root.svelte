@@ -11,7 +11,7 @@
     type SelectOpenReason,
     type SelectState,
   } from "@zealakit/omniselect-core";
-  import type { Placement } from "@zealakit/overlay-svelte";
+  import type { Placement } from "@zealakit/ui-engine/position";
   import { onDestroy, setContext, untrack, type Snippet } from "svelte";
   import { SELECT_KEY, type SelectContext } from "./context.js";
 

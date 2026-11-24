@@ -1,5 +1,5 @@
 import type { SelectMachine } from "@zealakit/omniselect-core";
-import type { Placement } from "@zealakit/overlay-react";
+import type { Placement } from "@zealakit/ui-engine/position";
 import { createContext, useContext } from "react";
 
 export type SelectContextValue = {

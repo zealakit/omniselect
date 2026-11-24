@@ -363,7 +363,7 @@ Request trùng lặp bị chặn khi `isLoading` là `true`. Khi một trang t�
 | Export | From |
 | --- | --- |
 | `DismissReason` (type) | `@zealakit/overlay-svelte` |
-| `Placement` (type) | `@zealakit/overlay-svelte` |
+| `Placement` (type) | `@zealakit/ui-engine/position` |
 
 ## Agent Skill
 

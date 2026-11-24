@@ -378,7 +378,7 @@ Request trùng lặp bị chặn khi `isLoading` là `true`. Khi một trang t�
 | `AnimationSetting` (type) | `@zealakit/overlay-react` |
 | `CustomAnimationClasses` (type) | `@zealakit/overlay-react` |
 | `DismissReason` (type) | `@zealakit/overlay-react` |
-| `Placement` (type) | `@zealakit/overlay-react` |
+| `Placement` (type) | `@zealakit/ui-engine/position` |
 | `ResolvedAnimationConfig` (type) | `@zealakit/overlay-react` |
 
 ## Agent Skill

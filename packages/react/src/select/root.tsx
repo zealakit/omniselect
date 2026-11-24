@@ -9,7 +9,7 @@ import {
   type SelectOpenReason,
   visuallyHiddenStyle,
 } from "@zealakit/omniselect-core";
-import type { Placement } from "@zealakit/overlay-react";
+import type { Placement } from "@zealakit/ui-engine/position";
 import { type ReactNode, useCallback, useEffect, useId, useRef, useState } from "react";
 import { useIsomorphicLayoutEffect } from "../internal/use-isomorphic-layout-effect.js";
 import { SelectContext, type SelectContextValue } from "./context.js";

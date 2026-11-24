@@ -1,3 +1,4 @@
 export * from "./native/index.js";
 export * from "./select/index.js";
-export type { DismissReason, Placement } from "@zealakit/overlay-vanilla";
+export type { DismissReason } from "@zealakit/overlay-vanilla";
+export type { Placement } from "@zealakit/ui-engine/position";

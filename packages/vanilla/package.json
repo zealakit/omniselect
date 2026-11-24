@@ -59,7 +59,8 @@
     "@zealakit/overlay-vanilla": "^1.0.1"
   },
   "devDependencies": {
-    "happy-dom": "^21.0.4"
+    "happy-dom": "^21.0.4",
+    "@zealakit/ui-engine": "link:../../../ui-engine"
   },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.json",
@@ -75,5 +76,8 @@
   "types": "./dist/index.d.ts",
   "publishConfig": {
     "access": "public"
+  },
+  "peerDependencies": {
+    "@zealakit/ui-engine": "^1.0.0-beta.1"
   }
 }

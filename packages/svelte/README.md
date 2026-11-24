@@ -363,7 +363,7 @@ Duplicate requests are blocked while `isLoading` is `true`. When a page finishes
 | Export | From |
 | --- | --- |
 | `DismissReason` (type) | `@zealakit/overlay-svelte` |
-| `Placement` (type) | `@zealakit/overlay-svelte` |
+| `Placement` (type) | `@zealakit/ui-engine/position` |
 
 ## Agent Skill
 

@@ -1,5 +1,5 @@
 import type { SelectMachine } from "@zealakit/omniselect-core";
-import type { Placement } from "@zealakit/overlay-vue";
+import type { Placement } from "@zealakit/ui-engine/position";
 import { type InjectionKey, inject, type Ref, type ShallowRef } from "vue";
 
 export type SelectContext = {
