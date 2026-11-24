@@ -37,6 +37,13 @@ function check(mounted: Mounted, expect: Expectation, where: string): void {
   for (const [ref, text] of Object.entries(expect.text ?? {})) {
     assert.equal(mounted.query(ref)?.textContent?.trim(), text, `${where}: text of ${ref}`);
   }
+  if (expect.announcement !== undefined) {
+    // D10: announcements live in the engine's one page region, not in a
+    // per-Select element. The component keeps an empty `live-region` part for
+    // compatibility only.
+    const region = document.querySelector('[data-zealakit-announcer="polite"]');
+    assert.equal(region?.textContent?.trim() ?? "", expect.announcement, `${where}: announcement`);
+  }
   if (expect.calls) {
     assert.deepEqual(mounted.calls(), expect.calls, `${where}: calls`);
   }

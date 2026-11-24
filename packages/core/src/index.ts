@@ -31,7 +31,6 @@ export {
 export { createStore, type Listener, type Store } from "./store/store.js";
 export { createTypeahead, type Typeahead, type TypeaheadItem } from "./typeahead.js";
 export { devWarn } from "./utils/dev-warn.js";
-export { getGlobalState } from "./utils/global-state.js";
 export { waitForExit } from "./presence.js";
 export {
   type Attrs,

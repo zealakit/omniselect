@@ -9,6 +9,7 @@ import {
   type SelectOpenReason,
   visuallyHiddenStyle,
 } from "@zealakit/omniselect-core";
+import { announce } from "@zealakit/ui-engine";
 import type { Placement } from "@zealakit/ui-engine/position";
 import { type ReactNode, useCallback, useEffect, useId, useRef, useState } from "react";
 import { useIsomorphicLayoutEffect } from "../internal/use-isomorphic-layout-effect.js";
@@ -252,7 +253,11 @@ export function Root<T>(props: SelectRootProps<T>) {
           focusField={focusField}
         />
       ) : null}
-      {announce !== false ? <LiveRegion machine={machine} /> : null}
+      {announce !== false ? <Announcer machine={machine} /> : null}
+      {announce !== false ? (
+        // @deprecated Render nothing into it: announcements use the engine region.
+        <span data-part="live-region" data-deprecated="announce through @zealakit/ui-engine" />
+      ) : null}
     </SelectContext.Provider>
   );
 }
@@ -321,21 +326,24 @@ function HiddenSelect({
   );
 }
 
-/** Polite live region for add/remove announcements. */
+/**
+ * Sends the machine's announcement through the engine's one page live region
+ * (D10). Renders nothing: there is no per-Select `role="status"` element any
+ * more, so messages auto-clear after 7 s and every Zealakit package shares one
+ * announcement channel.
+ */
 // oxlint-disable-next-line typescript/no-explicit-any -- the value type is erased
-function LiveRegion({ machine }: { machine: SelectMachine<any> }) {
+function Announcer({ machine }: { machine: SelectMachine<any> }) {
   const message = useSnapshot(machine, (m) => m.store.get().announcement);
-  return (
-    // oxlint-disable jsx-a11y/prefer-tag-over-role -- role=status is the live-region contract; <output> is not a drop-in replacement
-    <span
-      data-part="live-region"
-      role="status"
-      aria-live="polite"
-      aria-atomic="true"
-      style={visuallyHiddenStyle}
-    >
-      {message}
-    </span>
-    // oxlint-enable jsx-a11y/prefer-tag-over-role
-  );
+  const lastSent = useRef("");
+
+  useEffect(() => {
+    if (message === "" || message === lastSent.current) {
+      return;
+    }
+    lastSent.current = message;
+    announce(message, { politeness: "polite" });
+  }, [message]);
+
+  return null;
 }

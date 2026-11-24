@@ -100,7 +100,7 @@ test("normalize and defaultFilter handle CJK and diacritics", () => {
   assert.equal(defaultFilter({ value: 1, textValue: "abc" }, "d"), false);
 });
 
-test("ids encode keys safely and counter is page-global", () => {
+test("ids encode keys safely and the id counter comes from the engine", () => {
   const ids = createIds("r");
   assert.equal(ids.item("a b/c%"), "r-item-a_20b_2Fc_25");
   assert.equal(ids.trigger, "r-trigger");
@@ -108,7 +108,7 @@ test("ids encode keys safely and counter is page-global", () => {
   const a = nextId();
   const b = nextId();
   assert.notEqual(a, b);
-  assert.match(a, /^omniselect-\d+$/);
+  assert.match(a, /^zealakit-omniselect-\d+$/);
 });
 
 test("getItemText ignores aria-hidden decoration", async () => {

@@ -15,6 +15,7 @@ import {
   type SelectOpenReason,
   visuallyHiddenStyle,
 } from "@zealakit/omniselect-core";
+import { announce } from "@zealakit/ui-engine";
 import { createOverlay, type DismissReason, type Overlay } from "@zealakit/overlay-vanilla";
 import type { Placement } from "@zealakit/ui-engine/position";
 
@@ -331,7 +332,7 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
 
   // Form participation: a visually hidden native <select> (FormData, validation, reset).
   let hidden: HTMLSelectElement | null = null;
-  let live: HTMLElement | null = null;
+  let lastAnnouncement = "";
   let offReset = () => {};
   if (options.name !== undefined || options.required) {
     hidden = document.createElement("select");
@@ -358,15 +359,16 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
     owner?.addEventListener("reset", onReset);
     offReset = () => owner?.removeEventListener("reset", onReset);
   }
+  // Announcements go through the engine's one page live region (D10). The
+  // `data-part="live-region"` element stays for compatibility only: it is empty,
+  // has no `role`/`aria-live`, and is deprecated until the next major.
   if (options.announce !== false) {
-    live = document.createElement("span");
-    live.setAttribute("data-part", "live-region");
-    live.setAttribute("role", "status");
-    live.setAttribute("aria-live", "polite");
-    live.setAttribute("aria-atomic", "true");
-    Object.assign(live.style, visuallyHiddenStyle);
-    root.append(live);
+    const deprecatedRegion = document.createElement("span");
+    deprecatedRegion.setAttribute("data-part", "live-region");
+    deprecatedRegion.setAttribute("data-deprecated", "announce through @zealakit/ui-engine");
+    root.append(deprecatedRegion);
   }
+
   renderForm = () => {
     if (hidden) {
       hidden.replaceChildren(
@@ -379,8 +381,10 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
         }),
       );
     }
-    if (live) {
-      live.textContent = machine.store.get().announcement;
+    const message = machine.store.get().announcement;
+    if (message !== "" && message !== lastAnnouncement) {
+      lastAnnouncement = message;
+      announce(message, { politeness: "polite" });
     }
   };
 
@@ -623,7 +627,6 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
       guard.destroy();
       offReset();
       hidden?.remove();
-      live?.remove();
       overlay?.destroy();
       machine.destroy();
     },

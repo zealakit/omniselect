@@ -8,11 +8,13 @@ const packageRoot = fileURLToPath(new URL("..", import.meta.url));
 test("core imports in a process without browser globals", () => {
   const script = `
     const core = await import("./dist/index.js");
-    const state = core.getGlobalState("ssr", () => ({ ok: true }));
+    // The engine counter is client-only; calling it on the server must not throw
+    // or touch a DOM global.
+    const id = core.nextId("omniselect");
     console.log(JSON.stringify({
       window: typeof window,
       document: typeof document,
-      ok: state.ok,
+      id,
       exportCount: Object.keys(core).length,
     }));
   `;
@@ -25,12 +27,12 @@ test("core imports in a process without browser globals", () => {
   const result = JSON.parse(output.trim()) as {
     window: string;
     document: string;
-    ok: boolean;
+    id: string;
     exportCount: number;
   };
 
   assert.equal(result.window, "undefined");
   assert.equal(result.document, "undefined");
-  assert.equal(result.ok, true);
+  assert.match(result.id, /^zealakit-omniselect-\d+$/);
   assert.ok(result.exportCount > 0);
 });

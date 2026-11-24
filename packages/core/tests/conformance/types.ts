@@ -19,6 +19,8 @@ export type Expectation = {
   absent?: PartRef[];
   /** Trimmed `textContent` per part. */
   text?: Record<PartRef, string>;
+  /** Expected text in the engine's page live region (D10). */
+  announcement?: string;
   /** Exact callback log so far. */
   calls?: CallLog[];
   /** Every listed call must appear in the log, in this order (other calls may sit between). */

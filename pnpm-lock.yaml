@@ -336,6 +336,9 @@ importers:
 
   packages/core:
     devDependencies:
+      '@zealakit/ui-engine':
+        specifier: link:../../../ui-engine
+        version: link:../../../ui-engine
       happy-dom:
         specifier: ^21.0.4
         version: 21.0.4

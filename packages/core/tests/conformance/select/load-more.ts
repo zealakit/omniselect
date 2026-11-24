@@ -155,7 +155,7 @@ export const loadMoreScenarios: Scenario[] = [
         type: "expect",
         expect: {
           absent: ["empty"],
-          text: { liveRegion: "Loading more results" },
+          announcement: "Loading more results",
         },
       },
       {
@@ -164,7 +164,7 @@ export const loadMoreScenarios: Scenario[] = [
       },
       {
         type: "expect",
-        expect: { present: ["empty"], text: { liveRegion: "0 results" } },
+        expect: { present: ["empty"], announcement: "0 results" },
       },
     ],
   },

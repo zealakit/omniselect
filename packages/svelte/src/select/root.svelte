@@ -11,6 +11,7 @@
     type SelectOpenReason,
     type SelectState,
   } from "@zealakit/omniselect-core";
+  import { announce as announceToEngine } from "@zealakit/ui-engine";
   import type { Placement } from "@zealakit/ui-engine/position";
   import { onDestroy, setContext, untrack, type Snippet } from "svelte";
   import { SELECT_KEY, type SelectContext } from "./context.js";
@@ -251,6 +252,17 @@
     void $snapshot;
     return machine.store.get().announcement;
   });
+  // D10: one page live region, owned by the engine. No local role="status".
+  let lastAnnouncement = "";
+  $effect(() => {
+    const message = announcement;
+    // `announce` is optional and enabled by default, like every other adapter.
+    if (announce === false || message === "" || message === lastAnnouncement) {
+      return;
+    }
+    lastAnnouncement = message;
+    announceToEngine(message, { politeness: "polite" });
+  });
   // `multiple` can be set after the options exist; select them again so none are dropped.
   $effect(() => {
     void keys;
@@ -294,11 +306,6 @@
   </select>
 {/if}
 {#if announce !== false}
-  <span
-    data-part="live-region"
-    role="status"
-    aria-live="polite"
-    aria-atomic="true"
-    style={hiddenStyle}>{announcement}</span
-  >
+  <!-- @deprecated empty marker: announcements use the engine region -->
+  <span data-part="live-region" data-deprecated="true"></span>
 {/if}

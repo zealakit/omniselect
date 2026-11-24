@@ -1,4 +1,4 @@
-import { getGlobalState } from "./utils/global-state.js";
+import { createId } from "@zealakit/ui-engine";
 
 export type Ids = {
   root: string;
@@ -29,9 +29,13 @@ export function createIds(rootId: string): Ids {
   };
 }
 
-/** Page-global id source for adapters without a framework id primitive. */
+/**
+ * Id source for adapters without a framework id primitive.
+ *
+ * X11: the engine owns the one page-wide counter, so ids never collide with
+ * another Zealakit package or with a second bundled copy of Core. The format is
+ * `zealakit-<prefix>-<n>`; framework adapters keep their own `useId()` for SSR.
+ */
 export function nextId(prefix = "omniselect"): string {
-  const counter = getGlobalState("ids", () => ({ value: 0 }));
-  counter.value += 1;
-  return `${prefix}-${counter.value}`;
+  return createId(prefix);
 }

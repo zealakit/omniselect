@@ -148,14 +148,13 @@ export const multiScenarios: Scenario[] = [
       {
         type: "expect",
         expect: {
-          text: { liveRegion: "Apple added, 1 selected" },
-          attrs: { liveRegion: { "aria-live": "polite", role: "status" } },
+          announcement: "Apple added, 1 selected",
         },
       },
       { type: "click", target: "item:apple" },
       {
         type: "expect",
-        expect: { text: { liveRegion: "Apple removed, 0 selected" } },
+        expect: { announcement: "Apple removed, 0 selected" },
       },
     ],
   },

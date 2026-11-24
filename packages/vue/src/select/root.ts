@@ -1,5 +1,6 @@
 // oxlint-disable typescript/no-explicit-any -- values are user-defined
 import { createSelectMachine, nextId, visuallyHiddenStyle } from "@zealakit/omniselect-core";
+import { announce } from "@zealakit/ui-engine";
 import type { Placement } from "@zealakit/ui-engine/position";
 import {
   defineComponent,
@@ -209,6 +210,7 @@ export const Root = defineComponent({
     provide(selectKey, context);
     const hidden = shallowRef<HTMLSelectElement | null>(null);
     let offReset: (() => void) | undefined;
+    let lastAnnouncement = "";
     onMounted(() => {
       const owner = hidden.value?.form;
       if (!owner) {
@@ -255,20 +257,18 @@ export const Root = defineComponent({
           ),
         );
       }
+      // Announcements go through the engine's one page live region (D10). The
+      // `live-region` part stays as an empty deprecated marker until the next
+      // major; it has no role and no aria-live.
       if (props.announce !== false) {
-        out.push(
-          h(
-            "span",
-            {
-              "data-part": "live-region",
-              role: "status",
-              "aria-live": "polite",
-              "aria-atomic": "true",
-              style: visuallyHiddenStyle,
-            },
-            machine.store.get().announcement,
-          ),
-        );
+        out.push(h("span", { "data-part": "live-region", "data-deprecated": true }));
+      }
+      if (props.announce !== false) {
+        const message = machine.store.get().announcement;
+        if (message !== "" && message !== lastAnnouncement) {
+          lastAnnouncement = message;
+          announce(message, { politeness: "polite" });
+        }
       }
       return out;
     };
