@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { createCompositionGuard, isImeComposing } from "@zealakit/ui-engine/keyboard";
+  import type { CompositionGuard } from "@zealakit/ui-engine/keyboard";
   import { onMount, tick } from "svelte";
   import type { HTMLInputAttributes } from "svelte/elements";
   import { getSelectContext } from "./context.js";
@@ -11,7 +13,9 @@
   const context = getSelectContext("Input");
   const { machine, snapshot } = context;
   let element: HTMLInputElement | undefined = $state();
-  let composing = false;
+  // E30/E31: the engine guard owns composition state for this input.
+  let composition: CompositionGuard | null = null;
+  const composing = () => composition?.composing ?? false;
   const attrs = $derived.by(() => {
     void $snapshot;
     return machine.attrs.input();
@@ -21,11 +25,26 @@
     return machine.store.get().inputValue;
   });
 
-  onMount(() =>
-    machine.registerInput({
+  onMount(() => {
+    const off = machine.registerInput({
       inPopover: element?.closest('[data-part="popover"]') != null,
-    }),
-  );
+    });
+    return () => {
+      off();
+      composition?.destroy();
+      composition = null;
+    };
+  });
+  // The input node exists after mount; a separate effect keeps the guard in step.
+  $effect(() => {
+    if (!element) return;
+    const guard = createCompositionGuard(element);
+    composition = guard;
+    return () => {
+      guard.destroy();
+      if (composition === guard) composition = null;
+    };
+  });
   const open = $derived.by(() => {
     void $snapshot;
     return machine.isOpen();
@@ -44,7 +63,7 @@
   });
   // A controlled parent may reject the text; show the machine's value again.
   $effect(() => {
-    if (element && !composing && element.value !== text) element.value = text;
+    if (element && !composing() && element.value !== text) element.value = text;
   });
 </script>
 
@@ -59,16 +78,13 @@
   oninput={(event) => {
     (oninput as ((e: Event) => void) | undefined)?.(event);
     const el = event.currentTarget as HTMLInputElement;
-    machine.onInput(el.value, { composing });
-    if (!composing && el.value !== machine.store.get().inputValue) {
+    machine.onInput(el.value, { composing: composing() });
+    if (!composing() && el.value !== machine.store.get().inputValue) {
       el.value = machine.store.get().inputValue;
     }
   }}
-  oncompositionstart={() => {
-    composing = true;
-  }}
   oncompositionend={(event) => {
-    composing = false;
+    // The guard tracks the lifecycle; this only commits the IME text.
     machine.onInput((event.currentTarget as HTMLInputElement).value);
   }}
   onkeydown={(event) => {
@@ -80,7 +96,7 @@
       ctrlKey: event.ctrlKey,
       metaKey: event.metaKey,
       shiftKey: event.shiftKey,
-      isComposing: event.isComposing || composing,
+      isComposing: isImeComposing(event) || composing() || (composition?.justEnded(event) ?? false),
     });
     if (result.preventDefault) event.preventDefault();
   }}

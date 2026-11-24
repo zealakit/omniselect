@@ -1,4 +1,6 @@
 import { forwardRef, type InputHTMLAttributes, type ReactNode, useEffect, useRef } from "react";
+import { createCompositionGuard, isImeComposing } from "@zealakit/ui-engine/keyboard";
+import type { CompositionGuard } from "@zealakit/ui-engine/keyboard";
 import { useIsomorphicLayoutEffect } from "../internal/use-isomorphic-layout-effect.js";
 import { useMergedRef } from "../internal/merge-refs.js";
 import { useSelectContext } from "./context.js";
@@ -20,7 +22,21 @@ export const Input = forwardRef<HTMLInputElement, SelectInputProps>(function Sel
 ) {
   const { machine, inputRef } = useSelectContext("Input");
   const mergedRef = useMergedRef(ref, inputRef);
-  const composing = useRef(false);
+  // E30/E31: the engine guard owns composition state; React only forwards the
+  // consumer's own handlers.
+  const compositionRef = useRef<CompositionGuard | null>(null);
+  useIsomorphicLayoutEffect(() => {
+    const element = inputRef.current;
+    if (element === null) {
+      return;
+    }
+    const guard = createCompositionGuard(element);
+    compositionRef.current = guard;
+    return () => {
+      guard.destroy();
+      compositionRef.current = null;
+    };
+  }, [inputRef]);
   const open = useSnapshot(machine, (m) => String(m.isOpen())) === "true";
   useIsomorphicLayoutEffect(
     () =>
@@ -53,17 +69,15 @@ export const Input = forwardRef<HTMLInputElement, SelectInputProps>(function Sel
         onChange?.(event);
         if (!event.defaultPrevented) {
           machine.onInput(event.target.value, {
-            composing: composing.current,
+            composing: compositionRef.current?.composing ?? false,
           });
         }
       }}
       onCompositionStart={(event) => {
         onCompositionStart?.(event);
-        composing.current = true;
       }}
       onCompositionEnd={(event) => {
         onCompositionEnd?.(event);
-        composing.current = false;
         machine.onInput(event.currentTarget.value);
       }}
       onKeyDown={(event) => {
@@ -77,7 +91,10 @@ export const Input = forwardRef<HTMLInputElement, SelectInputProps>(function Sel
           ctrlKey: event.ctrlKey,
           metaKey: event.metaKey,
           shiftKey: event.shiftKey,
-          isComposing: event.nativeEvent.isComposing || composing.current,
+          isComposing:
+            isImeComposing(event.nativeEvent) ||
+            (compositionRef.current?.composing ?? false) ||
+            (compositionRef.current?.justEnded(event.nativeEvent) ?? false),
         });
         if (result.preventDefault) {
           event.preventDefault();

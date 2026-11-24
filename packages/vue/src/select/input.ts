@@ -1,3 +1,5 @@
+import { createCompositionGuard, isImeComposing } from "@zealakit/ui-engine/keyboard";
+import type { CompositionGuard } from "@zealakit/ui-engine/keyboard";
 import { defineComponent, h, nextTick, onBeforeUnmount, onMounted, watch } from "vue";
 import { useSelectContext } from "./context.js";
 import { attrsOf } from "./simple.js";
@@ -12,10 +14,14 @@ export const Input = defineComponent({
   setup() {
     const context = useSelectContext("Input");
     const { machine } = context;
-    let composing = false;
+    // E30/E31: the engine guard owns composition state for this input.
+    let composition: CompositionGuard | null = null;
     let off: (() => void) | undefined;
     // Registering before mount keeps hydration markup stable: the server renders select-only.
     onMounted(() => {
+      if (context.inputEl.value) {
+        composition = createCompositionGuard(context.inputEl.value);
+      }
       off = machine.registerInput({
         inPopover: context.inputEl.value?.closest('[data-part="popover"]') != null,
       });
@@ -35,7 +41,11 @@ export const Input = defineComponent({
         }
       },
     );
-    onBeforeUnmount(() => off?.());
+    onBeforeUnmount(() => {
+      off?.();
+      composition?.destroy();
+      composition = null;
+    });
     return () => {
       context.version.value;
       return h("input", {
@@ -47,19 +57,17 @@ export const Input = defineComponent({
         ref: context.inputEl,
         onInput: (event: Event) => {
           const el = event.target as HTMLInputElement;
+          const composing = composition?.composing ?? false;
           machine.onInput(el.value, { composing });
           // A controlled parent may reject the text; show the machine's value again.
           void nextTick().then(() => {
-            if (!composing && el.value !== machine.store.get().inputValue) {
+            if (!(composition?.composing ?? false) && el.value !== machine.store.get().inputValue) {
               el.value = machine.store.get().inputValue;
             }
           });
         },
-        onCompositionstart: () => {
-          composing = true;
-        },
         onCompositionend: (event: Event) => {
-          composing = false;
+          // The guard tracks the lifecycle; this only commits the IME text.
           machine.onInput((event.target as HTMLInputElement).value);
         },
         onKeydown: (event: KeyboardEvent) => {
@@ -69,7 +77,10 @@ export const Input = defineComponent({
             ctrlKey: event.ctrlKey,
             metaKey: event.metaKey,
             shiftKey: event.shiftKey,
-            isComposing: event.isComposing || composing,
+            isComposing:
+              isImeComposing(event) ||
+              (composition?.composing ?? false) ||
+              (composition?.justEnded(event) ?? false),
           });
           if (result.preventDefault) {
             event.preventDefault();

@@ -15,6 +15,7 @@ import {
   visuallyHiddenStyle,
 } from "@zealakit/omniselect-core";
 import { announce } from "@zealakit/ui-engine";
+import { createCompositionGuard, isImeComposing } from "@zealakit/ui-engine/keyboard";
 import { createPopoverController, type PopoverController } from "./popover.js";
 import type { Placement } from "@zealakit/ui-engine/position";
 
@@ -175,7 +176,6 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
     label.id = machine.ids.label;
   }
 
-  let composing = false;
   let popoverController: PopoverController | null = null;
   const unregister: (() => void)[] = [];
 
@@ -221,7 +221,7 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
     applyAttrs(control, machine.attrs.root());
     if (inputEl) {
       applyAttrs(inputEl, machine.attrs.input());
-      if (inputEl.value !== state.inputValue && !composing) {
+      if (inputEl.value !== state.inputValue && !(composition?.composing ?? false)) {
         inputEl.value = state.inputValue;
       }
     }
@@ -433,19 +433,21 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
       inputEl.focus({ preventScroll: true });
     }
   };
+  // E30/E31: the engine's guard owns composition state and the just-ended
+  // window (Safari sends compositionend before the committing Enter's keydown).
+  const composition = inputEl ? createCompositionGuard(inputEl) : null;
   const onInputEvent = () => {
     if (inputEl) {
+      const composing = composition?.composing ?? false;
       machine.onInput(inputEl.value, { composing });
       if (!composing && inputEl.value !== machine.store.get().inputValue) {
         inputEl.value = machine.store.get().inputValue;
       }
     }
   };
-  const onCompositionStart = () => {
-    composing = true;
-  };
+  // The guard owns the composition lifecycle; this listener only commits the
+  // text the IME produced to the machine once the composition is over.
   const onCompositionEnd = () => {
-    composing = false;
     if (inputEl) {
       machine.onInput(inputEl.value);
     }
@@ -457,7 +459,10 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
       ctrlKey: event.ctrlKey,
       metaKey: event.metaKey,
       shiftKey: event.shiftKey,
-      isComposing: event.isComposing || composing,
+      isComposing:
+        isImeComposing(event) ||
+        (composition?.composing ?? false) ||
+        (composition?.justEnded(event) ?? false),
     });
     if (result.preventDefault) {
       event.preventDefault();
@@ -505,7 +510,6 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
   popover.addEventListener("mousedown", onPopoverMouseDown);
 
   inputEl?.addEventListener("input", onInputEvent);
-  inputEl?.addEventListener("compositionstart", onCompositionStart);
   inputEl?.addEventListener("compositionend", onCompositionEnd);
   inputEl?.addEventListener("keydown", onInputKeyDown);
   inputEl?.addEventListener("focus", onInputFocus);
@@ -584,7 +588,6 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
       popover.removeEventListener("mousedown", onPopoverMouseDown);
       control?.removeEventListener("click", onControlClick);
       inputEl?.removeEventListener("input", onInputEvent);
-      inputEl?.removeEventListener("compositionstart", onCompositionStart);
       inputEl?.removeEventListener("compositionend", onCompositionEnd);
       inputEl?.removeEventListener("keydown", onInputKeyDown);
       inputEl?.removeEventListener("focus", onInputFocus);
@@ -595,6 +598,7 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
       sentinelObserver?.disconnect();
       offLoadMore();
       guard.destroy();
+      composition?.destroy();
       offReset();
       hidden?.remove();
       popoverController?.destroy();
