@@ -6,7 +6,6 @@ import {
   findScrollParent,
   getItemText,
   scrollItemIntoView,
-  getPopoverVars,
   nextId,
   type SelectCloseReason,
   type SelectInputChangeReason,
@@ -16,7 +15,7 @@ import {
   visuallyHiddenStyle,
 } from "@zealakit/omniselect-core";
 import { announce } from "@zealakit/ui-engine";
-import { createOverlay, type DismissReason, type Overlay } from "@zealakit/overlay-vanilla";
+import { createPopoverController, type PopoverController } from "./popover.js";
 import type { Placement } from "@zealakit/ui-engine/position";
 
 export type SelectOptions = {
@@ -79,11 +78,9 @@ export type SelectHandle = {
   destroy: () => void;
 };
 
-const dismissReasons: Record<DismissReason, SelectCloseReason> = {
+const dismissReasons: Record<"escape-key" | "outside-press", SelectCloseReason> = {
   "escape-key": "escape",
   "outside-press": "outside",
-  "reference-press": "toggle",
-  imperative: "imperative",
 };
 
 function applyAttrs(element: Element | null | undefined, attrs: Attrs): void {
@@ -179,7 +176,7 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
   }
 
   let composing = false;
-  let overlay: Overlay | null = null;
+  let popoverController: PopoverController | null = null;
   const unregister: (() => void)[] = [];
 
   const registerItems = () => {
@@ -280,53 +277,26 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
       }
     }
     renderForm();
-    // Keep the overlay in step with the machine.
-    if (overlay && overlay.isOpen !== open) {
+    // Keep the popover in step with the machine.
+    if (popoverController && popoverController.isOpen !== open) {
       if (open) {
-        overlay.open();
+        popoverController.open();
       } else {
-        overlay.close("imperative");
+        popoverController.close();
       }
     }
   };
 
-  const updateVars = () => {
-    if (!overlay) {
-      return;
-    }
-    const vars = getPopoverVars(
-      anchor.getBoundingClientRect(),
-      overlay.placement,
-      window.innerHeight,
-      options.offset ?? 4,
-    );
-    if (options.matchWidth !== false) {
-      popover.style.setProperty("--omniselect-anchor-width", `${vars.width}px`);
-    }
-    popover.style.setProperty("--omniselect-available-height", `${vars.availableHeight}px`);
-    const [side = "bottom", align = "center"] = overlay.placement.split("-");
-    popover.dataset.side = side;
-    popover.dataset.align = align;
-  };
-
-  overlay = createOverlay({
-    reference: anchor,
-    floating: popover,
-    placement: options.placement ?? "bottom-start",
+  popoverController = createPopoverController({
+    anchor,
+    popover,
+    placement: (options.placement ?? "bottom-start") as Placement,
     offset: options.offset ?? 4,
-    portal,
-    boundaries: [control, trigger],
-    trigger: "none",
-    defaultOpen: false,
-    dismissOnEscape: true,
-    dismissOnOutsidePress: true,
-    onOpenChange: (open, reason) => {
-      if (!open && reason && reason !== "imperative") {
-        machine.close(dismissReasons[reason]);
-      }
-      if (open) {
-        void overlay?.update().then(updateVars);
-      }
+    matchWidth: options.matchWidth,
+    portal: portal ?? null,
+    inside: [control, trigger, popover],
+    onDismiss: (reason) => {
+      machine.close(dismissReasons[reason]);
     },
   });
 
@@ -627,7 +597,7 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
       guard.destroy();
       offReset();
       hidden?.remove();
-      overlay?.destroy();
+      popoverController?.destroy();
       machine.destroy();
     },
   };

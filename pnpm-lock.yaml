@@ -404,9 +404,6 @@ importers:
       '@zealakit/omniselect-core':
         specifier: workspace:^
         version: link:../core
-      '@zealakit/overlay-vanilla':
-        specifier: ^1.0.1
-        version: 1.0.1
     devDependencies:
       '@zealakit/ui-engine':
         specifier: link:../../../ui-engine
@@ -1622,10 +1619,6 @@ packages:
     engines: {node: '>=20'}
     peerDependencies:
       svelte: ^5.0.0
-
-  '@zealakit/overlay-vanilla@1.0.1':
-    resolution: {integrity: sha512-YLpauJtR3wP5iXlxCIOm4nnevJYNyI5aQPo9jf+93Bithc1UQ/QYXLjOQB36RbzD0ASqAwd8FpybZJRVCxhiyA==}
-    engines: {node: '>=20'}
 
   '@zealakit/overlay-vue@1.0.1':
     resolution: {integrity: sha512-wTLsa2IXyXKOYK+BUslKRzXLll/wrjJF28KUmi1GQTtHe9XinTo+62Vg7ko+qBcNIduEnNkCtjVgqSHYBL/03A==}
@@ -3098,10 +3091,6 @@ snapshots:
     dependencies:
       '@floating-ui/dom': 1.8.0
       svelte: 5.58.0
-
-  '@zealakit/overlay-vanilla@1.0.1':
-    dependencies:
-      '@floating-ui/dom': 1.8.0
 
   '@zealakit/overlay-vue@1.0.1(vue@3.5.45(typescript@6.0.3))':
     dependencies:
