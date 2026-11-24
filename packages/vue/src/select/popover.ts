@@ -1,4 +1,5 @@
-import { getPopoverVars, type SelectCloseReason, waitForExit } from "@zealakit/omniselect-core";
+import { getPopoverVars, type SelectCloseReason } from "@zealakit/omniselect-core";
+import { waitForExit } from "@zealakit/omniselect-core/dom";
 import { type DismissReason, useLayer, usePositioner } from "@zealakit/overlay-vue";
 import { computed, defineComponent, h, nextTick, ref, shallowRef, Teleport, watch } from "vue";
 import { useSelectContext } from "./context.js";

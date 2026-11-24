@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { getPopoverVars, type SelectCloseReason, waitForExit } from "@zealakit/omniselect-core";
+  import { getPopoverVars, type SelectCloseReason } from "@zealakit/omniselect-core";
+  import { waitForExit } from "@zealakit/omniselect-core/dom";
   import { type DismissReason, overlay, type PositionerResult } from "@zealakit/overlay-svelte";
   import { portal as portalAction } from "./portal.js";
   import type { Snippet } from "svelte";

@@ -104,6 +104,32 @@ test("typeahead: prefix, growing query, cycling, timeout", () => {
   assert.equal(ta.onKey("a", fruit, "apple"), "apricot");
 });
 
+test("typeahead: Vietnamese đ folds to d, matching the engine", () => {
+  const ta = createTypeahead({ timeout: 500, now: () => 0 });
+  const items = [
+    { key: "dau", textValue: "Đậu" },
+    { key: "dua", textValue: "Dưa" },
+  ];
+  assert.equal(ta.onKey("d", items, null), "dau", "a bare d finds Đậu first");
+  ta.reset();
+  assert.equal(ta.onKey("d", items, "dau"), "dua", "cycling continues past it");
+});
+
+test("typeahead: Space continues a query but never starts one", () => {
+  const ta = createTypeahead({ timeout: 500, now: () => 0 });
+  const items = [
+    { key: "green-apple", textValue: "Green Apple" },
+    { key: "grape", textValue: "Grape" },
+  ];
+  assert.equal(ta.hasBuffer(), false, "no buffer: Space would activate, not search");
+  ta.onKey("g", items, null);
+  assert.equal(ta.hasBuffer(), true, "with a buffer, Space belongs to the query");
+  // A growing query may keep the current item while it still matches (this is
+  // where the data-driven buffer deliberately differs from the engine's
+  // DOM helper, which always starts after the active item).
+  assert.equal(ta.onKey("r", items, "green-apple"), "green-apple");
+});
+
 test("typeahead: disabled items and no match", () => {
   const ta = createTypeahead();
   assert.equal(ta.onKey("c", fruit, null), null);

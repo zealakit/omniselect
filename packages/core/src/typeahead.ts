@@ -1,3 +1,19 @@
+/**
+ * Data-driven typeahead, kept in Core (not the engine's DOM helper).
+ *
+ * Decision (03-1 Step 4): the engine's `createTypeahead` reads rendered
+ * `HTMLElement`s and derives text from `textContent`. This buffer runs in the
+ * machine, with no DOM at all, because the closed-trigger typeahead must match
+ * options that are not rendered (and the machine is shared by four adapters).
+ * The shapes are different, so this is "keep, recorded" rather than an
+ * extraction (X18's semantic diff).
+ *
+ * Observable rules are aligned with the engine: 500 ms buffer, case- and
+ * accent-insensitive matching including Vietnamese `đ → d`, repeated-character
+ * cycling, Space continues a query but never starts one (see `hasBuffer`), and
+ * disabled items never match.
+ */
+
 import { normalize } from "./filter.js";
 
 export type TypeaheadItem = {

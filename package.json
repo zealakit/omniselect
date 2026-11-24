@@ -38,7 +38,7 @@
     "lint:fix": "oxlint --fix",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "check": "pnpm build && pnpm typecheck && pnpm test && pnpm lint && pnpm format:check",
+    "check": "pnpm build && pnpm typecheck && pnpm test && pnpm lint && pnpm format:check && pnpm check:engine-usage && pnpm check:dom-private",
     "clean": "pnpm -r exec rm -rf dist .next && rm -rf artifacts",
     "dev:vanilla": "pnpm --filter @zealakit/omniselect-vanilla-example run dev",
     "dev:react": "pnpm --filter @zealakit/omniselect-react-example run dev",
@@ -56,7 +56,9 @@
     "npm:publish:vue": "node --strip-types scripts/npm-publish.ts vue",
     "npm:publish:svelte": "node --strip-types scripts/npm-publish.ts svelte",
     "npm:publish:all": "node --strip-types scripts/npm-publish.ts all",
-    "size": "node scripts/size.mjs"
+    "size": "node scripts/size.mjs",
+    "check:engine-usage": "node scripts/check-engine-usage.mjs",
+    "check:dom-private": "node scripts/check-dom-private.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.19.0",

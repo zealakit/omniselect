@@ -38,7 +38,12 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./dom": {
+      "types": "./dist/dom/index.d.ts",
+      "import": "./dist/dom/index.js",
+      "default": "./dist/dom/index.js"
+    }
   },
   "devDependencies": {
     "happy-dom": "^21.0.4",

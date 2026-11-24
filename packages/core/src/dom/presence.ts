@@ -1,4 +1,13 @@
 /**
+ * Candidate A.9 `presence` — private (D27), do not export from a published package.
+ *
+ * Rules (D35): zero dependencies, no `window`/`document` at import, CSP-safe
+ * (no style writes), framework-free, no page-global state. Plan 06 compares this
+ * against notice's implementation and either extracts `/presence` in the engine
+ * or records why it stays. `[OS-PRES-n]` tests pin the semantics for that diff.
+ */
+
+/**
  * Resolve once every CSS animation/transition running on `element` has
  * finished (or after a safety timeout). Used to keep a popover mounted with
  * `data-state="closed"` until its exit animation ends.

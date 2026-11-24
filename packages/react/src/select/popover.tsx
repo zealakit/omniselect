@@ -1,4 +1,5 @@
-import { getPopoverVars, waitForExit, type SelectCloseReason } from "@zealakit/omniselect-core";
+import { getPopoverVars, type SelectCloseReason } from "@zealakit/omniselect-core";
+import { waitForExit } from "@zealakit/omniselect-core/dom";
 import { type DismissReason, Portal, useLayer, usePositioner } from "@zealakit/overlay-react";
 import {
   type CSSProperties,

@@ -34,7 +34,7 @@ export const VENDOR_DIR = "dist/vendor/core";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const CORE_DIR = join(ROOT, "packages", "core");
-const SPECIFIER_RE = /(["'])@zealakit\/omniselect-core\1/g;
+const SPECIFIER_RE = /(["'])@zealakit\/omniselect-core(\/dom)?\1/g;
 const REWRITE_EXTENSIONS = [".js", ".d.ts", ".svelte"];
 
 function run(command, args, cwd) {
@@ -81,11 +81,17 @@ function rewriteSpecifiers(packageRoot) {
     if (!source.includes(CORE_NAME)) {
       continue;
     }
-    let target = toPosix(relative(dirname(file), join(vendorDir, "index.js")));
-    if (!target.startsWith(".")) {
-      target = `./${target}`;
-    }
-    const next = source.replace(SPECIFIER_RE, (_match, quote) => `${quote}${target}${quote}`);
+    const toSpecifier = (targetPath) => {
+      let target = toPosix(relative(dirname(file), targetPath));
+      return target.startsWith(".") ? target : `./${target}`;
+    };
+    const rootTarget = toSpecifier(join(vendorDir, "index.js"));
+    const domTarget = toSpecifier(join(vendorDir, "dom", "index.js"));
+    // 03-1 Step 5: the private `./dom` entry (D27) is vendored next to the root.
+    const next = source.replace(
+      SPECIFIER_RE,
+      (_match, quote, subpath) => `${quote}${subpath ? domTarget : rootTarget}${quote}`,
+    );
     if (next.includes(CORE_NAME)) {
       throw new Error(
         `${relative(packageRoot, file)} references ${CORE_NAME} in a form this step cannot rewrite (subpath or non-literal import).`,
