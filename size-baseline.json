@@ -1,0 +1,17 @@
+{
+  "note": "gzip bytes of each published entry (X31). Regenerate with --write.",
+  "packages": {
+    "@zealakit/omniselect-react": {
+      "gzip": 9761
+    },
+    "@zealakit/omniselect-svelte": {
+      "gzip": 1442
+    },
+    "@zealakit/omniselect-vanilla": {
+      "gzip": 7172
+    },
+    "@zealakit/omniselect-vue": {
+      "gzip": 9506
+    }
+  }
+}
