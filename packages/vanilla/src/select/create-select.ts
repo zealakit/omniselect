@@ -13,10 +13,16 @@ import {
   type SelectionBehavior,
   type SelectOpenReason,
   visuallyHiddenStyle,
+  type SelectMachineOptions,
+  withoutUndefined,
 } from "@zealakit/omniselect-core";
 import { announce } from "@zealakit/ui-engine";
 import { createCompositionGuard, isImeComposing } from "@zealakit/ui-engine/keyboard";
-import { createPopoverController, type PopoverController } from "./popover.js";
+import {
+  createPopoverController,
+  type PopoverController,
+  type PopoverControllerOptions,
+} from "./popover.js";
 import type { Placement } from "@zealakit/ui-engine/position";
 
 export type SelectOptions = {
@@ -141,37 +147,39 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
   const anchor = control ?? trigger;
   const portal = options.portal === undefined ? document.body : options.portal;
 
-  const machine = createSelectMachine<string>({
-    rootId: nextId("omniselect"),
-    multiple: options.multiple,
-    maxSelected: options.maxSelected,
-    announce: options.announce,
-    messages: options.messages,
-    defaultValue: (options.defaultValue ?? (options.multiple ? [] : null)) as never,
-    onValueChange: (value) => options.onValueChange?.(value as string | string[] | null),
-    defaultOpen: options.defaultOpen,
-    disabled: options.disabled,
-    required: options.required,
-    closeOnSelect: options.closeOnSelect,
-    allowsEmptyCollection: options.allowsEmptyCollection,
-    loop: options.loop,
-    defaultInputValue: options.defaultInputValue,
-    onInputChange: options.onInputChange,
-    filter: options.filter,
-    openOnFocus: options.openOnFocus,
-    openOnInput: options.openOnInput,
-    selectionBehavior: options.selectionBehavior,
-    restoreOnBlur: options.restoreOnBlur,
-    autoHighlight: options.autoHighlight,
-    autoSelectOnTab: options.autoSelectOnTab,
-    triggerLabel: options.triggerLabel,
-    onOpenChange(open, reason) {
-      options.onOpenChange?.(open, reason);
-      if (!open && (reason === "select" || reason === "escape" || reason === "tab")) {
-        focusAfterClose();
-      }
-    },
-  });
+  const machine = createSelectMachine<string>(
+    withoutUndefined<SelectMachineOptions<string>>({
+      rootId: nextId("omniselect"),
+      multiple: options.multiple,
+      maxSelected: options.maxSelected,
+      announce: options.announce,
+      messages: options.messages,
+      defaultValue: (options.defaultValue ?? (options.multiple ? [] : null)) as never,
+      onValueChange: (value) => options.onValueChange?.(value as string | string[] | null),
+      defaultOpen: options.defaultOpen,
+      disabled: options.disabled,
+      required: options.required,
+      closeOnSelect: options.closeOnSelect,
+      allowsEmptyCollection: options.allowsEmptyCollection,
+      loop: options.loop,
+      defaultInputValue: options.defaultInputValue,
+      onInputChange: options.onInputChange,
+      filter: options.filter,
+      openOnFocus: options.openOnFocus,
+      openOnInput: options.openOnInput,
+      selectionBehavior: options.selectionBehavior,
+      restoreOnBlur: options.restoreOnBlur,
+      autoHighlight: options.autoHighlight,
+      autoSelectOnTab: options.autoSelectOnTab,
+      triggerLabel: options.triggerLabel,
+      onOpenChange(open, reason) {
+        options.onOpenChange?.(open, reason);
+        if (!open && (reason === "select" || reason === "escape" || reason === "tab")) {
+          focusAfterClose();
+        }
+      },
+    }),
+  );
   if (label) {
     label.id = machine.ids.label;
   }
@@ -287,18 +295,20 @@ export function createSelect(root: HTMLElement, options: SelectOptions = {}): Se
     }
   };
 
-  popoverController = createPopoverController({
-    anchor,
-    popover,
-    placement: (options.placement ?? "bottom-start") as Placement,
-    offset: options.offset ?? 4,
-    matchWidth: options.matchWidth,
-    portal: portal ?? null,
-    inside: [control, trigger, popover],
-    onDismiss: (reason) => {
-      machine.close(dismissReasons[reason]);
-    },
-  });
+  popoverController = createPopoverController(
+    withoutUndefined<PopoverControllerOptions>({
+      anchor,
+      popover,
+      placement: (options.placement ?? "bottom-start") as Placement,
+      offset: options.offset ?? 4,
+      matchWidth: options.matchWidth,
+      portal: portal ?? null,
+      inside: [control, trigger, popover],
+      onDismiss: (reason) => {
+        machine.close(dismissReasons[reason]);
+      },
+    }),
+  );
 
   // Form participation: a visually hidden native <select> (FormData, validation, reset).
   let hidden: HTMLSelectElement | null = null;
