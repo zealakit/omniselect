@@ -8,6 +8,8 @@ import {
   type SelectMessages,
   type SelectOpenReason,
   visuallyHiddenStyle,
+  type SelectMachineOptions,
+  withoutUndefined,
 } from "@zealakit/omniselect-core";
 import { announce } from "@zealakit/ui-engine";
 import type { Placement } from "@zealakit/ui-engine/position";
@@ -156,42 +158,44 @@ export function Root<T>(props: SelectRootProps<T>) {
     });
   }, []);
   if (machineRef.current === null) {
-    machineRef.current = createSelectMachine<T>({
-      rootId,
-      multiple,
-      maxSelected,
-      announce,
-      messages,
-      itemToKey,
-      itemToString,
-      value: value as never,
-      defaultValue: defaultValue as never,
-      onValueChange: onValueChange as never,
-      open,
-      defaultOpen,
-      disabled,
-      required,
-      closeOnSelect,
-      allowsEmptyCollection,
-      loop,
-      inputValue,
-      defaultInputValue,
-      onInputChange,
-      filter,
-      openOnFocus,
-      openOnInput,
-      selectionBehavior,
-      restoreOnBlur,
-      autoHighlight,
-      autoSelectOnTab,
-      triggerLabel,
-      onOpenChange(next, reason) {
-        latest.current.onOpenChange?.(next, reason);
-        if (!next && (reason === "select" || reason === "escape" || reason === "tab")) {
-          focusAfterClose();
-        }
-      },
-    });
+    machineRef.current = createSelectMachine<T>(
+      withoutUndefined<SelectMachineOptions<T>>({
+        rootId,
+        multiple,
+        maxSelected,
+        announce,
+        messages,
+        itemToKey,
+        itemToString,
+        value: value as never,
+        defaultValue: defaultValue as never,
+        onValueChange: onValueChange as never,
+        open,
+        defaultOpen,
+        disabled,
+        required,
+        closeOnSelect,
+        allowsEmptyCollection,
+        loop,
+        inputValue,
+        defaultInputValue,
+        onInputChange,
+        filter,
+        openOnFocus,
+        openOnInput,
+        selectionBehavior,
+        restoreOnBlur,
+        autoHighlight,
+        autoSelectOnTab,
+        triggerLabel,
+        onOpenChange(next, reason) {
+          latest.current.onOpenChange?.(next, reason);
+          if (!next && (reason === "select" || reason === "escape" || reason === "tab")) {
+            focusAfterClose();
+          }
+        },
+      }),
+    );
   }
   const machine = machineRef.current;
 

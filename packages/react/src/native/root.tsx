@@ -1,4 +1,9 @@
-import { createNativeSelect, type NativeSelectController } from "@zealakit/omniselect-core";
+import {
+  createNativeSelect,
+  type NativeSelectController,
+  type NativeSelectOptions,
+  withoutUndefined,
+} from "@zealakit/omniselect-core";
 import { type ReactNode, useId, useRef } from "react";
 import { useIsomorphicLayoutEffect } from "../internal/use-isomorphic-layout-effect.js";
 import { NativeContext, type NativeContextValue } from "./context.js";
@@ -58,13 +63,15 @@ export function Root<T>(props: NativeSelectRootProps<T>) {
   const controlId = useId();
   const controllerRef = useRef<NativeSelectController<T> | null>(null);
   if (controllerRef.current === null) {
-    controllerRef.current = createNativeSelect<T>({
-      multiple,
-      itemToKey,
-      value,
-      defaultValue,
-      onValueChange,
-    });
+    controllerRef.current = createNativeSelect<T>(
+      withoutUndefined<NativeSelectOptions<T>>({
+        multiple,
+        itemToKey,
+        value,
+        defaultValue,
+        onValueChange,
+      }),
+    );
   }
   const controller = controllerRef.current;
 
