@@ -10,6 +10,8 @@
     type SelectCloseReason,
     type SelectOpenReason,
     type SelectState,
+    type SelectMachineOptions,
+    withoutUndefined,
   } from "@zealakit/omniselect-core";
   import { announce as announceToEngine } from "@zealakit/ui-engine";
   import type { Placement } from "@zealakit/ui-engine/position";
@@ -124,46 +126,48 @@
   }
 
   const machine = untrack(() =>
-    createSelectMachine<T>({
-      rootId: nextId("omniselect"),
-      multiple,
-      maxSelected,
-      announce,
-      messages,
-      itemToKey,
-      itemToString,
-      value: value as never,
-      defaultValue: defaultValue as never,
-      onValueChange: handleValue as never,
-      open,
-      defaultOpen,
-      disabled,
-      required,
-      closeOnSelect,
-      allowsEmptyCollection,
-      loop,
-      inputValue,
-      defaultInputValue,
-      onInputChange(next, reason) {
-        inputValue = next;
-        onInputChange?.(next, reason);
-      },
-      filter,
-      openOnFocus,
-      openOnInput,
-      selectionBehavior,
-      restoreOnBlur,
-      autoHighlight,
-      autoSelectOnTab,
-      triggerLabel,
-      onOpenChange(next, reason) {
-        open = next;
-        onOpenChange?.(next, reason);
-        if (!next && (reason === "select" || reason === "escape" || reason === "tab")) {
-          focusAfterClose();
-        }
-      },
-    }),
+    createSelectMachine<T>(
+      withoutUndefined<SelectMachineOptions<T>>({
+        rootId: nextId("omniselect"),
+        multiple,
+        maxSelected,
+        announce,
+        messages,
+        itemToKey,
+        itemToString,
+        value: value as never,
+        defaultValue: defaultValue as never,
+        onValueChange: handleValue as never,
+        open,
+        defaultOpen,
+        disabled,
+        required,
+        closeOnSelect,
+        allowsEmptyCollection,
+        loop,
+        inputValue,
+        defaultInputValue,
+        onInputChange(next, reason) {
+          inputValue = next;
+          onInputChange?.(next, reason);
+        },
+        filter,
+        openOnFocus,
+        openOnInput,
+        selectionBehavior,
+        restoreOnBlur,
+        autoHighlight,
+        autoSelectOnTab,
+        triggerLabel,
+        onOpenChange(next, reason) {
+          open = next;
+          onOpenChange?.(next, reason);
+          if (!next && (reason === "select" || reason === "escape" || reason === "tab")) {
+            focusAfterClose();
+          }
+        },
+      }),
+    ),
   );
   onDestroy(() => machine.destroy());
 

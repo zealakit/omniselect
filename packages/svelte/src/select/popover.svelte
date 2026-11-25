@@ -106,8 +106,8 @@
       disabled: context.props.portal === false,
       target:
         context.props.portal === true || context.props.portal === false
-          ? undefined
-          : context.props.portal,
+          ? null
+          : (context.props.portal ?? null),
     }}
     use:enginePopover={{
       reference: anchor,

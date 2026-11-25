@@ -1,5 +1,11 @@
 <script lang="ts" generics="T">
-  import { createNativeSelect, type NativeState, nextId } from "@zealakit/omniselect-core";
+  import {
+    createNativeSelect,
+    type NativeState,
+    nextId,
+    type NativeSelectOptions,
+    withoutUndefined,
+  } from "@zealakit/omniselect-core";
   import { setContext, untrack, type Snippet } from "svelte";
   import { NATIVE_KEY, type NativeContext } from "./context.js";
 
@@ -42,13 +48,15 @@
   };
 
   const controller = untrack(() =>
-    createNativeSelect<T>({
-      multiple,
-      itemToKey,
-      value,
-      defaultValue,
-      onValueChange: handleChange as never,
-    }),
+    createNativeSelect<T>(
+      withoutUndefined<NativeSelectOptions<T>>({
+        multiple,
+        itemToKey,
+        value,
+        defaultValue,
+        onValueChange: handleChange as never,
+      }),
+    ),
   );
 
   $effect.pre(() => {

@@ -1,9 +1,11 @@
+import { withoutUndefined } from "@zealakit/omniselect-core";
 import { createLayer, type LayerHandle } from "@zealakit/ui-engine";
 import {
   autoUpdate,
   computePosition,
   type Placement,
   type PositionResult,
+  type PositionOptions,
 } from "@zealakit/ui-engine/position";
 
 /**
@@ -43,13 +45,17 @@ export function enginePopover(node: HTMLElement, params: EnginePopoverParams) {
       return;
     }
     current.onUpdate?.(
-      computePosition(current.reference, node, {
-        placement: current.placement,
-        offset: current.offset,
-        flip: true,
-        shift: true,
-        strategy: "fixed",
-      }),
+      computePosition(
+        current.reference,
+        node,
+        withoutUndefined<PositionOptions>({
+          placement: current.placement,
+          offset: current.offset,
+          flip: true,
+          shift: true,
+          strategy: "fixed",
+        }),
+      ),
     );
   };
 
