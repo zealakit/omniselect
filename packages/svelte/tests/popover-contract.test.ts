@@ -1,7 +1,7 @@
 import { after } from "node:test";
 import assert from "node:assert/strict";
 import { flushSync, mount, unmount } from "svelte";
-import { runPopoverContract } from "../../core/tests/conformance/popover-dom.ts";
+import { runPopoverContract, runSsrRow } from "../../core/tests/conformance/popover-dom.ts";
 import Fixture from "./fixtures/popover-contract.svelte";
 
 /**
@@ -38,6 +38,12 @@ runPopoverContract("svelte", async () => {
     part,
     maybePart,
     settle,
+    escapeField() {
+      const field = maybePart("input") ?? part("trigger");
+      field.dispatchEvent(
+        new window.KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }),
+      );
+    },
     triggerPress() {
       const trigger = part("trigger");
       const down = new window.Event("pointerdown", { bubbles: true, cancelable: true });
@@ -52,3 +58,10 @@ runPopoverContract("svelte", async () => {
     },
   };
 });
+
+// Row 12 (SSR) for Svelte lives in `tests/ssr.test.ts` — "Select renders closed,
+// select-only markup on the server" — because this file's loader compiles
+// fixtures with `generate: "client"` and `svelte/server` needs a server compile.
+// That test asserts the same three things: no `document`, `aria-expanded="false"`,
+// and no listbox in the markup.
+void runSsrRow;

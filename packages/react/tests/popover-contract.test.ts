@@ -2,7 +2,8 @@ import { after } from "node:test";
 import assert from "node:assert/strict";
 import { act, cleanup, render } from "@testing-library/react";
 import { createElement as h } from "react";
-import { runPopoverContract } from "../../core/tests/conformance/popover-dom.ts";
+import { runPopoverContract, runSsrRow } from "../../core/tests/conformance/popover-dom.ts";
+import { renderToString } from "react-dom/server";
 import { Select } from "../dist/select/index.js";
 
 /**
@@ -67,9 +68,17 @@ runPopoverContract("react", async () => {
       trigger.dispatchEvent(down);
       trigger.click();
     },
+    escapeField() {
+      const field = maybePart("input") ?? part("trigger");
+      field.dispatchEvent(
+        new window.KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }),
+      );
+    },
     settle: flush,
     unmount() {
       view.unmount();
     },
   };
 });
+
+runSsrRow("react", () => renderToString(tree() as never));

@@ -2,7 +2,9 @@ import { after } from "node:test";
 import assert from "node:assert/strict";
 import { mount } from "@vue/test-utils";
 import { defineComponent, h, nextTick } from "vue";
-import { runPopoverContract } from "../../core/tests/conformance/popover-dom.ts";
+import { runPopoverContract, runSsrRow } from "../../core/tests/conformance/popover-dom.ts";
+import { createSSRApp } from "vue";
+import { renderToString } from "vue/server-renderer";
 import { Select } from "../dist/select/index.js";
 
 /**
@@ -55,6 +57,12 @@ runPopoverContract("vue", async () => {
   return {
     part,
     maybePart,
+    escapeField() {
+      const field = maybePart("input") ?? part("trigger");
+      field.dispatchEvent(
+        new window.KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }),
+      );
+    },
     settle: flush,
     triggerPress() {
       const trigger = part("trigger");
@@ -69,3 +77,5 @@ runPopoverContract("vue", async () => {
     },
   };
 });
+
+runSsrRow("vue", () => renderToString(createSSRApp(App)));
