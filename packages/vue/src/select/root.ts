@@ -1,5 +1,11 @@
 // oxlint-disable typescript/no-explicit-any -- values are user-defined
-import { createSelectMachine, nextId, visuallyHiddenStyle } from "@zealakit/omniselect-core";
+import {
+  createSelectMachine,
+  nextId,
+  visuallyHiddenStyle,
+  type SelectMachineOptions,
+  withoutUndefined,
+} from "@zealakit/omniselect-core";
 import { announce } from "@zealakit/ui-engine";
 import type { Placement } from "@zealakit/ui-engine/position";
 import {
@@ -89,46 +95,48 @@ export const Root = defineComponent({
       emit("update:modelValue", value);
       emit("valueChange", value);
     };
-    const machine = createSelectMachine<any>({
-      rootId: nextId("omniselect"),
-      multiple: props.multiple,
-      maxSelected: props.maxSelected,
-      announce: props.announce,
-      messages: props.messages,
-      itemToKey: props.itemToKey,
-      itemToString: props.itemToString,
-      value: props.modelValue,
-      defaultValue: props.defaultValue,
-      onValueChange,
-      open: props.open,
-      defaultOpen: props.defaultOpen,
-      disabled: props.disabled,
-      required: props.required,
-      closeOnSelect: props.closeOnSelect,
-      allowsEmptyCollection: props.allowsEmptyCollection,
-      loop: props.loop,
-      inputValue: props.inputValue,
-      defaultInputValue: props.defaultInputValue,
-      onInputChange(value, reason) {
-        emit("update:inputValue", value);
-        emit("inputChange", value, reason);
-      },
-      filter: props.filter,
-      openOnFocus: props.openOnFocus,
-      openOnInput: props.openOnInput,
-      selectionBehavior: props.selectionBehavior,
-      restoreOnBlur: props.restoreOnBlur,
-      autoHighlight: props.autoHighlight,
-      autoSelectOnTab: props.autoSelectOnTab,
-      triggerLabel: props.triggerLabel,
-      onOpenChange(open, reason) {
-        emit("update:open", open);
-        emit("openChange", open, reason);
-        if (!open && (reason === "select" || reason === "escape" || reason === "tab")) {
-          focusAfterClose();
-        }
-      },
-    });
+    const machine = createSelectMachine<any>(
+      withoutUndefined<SelectMachineOptions<any>>({
+        rootId: nextId("omniselect"),
+        multiple: props.multiple,
+        maxSelected: props.maxSelected,
+        announce: props.announce,
+        messages: props.messages,
+        itemToKey: props.itemToKey,
+        itemToString: props.itemToString,
+        value: props.modelValue,
+        defaultValue: props.defaultValue,
+        onValueChange,
+        open: props.open,
+        defaultOpen: props.defaultOpen,
+        disabled: props.disabled,
+        required: props.required,
+        closeOnSelect: props.closeOnSelect,
+        allowsEmptyCollection: props.allowsEmptyCollection,
+        loop: props.loop,
+        inputValue: props.inputValue,
+        defaultInputValue: props.defaultInputValue,
+        onInputChange(value, reason) {
+          emit("update:inputValue", value);
+          emit("inputChange", value, reason);
+        },
+        filter: props.filter,
+        openOnFocus: props.openOnFocus,
+        openOnInput: props.openOnInput,
+        selectionBehavior: props.selectionBehavior,
+        restoreOnBlur: props.restoreOnBlur,
+        autoHighlight: props.autoHighlight,
+        autoSelectOnTab: props.autoSelectOnTab,
+        triggerLabel: props.triggerLabel,
+        onOpenChange(open, reason) {
+          emit("update:open", open);
+          emit("openChange", open, reason);
+          if (!open && (reason === "select" || reason === "escape" || reason === "tab")) {
+            focusAfterClose();
+          }
+        },
+      }),
+    );
     machine.sync({ invalid: props.invalid });
     /** Combobox: the input. A search box inside the popover unmounts on close, so the trigger. */
     function focusAfterClose(): void {

@@ -1,5 +1,10 @@
 // oxlint-disable typescript/no-explicit-any -- values are user-defined
-import { createNativeSelect, nextId } from "@zealakit/omniselect-core";
+import {
+  createNativeSelect,
+  nextId,
+  type NativeSelectOptions,
+  withoutUndefined,
+} from "@zealakit/omniselect-core";
 import { defineComponent, type PropType, provide, shallowRef, watch, onBeforeUnmount } from "vue";
 import { type NativeContext, nativeKey } from "./context.js";
 
@@ -40,13 +45,15 @@ export const Root = defineComponent({
       emit("update:modelValue", value);
       emit("valueChange", value);
     };
-    const controller = createNativeSelect<unknown>({
-      multiple: props.multiple,
-      itemToKey: props.itemToKey as ((value: unknown) => string) | undefined,
-      value: props.modelValue as never,
-      defaultValue: props.defaultValue as never,
-      onValueChange: onValueChange as never,
-    });
+    const controller = createNativeSelect<unknown>(
+      withoutUndefined<NativeSelectOptions<unknown>>({
+        multiple: props.multiple,
+        itemToKey: props.itemToKey as ((value: unknown) => string) | undefined,
+        value: props.modelValue as never,
+        defaultValue: props.defaultValue as never,
+        onValueChange: onValueChange as never,
+      }),
+    );
     const version = shallowRef(0);
     const stop = controller.store.subscribe(() => {
       version.value += 1;
