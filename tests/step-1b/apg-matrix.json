@@ -1,0 +1,47 @@
+{
+  "note": "APG rows (00-foundation-3 \u00a74). status: covered | todo; owner is the plan that fills a todo row.",
+  "rows": [
+    {
+      "component": "select",
+      "behaviour": "ArrowDown opens the popover and highlights the first option",
+      "keys": "ArrowDown",
+      "status": "covered",
+      "owner": "03-1"
+    },
+    {
+      "component": "select",
+      "behaviour": "Escape closes and returns focus to the trigger (E3)",
+      "keys": "Escape",
+      "status": "covered",
+      "owner": "03-2"
+    },
+    {
+      "component": "select",
+      "behaviour": "Typeahead jumps to a matching option",
+      "keys": "any",
+      "status": "covered",
+      "owner": "03-1"
+    },
+    {
+      "component": "select",
+      "behaviour": "Home/End move to the first and last option",
+      "keys": "Home",
+      "status": "covered",
+      "owner": "03-1"
+    },
+    {
+      "component": "combobox",
+      "behaviour": "Alt+ArrowDown opens without moving the highlight",
+      "keys": "Alt+ArrowDown",
+      "status": "todo",
+      "owner": "03-2"
+    },
+    {
+      "component": "typeahead",
+      "behaviour": "Typing several characters within the timeout forms one query",
+      "keys": "any",
+      "status": "covered",
+      "owner": "03-1"
+    }
+  ]
+}

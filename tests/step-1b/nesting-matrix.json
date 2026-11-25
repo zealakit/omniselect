@@ -1,0 +1,29 @@
+{
+  "note": "NQ14 nesting rows. Each row names the composition and the Escape/focus rule it must hold.",
+  "rows": [
+    {
+      "composition": "Dialog > Select",
+      "rule": "Escape closes only the select (E3)",
+      "status": "covered",
+      "owner": "03-2"
+    },
+    {
+      "composition": "Dialog > Select > Popover",
+      "rule": "Three Escapes unwind one layer each",
+      "status": "todo",
+      "owner": "16-1"
+    },
+    {
+      "composition": "Datagrid cell > Select",
+      "rule": "The grid does not steal the select's keys",
+      "status": "todo",
+      "owner": "09-2"
+    },
+    {
+      "composition": "Toast region > Select",
+      "rule": "F8 still reaches the toasts while the select is open",
+      "status": "todo",
+      "owner": "16-1"
+    }
+  ]
+}
