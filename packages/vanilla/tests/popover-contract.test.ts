@@ -81,9 +81,12 @@ beforeEach(() => {
   document.body.replaceChildren();
 });
 
-function mount(): { root: HTMLElement; select: ReturnType<typeof createSelect> } {
+function mount(options: Parameters<typeof createSelect>[1] = {}): {
+  root: HTMLElement;
+  select: ReturnType<typeof createSelect>;
+} {
   const root = host();
-  const select = createSelect(root, {});
+  const select = createSelect(root, options);
   cleanups.push(() => select.destroy());
   return { root, select };
 }
@@ -139,7 +142,8 @@ test("[OS-POP-5] Escape closes and returns focus to the trigger", () => {
 });
 
 test("[OS-POP-6] an outside press closes; a press on the trigger does not reopen-then-close", () => {
-  const { root } = mount();
+  const changes: { open: boolean; reason: string }[] = [];
+  const { root } = mount({ onOpenChange: (open, reason) => changes.push({ open, reason }) });
   const trigger = part(root, "trigger");
   trigger.click();
 
@@ -147,6 +151,31 @@ test("[OS-POP-6] an outside press closes; a press on the trigger does not reopen
   document.body.append(outside);
   pointer(outside);
   assert.equal(part(root, "popover").hidden, true, "an outside press closes it");
+
+  // The trigger is not "outside": a press on it must toggle once. The engine
+  // ignores a press that lands on the layer's own reference (E4), so the
+  // following click toggles instead of closing and reopening.
+  changes.length = 0;
+  pointer(trigger);
+  trigger.click();
+  assert.equal(
+    part(root, "popover").hidden,
+    false,
+    "pressing the trigger reopens it (no close-then-reopen)",
+  );
+  assert.deepEqual(
+    changes,
+    [{ open: true, reason: "trigger" }],
+    "exactly one open, never a close-then-reopen (E4)",
+  );
+  // Focus is not asserted here: happy-dom's pointerdown/click never move it, so
+  // the assertion would pass even if the code broke it. [OS-POP-5] covers focus
+  // where our own code returns it to the trigger.
+
+  // A second press-and-click on the trigger closes it, still once.
+  pointer(trigger);
+  trigger.click();
+  assert.equal(part(root, "popover").hidden, true, "the next trigger press closes it");
 });
 
 test("[OS-POP-7] a right-click outside does not close the listbox", () => {
@@ -394,4 +423,8 @@ test("[OS-POP-10] Select in a Popover in a Dialog: three Escapes, focus returns 
   escape(dialogParts.content);
   await Promise.resolve();
   assert.equal(dialogParts.content.hidden, true, "3: the Dialog closed");
+  assert.ok(
+    document.activeElement === dialogParts.trigger,
+    "3: focus returned to the dialog trigger, not the select or the popover",
+  );
 });
