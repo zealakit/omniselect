@@ -1,11 +1,18 @@
 // oxlint-disable typescript/no-explicit-any -- values are user-defined
 import {
   createNativeSelect,
-  nextId,
   type NativeSelectOptions,
   withoutUndefined,
 } from "@zealakit/omniselect-core";
-import { defineComponent, type PropType, provide, shallowRef, watch, onBeforeUnmount } from "vue";
+import {
+  defineComponent,
+  type PropType,
+  provide,
+  shallowRef,
+  watch,
+  onBeforeUnmount,
+  useId,
+} from "vue";
 import { type NativeContext, nativeKey } from "./context.js";
 
 /**
@@ -72,7 +79,7 @@ export const Root = defineComponent({
 
     const context: NativeContext = {
       controller,
-      controlId: nextId("omniselect-native"),
+      controlId: `omniselect-native-${useId()}`,
       version,
       props: new Proxy({} as NativeContext["props"], {
         get: (_target, key: string) => (props as Record<string, unknown>)[key],

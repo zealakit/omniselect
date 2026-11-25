@@ -10,7 +10,7 @@
     {
       "adapter": "vue",
       "behaviour": "Server render vue markup, then hydrate: zero warnings and identical ids/aria",
-      "status": "todo",
+      "status": "covered",
       "owner": "03-2"
     },
     {

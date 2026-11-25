@@ -1,5 +1,14 @@
-import { nextId } from "@zealakit/omniselect-core";
-import { defineComponent, h, onBeforeUnmount, onMounted, provide, ref, inject, watch } from "vue";
+import {
+  defineComponent,
+  h,
+  onBeforeUnmount,
+  onMounted,
+  provide,
+  ref,
+  inject,
+  watch,
+  useId,
+} from "vue";
 import { groupKey, useSelectContext } from "./context.js";
 import { attrsOf } from "./simple.js";
 
@@ -10,7 +19,7 @@ export const Group = defineComponent({
   setup(props, { slots }) {
     const context = useSelectContext("Group");
     const { machine } = context;
-    const groupId = nextId("group");
+    const groupId = `group-${useId()}`;
     const hasLabel = ref(false);
     provide(groupKey, { groupId, hasLabel });
     let off: (() => void) | undefined;

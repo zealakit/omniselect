@@ -1,7 +1,6 @@
 // oxlint-disable typescript/no-explicit-any -- values are user-defined
 import {
   createSelectMachine,
-  nextId,
   visuallyHiddenStyle,
   type SelectMachineOptions,
   withoutUndefined,
@@ -18,6 +17,7 @@ import {
   shallowRef,
   type VNodeArrayChildren,
   watch,
+  useId,
 } from "vue";
 import { type SelectContext, selectKey } from "./context.js";
 
@@ -97,7 +97,7 @@ export const Root = defineComponent({
     };
     const machine = createSelectMachine<any>(
       withoutUndefined<SelectMachineOptions<any>>({
-        rootId: nextId("omniselect"),
+        rootId: `omniselect-${useId()}`,
         multiple: props.multiple,
         maxSelected: props.maxSelected,
         announce: props.announce,
