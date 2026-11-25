@@ -1,3 +1,4 @@
+import { type OptionsPatch, withoutUndefined } from "./utils/without-undefined.js";
 import { type Collection, createCollection } from "./collection.js";
 import { compareDomOrder } from "./dom-order.js";
 import { createIds, type Ids } from "./ids.js";
@@ -165,7 +166,8 @@ export type SelectMachine<T> = {
   ids: Ids;
   typeahead: Typeahead;
   itemToKey: ItemToKey<T>;
-  sync: (props: SelectProps<T>) => void;
+  /** An explicit `undefined` leaves that prop as it is (`filter` is re-applied when present). */
+  sync: (props: OptionsPatch<SelectProps<T>>) => void;
   isOpen: () => boolean;
   open: (
     reason?: SelectOpenReason,
@@ -247,10 +249,12 @@ export function createSelectMachine<T>(options: SelectMachineOptions<T>): Select
   });
   const ids = createIds(options.rootId);
   const collection = createCollection<T>({ compare: compareDomOrder });
-  const typeahead = createTypeahead({
-    timeout: options.typeaheadTimeout,
-    now: options.now,
-  });
+  const typeahead = createTypeahead(
+    withoutUndefined<{ timeout?: number; now?: () => number }>({
+      timeout: options.typeaheadTimeout,
+      now: options.now,
+    }),
+  );
   let props: Required<
     Pick<
       SelectProps<T>,
@@ -269,9 +273,11 @@ export function createSelectMachine<T>(options: SelectMachineOptions<T>): Select
       | "announce"
     >
   > &
-    Pick<
-      SelectProps<T>,
-      "onValueChange" | "onOpenChange" | "onInputChange" | "filter" | "maxSelected"
+    OptionsPatch<
+      Pick<
+        SelectProps<T>,
+        "onValueChange" | "onOpenChange" | "onInputChange" | "filter" | "maxSelected"
+      >
     > & { messages: SelectMessages } = {
     disabled: options.disabled ?? false,
     required: options.required ?? false,
@@ -1193,11 +1199,11 @@ export function createSelectMachine<T>(options: SelectMachineOptions<T>): Select
   return machine;
 }
 
-function stripUndefined<T extends object>(input: T): Partial<T> {
-  const out: Partial<T> = {};
+function stripUndefined<T extends object>(input: T): { [K in keyof T]?: Exclude<T[K], undefined> } {
+  const out: { [K in keyof T]?: Exclude<T[K], undefined> } = {};
   for (const key of Object.keys(input) as (keyof T)[]) {
     if (input[key] !== undefined) {
-      out[key] = input[key];
+      out[key] = input[key] as Exclude<T[keyof T], undefined>;
     }
   }
   return out;

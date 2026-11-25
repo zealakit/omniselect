@@ -636,3 +636,13 @@ test("regular combobox still focuses the input and unregisters cleanly", () => {
   off();
   assert.equal(machine.store.get().inputInPopover, false);
 });
+
+test("sync with an explicit undefined keeps the current prop", () => {
+  const machine = createSelectMachine<string>({ rootId: "keep" });
+  machine.sync({ disabled: true });
+  machine.sync({ disabled: undefined });
+  machine.open();
+
+  assert.equal(machine.isOpen(), false, "disabled stays set: undefined is not a reset");
+  machine.destroy();
+});

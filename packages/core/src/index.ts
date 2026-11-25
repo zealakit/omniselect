@@ -29,6 +29,7 @@ export {
   createControllable,
 } from "./store/controllable.js";
 export { createStore, type Listener, type Store } from "./store/store.js";
+export { type OptionsPatch, withoutUndefined } from "./utils/without-undefined.js";
 export { createTypeahead, type Typeahead, type TypeaheadItem } from "./typeahead.js";
 export { devWarn } from "./utils/dev-warn.js";
 export {
