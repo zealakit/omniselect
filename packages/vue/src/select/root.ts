@@ -35,11 +35,13 @@ export const Root = defineComponent({
     open: { type: Boolean, default: undefined },
     defaultOpen: { type: Boolean, default: undefined },
     itemToKey: {
-      type: Function as PropType<(value: unknown) => string>,
+      // oxlint-disable-next-line typescript/no-explicit-any -- the consumer's value type; `unknown` rejects `(user: User) => …`
+      type: Function as PropType<(value: any) => string>,
       default: undefined,
     },
     itemToString: {
-      type: Function as PropType<(value: unknown) => string>,
+      // oxlint-disable-next-line typescript/no-explicit-any -- the consumer's value type; `unknown` rejects `(user: User) => …`
+      type: Function as PropType<(value: any) => string>,
       default: undefined,
     },
     disabled: { type: Boolean, default: false },
@@ -50,7 +52,8 @@ export const Root = defineComponent({
     inputValue: { type: String, default: undefined },
     defaultInputValue: { type: String, default: undefined },
     filter: {
-      type: [Function, Boolean] as PropType<((item: unknown, query: string) => boolean) | false>,
+      // oxlint-disable-next-line typescript/no-explicit-any -- the consumer's value type; `unknown` rejects `(user: User) => …`
+      type: [Function, Boolean] as PropType<((item: any, query: string) => boolean) | false>,
       default: undefined,
     },
     openOnFocus: { type: Boolean, default: undefined },
