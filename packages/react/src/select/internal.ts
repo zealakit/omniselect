@@ -1,4 +1,3 @@
-// oxlint-disable typescript/no-explicit-any -- the value type is erased inside context
 import type { Attrs, SelectMachine } from "@zealakit/omniselect-core";
 import { useSyncExternalStore } from "react";
 
@@ -6,9 +5,9 @@ import { useSyncExternalStore } from "react";
  * Re-render only when `select(machine)` returns a different primitive. Parts
  * compute the string from machine state and then ask the machine for attrs.
  */
-export function useSnapshot(
-  machine: SelectMachine<any>,
-  select: (m: SelectMachine<any>) => string,
+export function useSnapshot<T>(
+  machine: SelectMachine<T>,
+  select: (m: SelectMachine<T>) => string,
 ): string {
   const read = () => select(machine);
   return useSyncExternalStore(machine.store.subscribe, read, read);

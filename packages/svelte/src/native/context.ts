@@ -2,8 +2,7 @@ import type { NativeSelectController, NativeState } from "@zealakit/omniselect-c
 import { getContext } from "svelte";
 
 export type NativeContext = {
-  // oxlint-disable-next-line typescript/no-explicit-any -- the value type is erased inside context
-  controller: NativeSelectController<any>;
+  controller: NativeSelectController<unknown>;
   controlId: string;
   /** Svelte store contract: use `$snapshot` in components to react to changes. */
   snapshot: {
@@ -28,4 +27,18 @@ export function getNativeContext(part: string): NativeContext {
     throw new Error(`NativeSelect.${part} must be rendered inside NativeSelect.Root.`);
   }
   return context;
+}
+
+/**
+ * Erase the value type once, at the point the context is set: the controller is
+ * invariant in `T`, so a typed controller cannot be assigned to the erased one
+ * without this explicit bridge.
+ *
+ * @param value The typed context value.
+ * @returns The same value with the value type erased.
+ */
+export function asNativeContext<T>(
+  value: { controller: NativeSelectController<T> } & Omit<NativeContext, "controller">,
+): NativeContext {
+  return value as unknown as NativeContext;
 }

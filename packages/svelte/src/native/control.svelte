@@ -54,7 +54,7 @@
   multiple={context.props.multiple}
   required={context.props.required}
   disabled={context.props.disabled}
-  autocomplete={context.props.autocomplete as any}
+  autocomplete={context.props.autocomplete as "on" | "off" | undefined}
   data-disabled={context.props.disabled ? "" : undefined}
   data-required={context.props.required ? "" : undefined}
   data-invalid={$snapshot.invalid || $snapshot.invalidProp ? "" : undefined}

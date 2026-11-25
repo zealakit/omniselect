@@ -16,7 +16,7 @@
   import { announce as announceToEngine } from "@zealakit/ui-engine";
   import type { Placement } from "@zealakit/ui-engine/position";
   import { onDestroy, setContext, untrack, type Snippet } from "svelte";
-  import { SELECT_KEY, type SelectContext } from "./context.js";
+  import { asSelectContext, SELECT_KEY } from "./context.js";
 
   type Props = {
     /** Selected value. Use `bind:value`, or `value` + `onValueChange`. */
@@ -204,7 +204,7 @@
     },
   };
 
-  const context: SelectContext = {
+  const context = asSelectContext<T>({
     machine,
     snapshot,
     get triggerEl() {
@@ -241,7 +241,7 @@
         return portal;
       },
     },
-  };
+  });
   setContext(SELECT_KEY, context);
 
   let hiddenEl: HTMLSelectElement | undefined = $state();

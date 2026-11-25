@@ -1,4 +1,3 @@
-// oxlint-disable typescript/no-explicit-any -- values are user-defined
 import {
   createNativeSelect,
   type NativeSelectOptions,
@@ -23,11 +22,11 @@ export const Root = defineComponent({
   name: "NativeSelectRoot",
   props: {
     modelValue: {
-      type: null as unknown as PropType<any>,
+      type: null as unknown as PropType<unknown>,
       default: undefined,
     },
     defaultValue: {
-      type: null as unknown as PropType<any>,
+      type: null as unknown as PropType<unknown>,
       default: undefined,
     },
     multiple: { type: Boolean, default: false },

@@ -1,4 +1,3 @@
-// oxlint-disable typescript/no-explicit-any -- values are user-defined
 import {
   createSelectMachine,
   visuallyHiddenStyle,
@@ -28,19 +27,19 @@ import { type SelectContext, selectKey } from "./context.js";
 export const Root = defineComponent({
   name: "SelectRoot",
   props: {
-    modelValue: { type: null as unknown as PropType<any>, default: undefined },
+    modelValue: { type: null as unknown as PropType<unknown>, default: undefined },
     defaultValue: {
-      type: null as unknown as PropType<any>,
+      type: null as unknown as PropType<unknown>,
       default: undefined,
     },
     open: { type: Boolean, default: undefined },
     defaultOpen: { type: Boolean, default: undefined },
     itemToKey: {
-      type: Function as PropType<(value: any) => string>,
+      type: Function as PropType<(value: unknown) => string>,
       default: undefined,
     },
     itemToString: {
-      type: Function as PropType<(value: any) => string>,
+      type: Function as PropType<(value: unknown) => string>,
       default: undefined,
     },
     disabled: { type: Boolean, default: false },
@@ -51,7 +50,7 @@ export const Root = defineComponent({
     inputValue: { type: String, default: undefined },
     defaultInputValue: { type: String, default: undefined },
     filter: {
-      type: [Function, Boolean] as PropType<((item: any, query: string) => boolean) | false>,
+      type: [Function, Boolean] as PropType<((item: unknown, query: string) => boolean) | false>,
       default: undefined,
     },
     openOnFocus: { type: Boolean, default: undefined },
@@ -70,7 +69,7 @@ export const Root = defineComponent({
     form: { type: String, default: undefined },
     maxSelected: { type: Number, default: undefined },
     announce: { type: Boolean, default: undefined },
-    messages: { type: Object as PropType<any>, default: undefined },
+    messages: { type: Object as PropType<unknown>, default: undefined },
     placement: { type: String as PropType<Placement>, default: "bottom-start" },
     offset: { type: Number, default: 4 },
     matchWidth: { type: Boolean, default: true },
@@ -95,8 +94,8 @@ export const Root = defineComponent({
       emit("update:modelValue", value);
       emit("valueChange", value);
     };
-    const machine = createSelectMachine<any>(
-      withoutUndefined<SelectMachineOptions<any>>({
+    const machine = createSelectMachine<unknown>(
+      withoutUndefined<SelectMachineOptions<unknown>>({
         rootId: `omniselect-${useId()}`,
         multiple: props.multiple,
         maxSelected: props.maxSelected,

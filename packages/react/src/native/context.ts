@@ -2,8 +2,11 @@ import type { NativeSelectController } from "@zealakit/omniselect-core";
 import { createContext, useContext } from "react";
 
 export type NativeContextValue = {
-  // oxlint-disable-next-line typescript/no-explicit-any -- the value type is erased inside context
-  controller: NativeSelectController<any>;
+  /**
+   * The value type is erased at the context boundary; `asNativeContext` below is
+   * the one explicit bridge, so no `any` is needed.
+   */
+  controller: NativeSelectController<unknown>;
   controlId: string;
   multiple: boolean;
   disabled: boolean;
@@ -17,6 +20,20 @@ export type NativeContextValue = {
 };
 
 export const NativeContext = createContext<NativeContextValue | null>(null);
+
+/**
+ * Erase the value type once, at the Provider.
+ *
+ * @param value The typed context value.
+ * @returns The same value with the value type erased.
+ */
+export function asNativeContext<T>(
+  value: {
+    controller: NativeSelectController<T>;
+  } & Omit<NativeContextValue, "controller">,
+): NativeContextValue {
+  return value as unknown as NativeContextValue;
+}
 
 export function useNativeContext(part: string): NativeContextValue {
   const context = useContext(NativeContext);

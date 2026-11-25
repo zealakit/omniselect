@@ -15,7 +15,7 @@ import { announce } from "@zealakit/ui-engine";
 import type { Placement } from "@zealakit/ui-engine/position";
 import { type ReactNode, useCallback, useEffect, useId, useRef, useState } from "react";
 import { useIsomorphicLayoutEffect } from "../internal/use-isomorphic-layout-effect.js";
-import { SelectContext, type SelectContextValue } from "./context.js";
+import { asContextValue, SelectContext } from "./context.js";
 import { useSnapshot } from "./internal.js";
 
 export type SelectOpenChangeReason = SelectOpenReason | SelectCloseReason;
@@ -229,7 +229,7 @@ export function Root<T>(props: SelectRootProps<T>) {
   const focusTrigger = useCallback(() => triggerRef.current?.focus({ preventScroll: true }), []);
   const focusField = focusAfterClose;
 
-  const context: SelectContextValue = {
+  const context = asContextValue<T>({
     machine,
     triggerEl,
     setTriggerEl,
@@ -242,7 +242,7 @@ export function Root<T>(props: SelectRootProps<T>) {
     offset,
     matchWidth,
     portal,
-  };
+  });
   return (
     <SelectContext.Provider value={context}>
       {children}
@@ -266,9 +266,8 @@ export function Root<T>(props: SelectRootProps<T>) {
   );
 }
 
-type HiddenSelectProps = {
-  // oxlint-disable-next-line typescript/no-explicit-any -- the value type is erased
-  machine: SelectMachine<any>;
+type HiddenSelectProps<T> = {
+  machine: SelectMachine<T>;
   name: string | undefined;
   form: string | undefined;
   required: boolean;
@@ -278,7 +277,7 @@ type HiddenSelectProps = {
 };
 
 /** Visually hidden native `<select>`: FormData, constraint validation, and form reset. */
-function HiddenSelect({
+function HiddenSelect<T>({
   machine,
   name,
   form,
@@ -286,7 +285,7 @@ function HiddenSelect({
   disabled,
   multiple,
   focusField,
-}: HiddenSelectProps) {
+}: HiddenSelectProps<T>) {
   const ref = useRef<HTMLSelectElement | null>(null);
   useSnapshot(machine, (m) => m.selectedKeys().join("\u0000"));
   const keys = machine.selectedKeys();
@@ -336,8 +335,7 @@ function HiddenSelect({
  * more, so messages auto-clear after 7 s and every Zealakit package shares one
  * announcement channel.
  */
-// oxlint-disable-next-line typescript/no-explicit-any -- the value type is erased
-function Announcer({ machine }: { machine: SelectMachine<any> }) {
+function Announcer<T>({ machine }: { machine: SelectMachine<T> }) {
   const message = useSnapshot(machine, (m) => m.store.get().announcement);
   const lastSent = useRef("");
 

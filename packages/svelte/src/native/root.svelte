@@ -7,7 +7,7 @@
     withoutUndefined,
   } from "@zealakit/omniselect-core";
   import { setContext, untrack, type Snippet } from "svelte";
-  import { NATIVE_KEY, type NativeContext } from "./context.js";
+  import { asNativeContext, NATIVE_KEY } from "./context.js";
 
   type Props = {
     /** Mark the field invalid from outside (a form library's error state). */
@@ -70,7 +70,7 @@
     },
   };
 
-  const context: NativeContext = {
+  const context = asNativeContext<T>({
     controller,
     controlId: nextId("omniselect-native"),
     snapshot,
@@ -94,7 +94,7 @@
         return autocomplete;
       },
     },
-  };
+  });
   setContext(NATIVE_KEY, context);
 </script>
 

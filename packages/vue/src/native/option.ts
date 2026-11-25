@@ -1,4 +1,3 @@
-// oxlint-disable typescript/no-explicit-any -- values are user-defined
 import {
   defineComponent,
   h,
@@ -15,7 +14,7 @@ import { groupKey, useNativeContext } from "./context.js";
 export const Option = defineComponent({
   name: "NativeSelectOption",
   props: {
-    value: { type: null as unknown as PropType<any>, default: null },
+    value: { type: null as unknown as PropType<unknown>, default: null },
     textValue: { type: String, default: undefined },
     disabled: { type: Boolean, default: false },
   },

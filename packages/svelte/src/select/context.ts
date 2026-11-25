@@ -3,8 +3,7 @@ import type { Placement } from "@zealakit/ui-engine/position";
 import { getContext } from "svelte";
 
 export type SelectContext = {
-  // oxlint-disable-next-line typescript/no-explicit-any -- the value type is erased inside context
-  machine: SelectMachine<any>;
+  machine: SelectMachine<unknown>;
   /** Svelte store contract: use `$snapshot` in components to react to machine changes. */
   snapshot: {
     subscribe: (run: (state: SelectState<unknown>) => void) => () => void;
@@ -36,4 +35,17 @@ export function getSelectContext(part: string): SelectContext {
     throw new Error(`Select.${part} must be rendered inside Select.Root.`);
   }
   return context;
+}
+
+/**
+ * Erase the value type once, at the point the context is set (see
+ * `asNativeContext` for the reason).
+ *
+ * @param value The typed context value.
+ * @returns The same value with the value type erased.
+ */
+export function asSelectContext<T>(
+  value: { machine: SelectMachine<T> } & Omit<SelectContext, "machine">,
+): SelectContext {
+  return value as unknown as SelectContext;
 }

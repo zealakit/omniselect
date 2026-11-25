@@ -6,7 +6,7 @@ import {
 } from "@zealakit/omniselect-core";
 import { type ReactNode, useId, useRef } from "react";
 import { useIsomorphicLayoutEffect } from "../internal/use-isomorphic-layout-effect.js";
-import { NativeContext, type NativeContextValue } from "./context.js";
+import { asNativeContext, NativeContext } from "./context.js";
 
 type RootBase<T> = {
   /** Map a value to the string used as `<option value>` and submitted in forms. */
@@ -88,7 +88,7 @@ export function Root<T>(props: NativeSelectRootProps<T>) {
       : [current === null ? "" : controller.keyOf(current as T)];
   };
 
-  const context: NativeContextValue = {
+  const context = asNativeContext<T>({
     controller,
     controlId,
     multiple,
@@ -99,7 +99,7 @@ export function Root<T>(props: NativeSelectRootProps<T>) {
     autoComplete,
     controlledKeys: value === undefined ? undefined : keysOf(value),
     defaultKeys: keysOf(defaultValue ?? controller.selection.empty()),
-  };
+  });
 
   return <NativeContext.Provider value={context}>{children}</NativeContext.Provider>;
 }

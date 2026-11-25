@@ -3,8 +3,12 @@ import type { Placement } from "@zealakit/ui-engine/position";
 import { createContext, useContext } from "react";
 
 export type SelectContextValue = {
-  // oxlint-disable-next-line typescript/no-explicit-any -- the value type is erased inside context
-  machine: SelectMachine<any>;
+  /**
+   * The value type is erased at the context boundary: a Provider holds a
+   * `SelectMachine<T>` and consumers work with any `T`. The cast lives in
+   * `asContextValue` below, so no `any` is needed.
+   */
+  machine: SelectMachine<unknown>;
   triggerEl: HTMLElement | null;
   setTriggerEl: (element: HTMLElement | null) => void;
   controlEl: HTMLElement | null;
@@ -21,6 +25,22 @@ export type SelectContextValue = {
 };
 
 export const SelectContext = createContext<SelectContextValue | null>(null);
+
+/**
+ * Erase the value type once, at the Provider: `SelectMachine` is invariant in
+ * `T`, so a `SelectMachine<T>` cannot be assigned to `SelectMachine<unknown>`
+ * without this explicit bridge.
+ *
+ * @param value The typed context value.
+ * @returns The same value with the value type erased.
+ */
+export function asContextValue<T>(
+  value: {
+    machine: SelectMachine<T>;
+  } & Omit<SelectContextValue, "machine">,
+): SelectContextValue {
+  return value as unknown as SelectContextValue;
+}
 
 export function useSelectContext(part: string): SelectContextValue {
   const context = useContext(SelectContext);

@@ -1,4 +1,3 @@
-// oxlint-disable typescript/no-explicit-any -- values are user-defined
 import { checkStructure, getItemText, scrollItemIntoView } from "@zealakit/omniselect-core";
 import {
   Comment,
@@ -43,7 +42,7 @@ void Text;
 export const Item = defineComponent({
   name: "SelectItem",
   props: {
-    value: { type: null as unknown as PropType<any>, required: true },
+    value: { type: null as unknown as PropType<unknown>, required: true },
     disabled: { type: Boolean, default: false },
     textValue: { type: String, default: undefined },
   },
