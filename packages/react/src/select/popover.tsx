@@ -1,4 +1,5 @@
-import { availableHeight, waitForExit } from "@zealakit/omniselect-core/dom";
+import { availableHeight } from "@zealakit/omniselect-core/dom";
+import { waitForExit } from "@zealakit/ui-engine/presence";
 import { createLayer, type LayerHandle } from "@zealakit/ui-engine";
 import {
   autoUpdate,

@@ -116,7 +116,11 @@ test("presence: the popover stays mounted until exit animations finish", async (
     getAnimations?: () => unknown[];
   };
   const original = proto.getAnimations;
-  proto.getAnimations = () => [{ finished }];
+  // A real Animation always exposes a finite endTime; the engine uses it to
+  // tell a bounded exit apart from an infinite one (E33).
+  proto.getAnimations = () => [
+    { effect: { getComputedTiming: () => ({ endTime: 300 }) }, finished },
+  ];
   try {
     render(tree());
     const trigger = document.querySelector("[role=combobox]") as HTMLElement;

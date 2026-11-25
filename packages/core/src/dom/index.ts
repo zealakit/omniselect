@@ -8,4 +8,3 @@
  * `@zealakit/ui-engine` when a second package needs the same semantics.
  */
 export { availableHeight } from "./available-height.js";
-export { waitForExit } from "./presence.js";

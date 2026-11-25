@@ -1,6 +1,7 @@
 import { createLayer, type LayerHandle } from "@zealakit/ui-engine";
 import { autoUpdate, computePosition, type Placement } from "@zealakit/ui-engine/position";
-import { availableHeight, waitForExit } from "@zealakit/omniselect-core/dom";
+import { availableHeight } from "@zealakit/omniselect-core/dom";
+import { waitForExit } from "@zealakit/ui-engine/presence";
 
 /**
  * Private popover controller on the engine (X4: engine-direct, no overlay).
