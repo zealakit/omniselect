@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { beforeEach, test } from "node:test";
+import { createDialog, createPopover } from "@zealakit/overlay-vanilla";
 import { createSelect } from "../dist/select/index.js";
 
 /**
  * `[OS-POP-1…12]` contract for the vanilla Select — the behaviour the popover
- * controller must keep (03-2 Step 1). Items 8–10 need the overlay pilot for the
- * nested-Dialog case and are covered by the engine/overlay suites; the rest run
- * here against the built adapter.
+ * controller must keep (03-2 Step 1). Items 8–10 run here too: 8 is the IME
+ * composition rule (E2), and 9–10 use the **linked overlay pilot** (no fakes),
+ * which is the original blocker: a Select inside a Dialog must not close it.
  */
 
 function host(): HTMLElement {
@@ -187,4 +188,210 @@ test("[OS-POP-12] SSR: creating the select on the server touches no document", a
     encoding: "utf8",
   });
   assert.deepEqual(JSON.parse(output.trim()), { exports: true });
+});
+
+/* ── Items 8–10: composition, and the nested-Dialog regression (real overlay pilot) ── */
+
+function withInput(): { root: HTMLElement; select: ReturnType<typeof createSelect> } {
+  const root = document.createElement("div");
+  root.innerHTML = `
+    <span data-part="label">Fruit</span>
+    <div data-part="control">
+      <input data-part="input" type="text" />
+      <button data-part="trigger" type="button">Pick</button>
+      <span data-part="value">Placeholder</span>
+    </div>
+    <div data-part="popover">
+      <div data-part="list">
+        <div data-part="item" data-value="apple">Apple</div>
+        <div data-part="item" data-value="banana">Banana</div>
+      </div>
+    </div>
+  `;
+  document.body.append(root);
+  const select = createSelect(root, {});
+  cleanups.push(() => select.destroy());
+  return { root, select };
+}
+
+function composition(input: HTMLInputElement, type: "compositionstart" | "compositionend"): void {
+  input.dispatchEvent(new window.CompositionEvent(type, { bubbles: true }));
+}
+
+test("[OS-POP-8] Escape while the search input is composing does not close (E2)", async () => {
+  const { root } = withInput();
+  const trigger = part(root, "trigger");
+  const popover = part(root, "popover");
+  const input = part(root, "input") as HTMLInputElement;
+
+  trigger.click();
+  await Promise.resolve();
+  assert.equal(popover.hidden, false, "open before the composition");
+
+  composition(input, "compositionstart");
+  const composing = new window.KeyboardEvent("keydown", {
+    key: "Escape",
+    bubbles: true,
+    cancelable: true,
+  });
+  Object.defineProperty(composing, "isComposing", { value: true });
+  input.dispatchEvent(composing);
+  await Promise.resolve();
+  assert.equal(popover.hidden, false, "still open: Escape belongs to the IME (E2)");
+
+  composition(input, "compositionend");
+  escape(input);
+  await Promise.resolve();
+  assert.equal(popover.hidden, true, "after the composition Escape closes");
+});
+
+function dialogShell(): {
+  content: HTMLElement;
+  destroy: () => void;
+  dialog: { open: () => void; close: () => void };
+  trigger: HTMLButtonElement;
+} {
+  const trigger = document.createElement("button");
+  trigger.type = "button";
+  trigger.textContent = "Open dialog";
+  const content = document.createElement("div");
+  content.textContent = "Dialog";
+  document.body.append(trigger, content);
+  const dialog = createDialog({ trigger, content });
+  cleanups.push(() => dialog.destroy());
+  return { trigger, content, dialog, destroy: () => dialog.destroy() };
+}
+
+test("[OS-POP-9] nested in an overlay Dialog: Escape closes the Select, then the Dialog", async () => {
+  const dialogParts = dialogShell();
+  dialogParts.dialog.open();
+
+  // The Select lives inside the Dialog's content.
+  const root = document.createElement("div");
+  root.innerHTML = `
+    <div data-part="control">
+      <button data-part="trigger" type="button">Pick</button>
+      <span data-part="value">Placeholder</span>
+    </div>
+    <div data-part="popover">
+      <div data-part="list">
+        <div data-part="item" data-value="apple">Apple</div>
+        <div data-part="item" data-value="banana">Banana</div>
+      </div>
+    </div>
+  `;
+  dialogParts.content.append(root);
+  const select = createSelect(root, {});
+  cleanups.push(() => select.destroy());
+
+  const trigger = part(root, "trigger");
+  const popover = part(root, "popover");
+  trigger.click();
+  await Promise.resolve();
+  assert.equal(popover.hidden, false, "the select is open inside the dialog");
+
+  // First Escape: the Select only.
+  escape(trigger);
+  await Promise.resolve();
+  assert.equal(popover.hidden, true, "first Escape closed the Select");
+  assert.equal(
+    dialogParts.content.hasAttribute("data-state"),
+    true,
+    "the dialog content is still mounted",
+  );
+  assert.equal(dialogParts.content.hidden, false, "the dialog stayed open");
+
+  // Second Escape: the Dialog.
+  escape(dialogParts.content);
+  await Promise.resolve();
+  assert.equal(dialogParts.content.hidden, true, "second Escape closed the Dialog");
+});
+
+test("[OS-POP-9b] a press inside the Dialog but outside the Select closes only the Select", async () => {
+  const dialogParts = dialogShell();
+  dialogParts.dialog.open();
+
+  const root = document.createElement("div");
+  root.innerHTML = `
+    <div data-part="control">
+      <button data-part="trigger" type="button">Pick</button>
+      <span data-part="value">Placeholder</span>
+    </div>
+    <div data-part="popover">
+      <div data-part="list">
+        <div data-part="item" data-value="apple">Apple</div>
+      </div>
+    </div>
+  `;
+  dialogParts.content.append(root);
+  const select = createSelect(root, {});
+  cleanups.push(() => select.destroy());
+
+  const trigger = part(root, "trigger");
+  const popover = part(root, "popover");
+  trigger.click();
+  await Promise.resolve();
+  assert.equal(popover.hidden, false);
+
+  const elsewhere = document.createElement("p");
+  elsewhere.textContent = "other dialog content";
+  dialogParts.content.append(elsewhere);
+  pointer(elsewhere);
+  await Promise.resolve();
+
+  assert.equal(popover.hidden, true, "the press closed the Select");
+  assert.equal(dialogParts.content.hidden, false, "the Dialog stayed open");
+});
+
+test("[OS-POP-10] Select in a Popover in a Dialog: three Escapes, focus returns each time", async () => {
+  const dialogParts = dialogShell();
+  dialogParts.dialog.open();
+
+  // The middle layer: an overlay Popover inside the Dialog.
+  const popoverTrigger = document.createElement("button");
+  popoverTrigger.type = "button";
+  popoverTrigger.textContent = "Open popover";
+  const popoverContent = document.createElement("div");
+  popoverContent.textContent = "Popover";
+  dialogParts.content.append(popoverTrigger, popoverContent);
+  const popoverHost = createPopover({ trigger: popoverTrigger, content: popoverContent });
+  cleanups.push(() => popoverHost.destroy());
+  popoverHost.open();
+  await Promise.resolve();
+
+  const root = document.createElement("div");
+  root.innerHTML = `
+    <div data-part="control">
+      <button data-part="trigger" type="button">Pick</button>
+      <span data-part="value">Placeholder</span>
+    </div>
+    <div data-part="popover">
+      <div data-part="list">
+        <div data-part="item" data-value="apple">Apple</div>
+      </div>
+    </div>
+  `;
+  popoverContent.append(root);
+  const select = createSelect(root, {});
+  cleanups.push(() => select.destroy());
+
+  const trigger = part(root, "trigger");
+  const selectPopover = part(root, "popover");
+  trigger.click();
+  await Promise.resolve();
+  assert.equal(selectPopover.hidden, false, "the Select is open");
+
+  escape(trigger);
+  await Promise.resolve();
+  assert.equal(selectPopover.hidden, true, "1: the Select closed");
+  assert.equal(document.activeElement, trigger, "1: focus returned to the select trigger");
+
+  escape(popoverTrigger);
+  await Promise.resolve();
+  assert.equal(popoverContent.hidden, true, "2: the Popover closed");
+  assert.equal(document.activeElement, popoverTrigger, "2: focus returned to the popover trigger");
+
+  escape(dialogParts.content);
+  await Promise.resolve();
+  assert.equal(dialogParts.content.hidden, true, "3: the Dialog closed");
 });

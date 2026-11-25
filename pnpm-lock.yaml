@@ -399,6 +399,9 @@ importers:
         specifier: workspace:^
         version: link:../core
     devDependencies:
+      '@zealakit/overlay-vanilla':
+        specifier: link:../../../overlay/packages/vanilla
+        version: link:../../../overlay/packages/vanilla
       '@zealakit/ui-engine':
         specifier: link:../../../ui-engine
         version: link:../../../ui-engine
