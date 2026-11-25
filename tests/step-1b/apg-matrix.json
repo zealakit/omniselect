@@ -1,5 +1,5 @@
 {
-  "note": "APG rows (00-foundation-3 \u00a74). status: covered | todo; owner is the plan that fills a todo row.",
+  "note": "APG rows (00-foundation-3 §4). status: covered | todo; owner is the plan that fills a todo row.",
   "rows": [
     {
       "component": "select",
@@ -33,8 +33,9 @@
       "component": "combobox",
       "behaviour": "Alt+ArrowDown opens without moving the highlight",
       "keys": "Alt+ArrowDown",
-      "status": "todo",
-      "owner": "03-2"
+      "status": "covered",
+      "owner": "03-2",
+      "test": "packages/core/tests/select-machine.test.ts :: ArrowDown/ArrowUp open; Alt+ArrowDown opens without a highlight"
     },
     {
       "component": "typeahead",
