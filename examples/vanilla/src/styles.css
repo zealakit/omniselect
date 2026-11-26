@@ -175,6 +175,12 @@ pre {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
 
+/* The popover is closed with the `hidden` attribute; `display: flex` above
+   would override the UA rule and keep every closed list on screen. */
+[data-part="popover"][hidden] {
+  display: none;
+}
+
 [data-part="popover"][data-state="open"] {
   animation: omniselect-in 120ms ease-out;
 }
@@ -233,6 +239,12 @@ pre {
   padding: 0.375rem 0.5rem;
   border-radius: 0.375rem;
   cursor: pointer;
+}
+
+/* Filtered-out items are closed with the `hidden` attribute; `display: flex`
+   above would override the UA rule and keep them visible. */
+[data-part="item"][hidden] {
+  display: none;
 }
 
 [data-part="item"][data-highlighted] {

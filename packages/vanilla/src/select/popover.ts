@@ -87,6 +87,9 @@ export function createPopoverController(options: PopoverControllerOptions): Popo
     });
     placement = result.placement;
     const style = options.popover.style;
+    // `computePosition` uses the fixed strategy; the panel is portaled to body,
+    // so it must be fixed too (the React adapter writes the same inline).
+    style.setProperty("position", "fixed");
     style.setProperty("left", `${result.x}px`);
     style.setProperty("top", `${result.y}px`);
     const [side = "bottom", align = "center"] = result.placement.split("-");

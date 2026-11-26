@@ -106,6 +106,10 @@ test("[OS-POP-2] open: the popover is visible, placed, and labelled by side/alig
   assert.equal(popover.hidden, false);
   assert.match(popover.dataset.side ?? "", /^(top|bottom|left|right)$/);
   assert.match(popover.dataset.align ?? "", /^(start|center|end)$/);
+  // The controller writes viewport coordinates from `computePosition` with the
+  // fixed strategy, so the panel itself must be fixed (the React adapter does
+  // the same inline).
+  assert.equal(popover.style.getPropertyValue("position"), "fixed");
 });
 
 test("[OS-POP-3] open: the anchor width and available height variables are set", () => {
