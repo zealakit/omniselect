@@ -85,7 +85,7 @@ runPopoverContract("vue", async () => {
 
 runSsrRow("vue", () => renderToString(createSSRApp(App)));
 
-// Q4: OS-POP-9/9b/10 against the linked Overlay pilot (dev dependency).
+// OS-POP-9/9b/10: hosts built from the engine stand for a dialog and a popover (X36).
 import {
   Dialog,
   DialogContent,
@@ -93,7 +93,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@zealakit/overlay-vue";
+} from "./support/engine-hosts.ts";
 import { test } from "node:test";
 
 const clickAt = (element: Element | null) =>

@@ -67,7 +67,6 @@
   },
   "devDependencies": {
     "@sveltejs/package": "^3.0.2",
-    "@zealakit/overlay-svelte": "link:../../../overlay/packages/svelte",
     "@zealakit/ui-engine": "link:../../../ui-engine",
     "happy-dom": "^21.0.4",
     "svelte": "^5.57.3",

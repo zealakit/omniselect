@@ -1,21 +1,16 @@
 <script lang="ts">
-  import {
-    Dialog,
-    DialogContent,
-    DialogTrigger,
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-  } from "@zealakit/overlay-svelte";
+  import Host from "./engine-host.svelte";
+  import Trigger from "./engine-trigger.svelte";
+  import Content from "./engine-content.svelte";
   import { Select } from "../../dist/select/index.js";
 </script>
 
-<Dialog>
-  <DialogTrigger data-testid="dialog-trigger">Open dialog</DialogTrigger>
-  <DialogContent data-testid="dialog-content">
-    <Popover>
-      <PopoverTrigger data-testid="popover-trigger">Open popover</PopoverTrigger>
-      <PopoverContent data-testid="popover-content">
+<Host modal>
+  <Trigger data-testid="dialog-trigger">Open dialog</Trigger>
+  <Content data-testid="dialog-content">
+    <Host>
+      <Trigger data-testid="popover-trigger">Open popover</Trigger>
+      <Content data-testid="popover-content">
         <Select.Root>
           <Select.Label>Fruit</Select.Label>
           <Select.Control>
@@ -30,7 +25,7 @@
             </Select.List>
           </Select.Popover>
         </Select.Root>
-      </PopoverContent>
-    </Popover>
-  </DialogContent>
-</Dialog>
+      </Content>
+    </Host>
+  </Content>
+</Host>

@@ -1,18 +1,17 @@
 ---
-description: Zealakit Omniselect monorepo conventions — package boundaries, Overlay dependency, SSR safety, build order
+description: Zealakit Omniselect monorepo conventions — package boundaries, engine dependency, SSR safety, build order
 alwaysApply: true
 ---
 
 # Zealakit Omniselect conventions
 
 - `@zealakit/omniselect-core` is framework-independent and has zero runtime dependencies. It
-  never imports React / Vue / Svelte or Overlay.
-- Adapters (`vanilla`, `react`, `vue`, `svelte`) depend on core with `workspace:^` and on the
-  published `@zealakit/overlay-<same framework>`; core depends on no adapter. Keep the graph
-  acyclic.
-- Floating UI, layers, dismissal, focus, and portal come only from `@zealakit/overlay-<fw>` via
-  its public exports. Never copy Overlay code, import `@zealakit/overlay-core` or
-  `@floating-ui/*`, or deep-import Overlay's `dist`.
+  never imports React / Vue / Svelte.
+- Adapters (`vanilla`, `react`, `vue`, `svelte`) depend on core with `workspace:^` and peer
+  `@zealakit/ui-engine`; core depends on no adapter. Keep the graph acyclic.
+- Floating UI, layers, dismissal, focus and portal come from `@zealakit/ui-engine` public entries.
+  Never import another component package (X36) or `@floating-ui/*`, or deep-import the engine's
+  `dist`.
 - SSR safety: no `window` / `document` access at module init or during render. Use framework
   lifecycle hooks for DOM effects.
 - Do not ship default CSS or a styling system. Styling is the consumer's job (`data-*` hooks OK).

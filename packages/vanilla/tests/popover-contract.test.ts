@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import { beforeEach, test } from "node:test";
-import { createDialog, createPopover } from "@zealakit/overlay-vanilla";
+import { createDialog, createPopover } from "./support/engine-hosts.ts";
 import { createSelect } from "../dist/select/index.js";
 
 /**
  * `[OS-POP-1…12]` contract for the vanilla Select — the behaviour the popover
  * controller must keep (03-2 Step 1). Items 8–10 run here too: 8 is the IME
- * composition rule (E2), and 9–10 use the **linked overlay pilot** (no fakes),
- * which is the original blocker: a Select inside a Dialog must not close it.
+ * composition rule (E2), and 9–10 host the Select in a dialog and popover built from the engine (X36),
+ * for the original blocker: a Select inside a Dialog must not close it.
  */
 
 function host(): HTMLElement {

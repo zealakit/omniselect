@@ -1,18 +1,4 @@
-import { createRequire, registerHooks } from "node:module";
-import { pathToFileURL } from "node:url";
 import { Window } from "happy-dom";
-
-// The Overlay pilot is a `link:` dependency: pin Vue imports from it to this copy.
-const requireFromHere = createRequire(import.meta.url);
-const vueUrl = pathToFileURL(requireFromHere.resolve("vue")).href;
-registerHooks({
-  resolve(specifier, context, nextResolve) {
-    if (specifier === "vue" && context.parentURL?.includes("/overlay/")) {
-      return { url: vueUrl, shortCircuit: true };
-    }
-    return nextResolve(specifier, context);
-  },
-});
 
 /**
  * Register a DOM before Vue and the adapter are imported. `--import` runs this

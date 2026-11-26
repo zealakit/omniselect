@@ -72,14 +72,14 @@ pnpm monitor      # dependency dashboard at http://127.0.0.1:4177
   another Omniselect adapter. No circular dependencies.
 - **Core has zero runtime dependencies** and no DOM-framework or styling code.
 - **Floating behavior comes only from `@zealakit/ui-engine`** — `createLayer` for dismissal,
-  `computePosition`/`autoUpdate` from `/position` for placement. Never import an
-  `@zealakit/overlay-*` adapter (X4 removed overlay from the runtime path), never import
+  `computePosition`/`autoUpdate` from `/position` for placement. Never import another
+  component package (X36), never import
   `@floating-ui/*`, never deep-import the engine's `dist`. The listbox keeps its own ARIA and
   owns its portal.
 - **Engine dependency:** `@zealakit/ui-engine` is a **peer** (`^1.0.0-beta.1`) plus a
   `link:../../../ui-engine` dev dependency while unpublished (D23); it is never a runtime
   dependency and is never bundled. `DismissReason` is a deprecated alias of omniselect's own
-  `SelectDismissReason`, not an overlay type.
+  `SelectDismissReason`.
 - **Tests:** new behavior needs focused tests in the owning package (`packages/*/tests/`);
   run `pnpm test`. Do not add a second test framework or DOM library.
 - **Lint and format:** use `oxlint` and `oxfmt` (Oxc), not another linter/formatter. Suppression
@@ -99,7 +99,7 @@ pnpm monitor      # dependency dashboard at http://127.0.0.1:4177
   and drops the Core dependency. Core keeps **no page-global state**: ids, live regions, layers
   and the gesture claim belong to the engine, which is shared across copies through its own
   versioned protocol (X11, spec §3). Never document Core as an install or configuration
-  entry point. No adapter tarball depends on an `@zealakit/overlay-*` package any more.
+  entry point. No adapter tarball depends on another component package.
 - **Scope:** Select and Combobox (`Select` with an optional `Select.Input`) plus `NativeSelect`.
   No bundled CSS/themes, no schema validation, no JS animation engine. Virtualization,
   creatable options, and built-in tag components are out of scope unless explicitly requested.

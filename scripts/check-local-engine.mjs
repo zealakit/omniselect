@@ -7,8 +7,6 @@
  * The engine stays unpublished (D23), so every package repo is developed against
  * `link:../../../ui-engine`. A release must switch those to the published range
  * first; this guard makes publishing from the development state impossible. It
- * also covers `@zealakit/overlay-*`, which a repo may link while the overlay
- * pilot is the release candidate.
  *
  * It is deliberately **not** part of `pnpm check` (the branch is linked on
  * purpose) — it is chained in front of every publish and release script.
@@ -20,7 +18,7 @@ import { fileURLToPath } from "node:url";
 const rootDir = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const LOCAL_PREFIXES = ["link:", "file:"];
 /** A local link is only a problem for packages this repo would publish. */
-const LINKED_PACKAGES = [/^@zealakit\/ui-engine$/, /^@zealakit\/overlay-/];
+const LINKED_PACKAGES = [/^@zealakit\/ui-engine$/];
 const failures = [];
 
 function isLinked(value) {
@@ -63,7 +61,7 @@ if (existsSync(lockfilePath)) {
       LINKED_PACKAGES.some((pattern) => pattern.test(trimmed) || trimmed.includes("@zealakit/"))
     ) {
       // Only the engine/overlay entries matter; core links are internal.
-      if (trimmed.includes("ui-engine") || trimmed.includes("overlay-")) {
+      if (trimmed.includes("ui-engine")) {
         failures.push(`pnpm-lock.yaml: ${trimmed}`);
       }
     }

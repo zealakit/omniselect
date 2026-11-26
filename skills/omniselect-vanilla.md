@@ -8,7 +8,7 @@ description: >-
 # Omniselect for Vanilla
 
 Use `@zealakit/omniselect-vanilla` for headless Select and Combobox primitives. The package owns selection state,
-keyboard navigation, and ARIA wiring on top of `@zealakit/overlay-vanilla`. You own all CSS and
+keyboard navigation, and ARIA wiring on top of `@zealakit/ui-engine`. You own all CSS and
 visual markup.
 
 `@zealakit/omniselect-core` is an internal package bundled inside the adapter and not published
@@ -23,8 +23,8 @@ npm install @zealakit/omniselect-vanilla
 ```
 
 No peer dependencies.
-`@zealakit/overlay-vanilla` is installed automatically. If the app also uses Overlay directly,
-keep its Overlay adapter on the same major version.
+Install `@zealakit/ui-engine` as well: it is a required peer, shared by every Zealakit component
+on the page.
 
 ## Import
 
@@ -33,7 +33,7 @@ import { createNativeSelect } from "@zealakit/omniselect-vanilla/native";
 import { createSelect } from "@zealakit/omniselect-vanilla/select";
 ```
 
-Import from the `/native` entry so Overlay stays out of the bundle.
+Import from the `/native` entry so the floating listbox stays out of the bundle.
 
 ## NativeSelect
 
@@ -61,7 +61,7 @@ const select = createSelect(rootElement, {
 - Place `Clear` and `Indicator` beside the trigger inside `Control`, never inside `Trigger`. `Item`, `Group`, and `Empty` go inside `List`.
 - Items register while the popover is mounted. For a selected value without a mounted item, pass `itemToString`; set `forceMount` on `Popover` to keep items registered (needed for type-ahead while closed).
 - Items are `data-part="item"` elements with `data-value`; call `select.refresh()` after changing markup. Style with `data-state`, `data-highlighted`, `data-selected`, `data-disabled`, `data-placeholder`, and `--omniselect-anchor-width`. Animate exit with CSS only; `Popover` stays mounted until it ends.
-- Inside a modal Overlay Dialog, set `portal: null` in the options (a modal marks other body children inert).
+- Inside a modal dialog that makes the rest of the page inert, set `portal: null` in the options (a modal marks other body children inert).
 - Add `Select.Input` for a searchable combobox: the input takes `role="combobox"` and keeps focus, the trigger becomes a plain button (`triggerLabel`), and items are filtered as the user types (`filter`, `filter=false` for outside/async filtering, `selectionBehavior`, `restoreOnBlur`, `openOnFocus`). Never put focus in the list.
 - Popover search: put `Select.Input` inside `Select.Popover` above the list; the trigger stays a plain select control, the input is focused on open, starts empty, and clears on close (Backspace never removes chips there). In the inline combobox, pressing the control background focuses the input. Item labels ignore `aria-hidden`/`ItemIndicator` text.
 - `multiple` selects an array (the list stays open; `Value` exposes `items`, `remove`, `clear` for chips; `maxSelected` caps picks). `name` or `required` adds a hidden native `<select>` so the value joins `<form>`/`FormData`, validation, and reset like `NativeSelect`; object values submit their `itemToKey`.

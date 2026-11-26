@@ -1,25 +1,8 @@
 import { readFileSync } from "node:fs";
-import { createRequire, registerHooks } from "node:module";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { registerHooks } from "node:module";
+import { fileURLToPath } from "node:url";
 import { compile } from "svelte/compiler";
 import { Window } from "happy-dom";
-
-// The Overlay pilot is a `link:` dependency: pin Svelte imports from it to this copy.
-const requireFromHere = createRequire(import.meta.url);
-const sveltePackages: Record<string, string> = {};
-for (const name of [
-  "svelte",
-  "svelte/internal",
-  "svelte/internal/client",
-  "svelte/store",
-  "svelte/reactivity",
-]) {
-  try {
-    sveltePackages[name] = pathToFileURL(requireFromHere.resolve(name)).href;
-  } catch {
-    // Not every subpath is exported at run time.
-  }
-}
 
 /** Register a DOM before the built adapter is imported. */
 const window = new Window({ url: "http://localhost/" });
@@ -77,12 +60,6 @@ for (const [key, value] of Object.entries(values)) {
 
 /** Compile `.svelte` files on import so tests can load the built components. */
 registerHooks({
-  resolve(specifier, context, nextResolve) {
-    const target = sveltePackages[specifier];
-    if (target && context.parentURL?.includes("/overlay/"))
-      return { url: target, shortCircuit: true };
-    return nextResolve(specifier, context);
-  },
   load(url, context, nextLoad) {
     if (url.endsWith(".svelte")) {
       const filename = fileURLToPath(url);

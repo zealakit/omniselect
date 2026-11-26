@@ -65,7 +65,6 @@
     "@testing-library/react": "^16.3.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@zealakit/overlay-react": "link:../../../overlay/packages/react",
     "@zealakit/ui-engine": "link:../../../ui-engine",
     "happy-dom": "^21.0.4",
     "react": "^19.3.1",

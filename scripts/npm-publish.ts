@@ -591,29 +591,7 @@ function assertPackedEntryPoints(pkg: PackageConfig, packed: PackageJson): void 
   }
 }
 
-const OVERLAY_SCOPE = "@zealakit/overlay-";
-
-/** Exactly one Overlay runtime dependency: the adapter for the same framework. */
-function assertOverlayDependency(pkg: PackageConfig, packed: PackageJson): void {
-  const overlays = Object.keys(packed.dependencies ?? {}).filter((name) =>
-    name.startsWith(OVERLAY_SCOPE),
-  );
-  const expected = `${OVERLAY_SCOPE}${pkg.id}`;
-  if (overlays.length !== 1 || overlays[0] !== expected) {
-    fail(
-      `${pkg.label} tarball must depend on exactly ${expected} from Overlay (found ${
-        overlays.length > 0 ? overlays.join(", ") : "none"
-      }).`,
-    );
-  }
-  for (const field of DEPENDENCY_FIELDS) {
-    if (packed[field]?.[`${OVERLAY_SCOPE}core`]) {
-      fail(`${pkg.label} tarball lists ${OVERLAY_SCOPE}core in ${field}.`);
-    }
-  }
-}
-
-/** Omniselect Core may only appear under the vendored folder; Overlay Core nowhere. */
+/** Omniselect Core may only appear under the vendored folder. */
 function assertNoStrayCoreReferences(pkg: PackageConfig, tarball: string, entries: string[]): void {
   for (const entry of entries) {
     if (!/\.(js|d\.ts|svelte|json)$/.test(entry)) {
@@ -625,9 +603,6 @@ function assertNoStrayCoreReferences(pkg: PackageConfig, tarball: string, entrie
     const content = runCaptured("tar", ["-xOzf", tarball, entry], PROJECT_ROOT).stdout;
     if (entry !== "package/package.json" && content.includes(CORE_NAME)) {
       fail(`${pkg.label} tarball references ${CORE_NAME} outside ${VENDOR_DIR}: ${entry}`);
-    }
-    if (content.includes("@zealakit/overlay-core")) {
-      fail(`${pkg.label} tarball references @zealakit/overlay-core: ${entry}`);
     }
   }
 }

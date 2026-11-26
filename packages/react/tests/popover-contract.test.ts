@@ -85,7 +85,7 @@ runPopoverContract("react", async () => {
 
 runSsrRow("react", () => renderToString(tree() as never));
 
-// Q4: OS-POP-9/9b/10 against the linked Overlay pilot (dev dependency).
+// OS-POP-9/9b/10: hosts built from the engine stand for a dialog and a popover (X36).
 import {
   Dialog,
   DialogContent,
@@ -93,7 +93,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@zealakit/overlay-react";
+} from "./support/engine-hosts.ts";
 import { fireEvent } from "@testing-library/react";
 import type { ComponentType } from "react";
 const anyPart = (component: unknown) => component as ComponentType<Record<string, unknown>>;

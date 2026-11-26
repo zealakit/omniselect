@@ -3,7 +3,7 @@ name: omniselect-architecture
 description: >-
   Use for any Zealakit Omniselect code, test, documentation, or release work:
   deciding where logic belongs, implementing packages, keeping Core and
-  adapters separated, using the Overlay dependency, validating behavior, and
+  adapters separated, using the engine dependency, validating behavior, and
   packaging releases.
 ---
 
@@ -25,7 +25,7 @@ READMEs (EN/VI/CN) -> product documentation
 
 - **Core** (`packages/core`) owns framework-independent logic: selection model, option
   collection, keyboard navigation, type-ahead, filtering, ids. It has no DOM-framework or
-  Overlay imports.
+  engine imports.
 - **Adapters** own framework lifecycle and idiomatic APIs, and float the listbox on the engine:
   `createLayer` for dismissal, `computePosition`/`autoUpdate` from `/position` for placement,
   and their own portal (`createPortal`, `Teleport`, a portal action, or a DOM move).
@@ -56,8 +56,8 @@ omniselect/
 
 ## Boundaries
 
-- Dependency direction: adapters → Core, adapters → same-framework Overlay adapter.
-- Core never imports an adapter, a framework, or Overlay. No adapter imports another adapter.
+- Dependency direction: adapters → Core, adapters → `@zealakit/ui-engine` (peer).
+- Core never imports an adapter or a framework. No adapter imports another adapter.
 - No default CSS or styling system.
 - No speculative APIs, placeholders, or unimplemented components.
 - Keep `workspace:^` for Core in adapter manifests.
@@ -71,10 +71,8 @@ omniselect/
 | vue | `@zealakit/ui-engine` | `createLayer`, `computePosition`, `autoUpdate` | `Teleport` |
 | svelte | `@zealakit/ui-engine` | `createLayer`, `computePosition`, `autoUpdate` | `portal` action |
 
-- **No `@zealakit/overlay-*` adapter is used or declared.** X4 chose the engine-direct popover:
-  a Select inside an overlay Dialog used to close both on one Escape, because the published
-  overlay carried its own Escape stack. On the engine they share one stack, so one Escape closes
-  one layer.
+- **No other component package is used or declared (X36).** Components share the engine's one
+  layer stack, so one Escape closes one layer.
 - No focus scope: DOM focus stays on the trigger or the search input and the active option is
   exposed with `aria-activedescendant`, so the listbox keeps combobox semantics.
 - The engine is a peer, never a dependency and never bundled; the size script externalises it.
@@ -100,7 +98,7 @@ all but the first value of a `<select multiple>`) and avoid putting DOM nodes in
 ## Change workflow
 
 1. Identify the owning package and existing tests.
-2. Put shared contracts and logic in Core; framework lifecycle and Overlay glue in the adapter.
+2. Put shared contracts and logic in Core; framework lifecycle and engine glue in the adapter.
 3. Use TypeScript `type` aliases, `import type`, explicit `.js` relative imports.
 4. Keep imports SSR-safe: no browser globals at module init or during render.
 5. Clean up listeners, observers, layers, portals, and focus handling.
@@ -151,8 +149,7 @@ when the finding no longer applies.
 - Preflight: `pnpm install --frozen-lockfile`, `pnpm clean`, `pnpm check`, `pnpm readme:check`,
   build every example, then `pnpm pack:packages` (tarballs in `artifacts/`, no publish).
 - Inspect each adapter tarball: only `package.json`, `README*.md`, `LICENSE`, and `dist/**`; no
-  `workspace:`; no `@zealakit/omniselect-core` outside `dist/vendor/core/`; exactly one
-  `@zealakit/overlay-*` dependency at all; `main`/`module`/
+  `workspace:`; no `@zealakit/omniselect-core` outside `dist/vendor/core/`; no other component package in any dependency field; `main`/`module`/
   `types`/`exports` point into `dist`; no sources, tests, source maps, or credentials.
 - Validate tarballs in temporary projects outside the repository, never with `workspace:*`
   aliases.

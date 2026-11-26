@@ -62,7 +62,6 @@
   },
   "devDependencies": {
     "@vue/test-utils": "^2.6.0",
-    "@zealakit/overlay-vue": "link:../../../overlay/packages/vue",
     "@zealakit/ui-engine": "link:../../../ui-engine",
     "happy-dom": "^21.0.4",
     "vue": "^3.5.45"
