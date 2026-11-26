@@ -48,8 +48,7 @@ export function PopoverSearch({ multiple = false }: { multiple?: boolean }) {
             {multiple
               ? ({ items, remove }) =>
                   items.map((item) => (
-                    <button
-                      type="button"
+                    <span
                       key={item.key}
                       className="chip"
                       onClick={(event) => {
@@ -58,7 +57,7 @@ export function PopoverSearch({ multiple = false }: { multiple?: boolean }) {
                       }}
                     >
                       {item.label} ×
-                    </button>
+                    </span>
                   ))
               : undefined}
           </Select.Value>

@@ -171,8 +171,7 @@ export function FormDemo() {
                   <Select.Value placeholder="Pick fruits">
                     {({ items, remove }) =>
                       items.map((item) => (
-                        <button
-                          type="button"
+                        <span
                           key={item.key}
                           className="chip"
                           onClick={(event) => {
@@ -181,7 +180,7 @@ export function FormDemo() {
                           }}
                         >
                           {item.label} ×
-                        </button>
+                        </span>
                       ))
                     }
                   </Select.Value>

@@ -116,8 +116,7 @@ export function App() {
               <Select.Value placeholder="Pick fruit">
                 {({ items, remove }) =>
                   items.map((item) => (
-                    <button
-                      type="button"
+                    <span
                       key={item.key}
                       className="chip"
                       onClick={(event) => {
@@ -126,7 +125,7 @@ export function App() {
                       }}
                     >
                       {item.label} ×
-                    </button>
+                    </span>
                   ))
                 }
               </Select.Value>
