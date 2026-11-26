@@ -12,6 +12,9 @@
     },
     "@zealakit/omniselect-vue": {
       "gzip": 9506
+    },
+    "@zealakit/omniselect-core": {
+      "gzip": 13688
     }
   }
 }
