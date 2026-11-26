@@ -86,7 +86,14 @@ runPopoverContract("vue", async () => {
 runSsrRow("vue", () => renderToString(createSSRApp(App)));
 
 // Q4: OS-POP-9/9b/10 against the linked Overlay pilot (dev dependency).
-import { Dialog, DialogContent, DialogTrigger } from "@zealakit/overlay-vue";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@zealakit/overlay-vue";
 import { test } from "node:test";
 
 const clickAt = (element: Element | null) =>
@@ -184,6 +191,58 @@ test("[OS-POP-9b] a press inside the Dialog but outside the Select closes only t
   wrapper.unmount();
 });
 
-// OS-POP-10 (Select in an Overlay Popover in a Dialog) is **open for Vue**: the
-// Select trigger inside the overlay Popover content does not open the Select in
-// this harness (measured 2026-11-26). React and vanilla cover the three-layer row.
+test("[OS-POP-10] Select in a Popover in a Dialog: three Escapes, focus returns each time", async () => {
+  mountInDialog(() =>
+    h(Popover, null, {
+      default: () => [
+        h(PopoverTrigger, { "data-testid": "popover-trigger" }, () => "Open popover"),
+        h(
+          PopoverContent,
+          { "data-testid": "popover-content" },
+          { default: () => h(SelectApp as never) },
+        ),
+      ],
+    }),
+  );
+  await flush();
+  clickAt(document.querySelector('[data-testid="dialog-trigger"]'));
+  await flush();
+  clickAt(document.querySelector('[data-testid="popover-trigger"]'));
+  await flush();
+  const popoverTrigger = document.querySelector<HTMLElement>('[data-testid="popover-trigger"]');
+  const selectTrigger = part("trigger");
+  selectTrigger.dispatchEvent(
+    new window.PointerEvent("pointerdown", { bubbles: true, button: 0, isPrimary: true }),
+  );
+  clickAt(selectTrigger);
+  await flush();
+  assert.equal(selectOpen(), true, "the Select is open");
+
+  selectTrigger.dispatchEvent(
+    new window.KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }),
+  );
+  await flush();
+  assert.equal(selectOpen(), false, "1: the Select closed");
+  assert.ok(
+    selectTrigger.closest('[data-part="control"]')?.contains(document.activeElement),
+    "1: focus returned into the Select control",
+  );
+
+  document.activeElement?.dispatchEvent(
+    new window.KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }),
+  );
+  await flush();
+  assert.equal(
+    document.querySelector('[data-testid="popover-content"]')?.getAttribute("data-state") ??
+      "closed",
+    "closed",
+    "2: the Popover closed",
+  );
+  assert.equal(document.activeElement, popoverTrigger, "2: focus returned to the popover trigger");
+
+  document.activeElement?.dispatchEvent(
+    new window.KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }),
+  );
+  await flush();
+  assert.equal(dialogOpen(), false, "3: the Dialog closed");
+});

@@ -72,6 +72,7 @@ void runSsrRow;
 // Q4: OS-POP-9/9b/10 against the linked Overlay pilot (dev dependency).
 import { test } from "node:test";
 import DialogFixture from "./fixtures/os-pop-dialog.svelte";
+import DialogPopoverFixture from "./fixtures/os-pop-dialog-popover.svelte";
 
 const dialogOpen = () =>
   document.querySelector('[data-testid="dialog-content"]')?.getAttribute("data-state") === "open";
@@ -134,7 +135,55 @@ test("[OS-POP-9b] a press inside the Dialog but outside the Select closes only t
   target.remove();
 });
 
-// OS-POP-10 (Select in an Overlay Popover in a Dialog) is **open for Svelte**:
-// clicking the Select trigger inside the overlay Popover content does not open
-// the Select popover (measured 2026-11-26; no popover element is rendered).
-// React and Vue cover the three-layer row.
+test("[OS-POP-10] Select in a Popover in a Dialog: three Escapes, focus returns each time", async () => {
+  const target = document.createElement("div");
+  document.body.append(target);
+  const instance = mount(DialogPopoverFixture, { target });
+  await settle();
+  document.querySelector<HTMLElement>('[data-testid="dialog-trigger"]')?.click();
+  await settle();
+  const popoverTrigger = document.querySelector<HTMLElement>('[data-testid="popover-trigger"]');
+  popoverTrigger?.dispatchEvent(
+    new window.PointerEvent("pointerdown", { bubbles: true, button: 0, isPrimary: true }),
+  );
+  popoverTrigger?.click();
+  await settle();
+
+  const selectTrigger = part("trigger");
+  selectTrigger.dispatchEvent(
+    new window.PointerEvent("pointerdown", { bubbles: true, button: 0, isPrimary: true }),
+  );
+  selectTrigger.click();
+  await settle();
+  assert.equal(selectOpen(), true, "the Select is open");
+
+  selectTrigger.dispatchEvent(
+    new window.KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }),
+  );
+  await settle();
+  assert.equal(selectOpen(), false, "1: the Select closed");
+  assert.ok(
+    selectTrigger.closest('[data-part="control"]')?.contains(document.activeElement),
+    "1: focus returned into the Select control",
+  );
+
+  document.activeElement?.dispatchEvent(
+    new window.KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }),
+  );
+  await settle();
+  assert.equal(
+    document.querySelector('[data-testid="popover-content"]')?.getAttribute("data-state") ??
+      "closed",
+    "closed",
+    "2: the Popover closed",
+  );
+  assert.equal(document.activeElement, popoverTrigger, "2: focus returned to the popover trigger");
+
+  document.activeElement?.dispatchEvent(
+    new window.KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }),
+  );
+  await settle();
+  assert.equal(dialogOpen(), false, "3: the Dialog closed");
+  void unmount(instance);
+  target.remove();
+});
