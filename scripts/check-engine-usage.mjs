@@ -6,7 +6,7 @@
  *  - lists the engine or another `@zealakit/*` component in `dependencies`
  *    (NS1, spec §2.2), or a package that never imports the engine declares it;
  *  - imports the engine while missing the peer, or with the wrong peer range
- *    (X23: `/internal` importers pin `~<minor>`, others use `^1.0.0-beta.1`);
+ *    (X23: `/internal` importers pin the exact `1.0.0-beta.1`, others use `^1.0.0-beta.1`);
  *  - still duplicates engine-owned behaviour: its own `getGlobalState` or
  *    `Symbol.for("@zealakit/` key, an announcement live region it creates, or a
  *    document-level dismissal listener (NQ2);
@@ -18,6 +18,7 @@
  * list must shrink, never grow, without one.
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
+import { expectedEnginePeer } from "./lib/engine-peer.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -109,7 +110,7 @@ for (const name of PACKAGES) {
       fail("NS1", `${name}: imports ${ENGINE} but has no peerDependencies entry`);
     } else {
       const internal = srcText.includes(`${ENGINE}/internal`);
-      const expected = internal ? "~1.0.0-beta.1" : "^1.0.0-beta.1";
+      const expected = expectedEnginePeer(internal);
       if (peer !== expected) {
         fail(
           "X23",
