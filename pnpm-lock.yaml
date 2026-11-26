@@ -358,6 +358,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.3.0
         version: 19.3.0(@types/react@19.3.0)
+      '@zealakit/overlay-react':
+        specifier: link:../../../overlay/packages/react
+        version: link:../../../overlay/packages/react
       '@zealakit/ui-engine':
         specifier: link:../../../ui-engine
         version: link:../../../ui-engine
@@ -380,6 +383,9 @@ importers:
       '@sveltejs/package':
         specifier: ^3.0.2
         version: 3.0.3(svelte@5.58.0)(typescript@6.0.3)
+      '@zealakit/overlay-svelte':
+        specifier: link:../../../overlay/packages/svelte
+        version: link:../../../overlay/packages/svelte
       '@zealakit/ui-engine':
         specifier: link:../../../ui-engine
         version: link:../../../ui-engine
@@ -418,6 +424,9 @@ importers:
       '@vue/test-utils':
         specifier: ^2.6.0
         version: 2.6.0(@vue/compiler-dom@3.5.45)(@vue/server-renderer@3.5.45)(vue@3.5.45(typescript@6.0.3))
+      '@zealakit/overlay-vue':
+        specifier: link:../../../overlay/packages/vue
+        version: link:../../../overlay/packages/vue
       '@zealakit/ui-engine':
         specifier: link:../../../ui-engine
         version: link:../../../ui-engine

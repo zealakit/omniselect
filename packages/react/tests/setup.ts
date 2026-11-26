@@ -1,4 +1,27 @@
+import { createRequire, registerHooks } from "node:module";
+import { pathToFileURL } from "node:url";
 import { Window } from "happy-dom";
+
+// The Overlay pilot is a `link:` dependency: pin React imports from it to this copy.
+const requireFromHere = createRequire(import.meta.url);
+const reactPackages: Record<string, string> = {};
+for (const name of [
+  "react",
+  "react-dom",
+  "react/jsx-runtime",
+  "react/jsx-dev-runtime",
+  "react-dom/client",
+]) {
+  reactPackages[name] = pathToFileURL(requireFromHere.resolve(name)).href;
+}
+registerHooks({
+  resolve(specifier, context, nextResolve) {
+    const target = reactPackages[specifier];
+    if (target && context.parentURL?.includes("/overlay/"))
+      return { url: target, shortCircuit: true };
+    return nextResolve(specifier, context);
+  },
+});
 
 /**
  * Register a DOM before React and the adapter are imported. `--import` runs
