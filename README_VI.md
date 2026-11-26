@@ -33,9 +33,13 @@ Hãy cài một adapter cho framework của bạn cùng `@zealakit/ui-engine`, t
 
 ```bash
 npm i @zealakit/omniselect-vanilla
+npm i @zealakit/ui-engine   # peer
 npm i @zealakit/omniselect-react
+npm i @zealakit/ui-engine   # peer
 npm i @zealakit/omniselect-vue
+npm i @zealakit/ui-engine   # peer
 npm i @zealakit/omniselect-svelte
+npm i @zealakit/ui-engine   # peer
 
 # or yarn, pnpm, ...
 ```

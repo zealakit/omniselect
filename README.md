@@ -33,9 +33,13 @@ Install one adapter for your framework plus `@zealakit/ui-engine`, which every a
 
 ```bash
 npm i @zealakit/omniselect-vanilla
+npm i @zealakit/ui-engine   # peer
 npm i @zealakit/omniselect-react
+npm i @zealakit/ui-engine   # peer
 npm i @zealakit/omniselect-vue
+npm i @zealakit/ui-engine   # peer
 npm i @zealakit/omniselect-svelte
+npm i @zealakit/ui-engine   # peer
 
 # or yarn, pnpm, ...
 ```

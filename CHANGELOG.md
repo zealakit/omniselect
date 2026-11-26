@@ -14,6 +14,10 @@ file records what changed while the branch runs against the local `@zealakit/ui-
   the old name stays as a deprecated alias of it, so existing imports keep compiling.
 - Generated ids are `zealakit-omniselect-N` instead of `omniselect-N` (relations unchanged).
 
+### Fixed
+
+- The vanilla Select's popover is positioned with `position: fixed` and appears next to its trigger (before, it sat in normal flow at the end of the document); a closed list and filtered-out items are no longer left visible.
+
 ### Changed
 
 - The listbox floats on the engine's layer stack and `/position` (X4): one Escape closes one

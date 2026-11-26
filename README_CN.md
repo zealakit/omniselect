@@ -33,9 +33,13 @@ Omniselect 只处理选择状态、键盘导航、无障碍属性以及与 Overl
 
 ```bash
 npm i @zealakit/omniselect-vanilla
+npm i @zealakit/ui-engine   # peer
 npm i @zealakit/omniselect-react
+npm i @zealakit/ui-engine   # peer
 npm i @zealakit/omniselect-vue
+npm i @zealakit/ui-engine   # peer
 npm i @zealakit/omniselect-svelte
+npm i @zealakit/ui-engine   # peer
 
 # or yarn, pnpm, ...
 ```

@@ -17,6 +17,7 @@ Style the parts with your own CSS and `data-*` state attributes. Omniselect ship
 
 ```bash
 npm install @zealakit/omniselect-react
+npm install @zealakit/ui-engine   # peer
 
 # or yarn, pnpm, ...
 ```

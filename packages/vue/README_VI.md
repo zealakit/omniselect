@@ -17,6 +17,7 @@ Style các phần bằng CSS của bạn và các thuộc tính trạng thái `d
 
 ```bash
 npm install @zealakit/omniselect-vue
+npm install @zealakit/ui-engine   # peer
 
 # or yarn, pnpm, ...
 ```

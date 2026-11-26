@@ -17,6 +17,7 @@
 
 ```bash
 npm install @zealakit/omniselect-react
+npm install @zealakit/ui-engine   # peer
 
 # or yarn, pnpm, ...
 ```
