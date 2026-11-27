@@ -181,12 +181,16 @@ pre {
   display: none;
 }
 
+[data-part="popover"][hidden] {
+  display: none;
+}
+
 [data-part="popover"][data-state="open"] {
   animation: omniselect-in 120ms ease-out;
 }
 
 [data-part="popover"][data-state="closed"] {
-  animation: omniselect-out 120ms ease-in;
+  animation: omniselect-out 120ms ease-in forwards;
 }
 
 [data-part="list"] {

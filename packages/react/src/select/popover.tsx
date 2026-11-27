@@ -146,7 +146,7 @@ export const Popover = forwardRef<HTMLDivElement, SelectPopoverProps>(function S
         event.preventDefault();
       }}
       ref={mergedRef}
-      hidden={!open}
+      hidden={!mounted && !open}
       data-state={open ? "open" : "closed"}
       data-side={side}
       data-align={align}

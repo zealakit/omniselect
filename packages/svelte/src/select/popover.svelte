@@ -91,7 +91,7 @@
       // Keep focus on the trigger/input (also when grabbing the scrollbar).
       event.preventDefault();
     }}
-    hidden={!open}
+    hidden={!mounted && !open}
     data-state={open ? "open" : "closed"}
     data-side={side}
     data-align={align}
